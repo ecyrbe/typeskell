@@ -40,6 +40,13 @@ describe("Result", () => {
     );
     expectTypeOf(result).toEqualTypeOf<R.Result<number, Error>>();
     expect(result).toEqual(R.ok(1));
+
+    const result2 = pipe(
+      data,
+      mapRight(bifunctor)((e) => e.message)
+    );
+    expectTypeOf(result2).toEqualTypeOf<R.Result<number, string>>();
+    expect(result2).toEqual(R.ok(0));
   });
 
   it("should map right on err result", () => {
@@ -50,5 +57,12 @@ describe("Result", () => {
     );
     expectTypeOf(result).toEqualTypeOf<R.Result<number, Error>>();
     expect(result).toEqual(R.err(new Error("error!")));
+
+    const result2 = pipe(
+      data,
+      mapLeft(bifunctor)((x) => x + 1)
+    );
+    expectTypeOf(result2).toEqualTypeOf<R.Result<number, string>>();
+    expect(result2).toEqual(R.err("error"));
   });
 });
