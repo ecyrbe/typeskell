@@ -1,34 +1,8 @@
 import { describe, it, expect, expectTypeOf } from "vitest";
-import { Functor, mapComposition, flap } from "@typeclass/functor";
-import { Kind, $ } from "@kinds";
+import { mapComposition, flap } from "@typeclass/functor";
 import { pipe } from "../pipe";
-
-// implementation for Array
-const A: Functor<Kind.Array> = {
-  map: (f) => (fa) => fa.map(f),
-};
-
-// implementation for Either
-type Result<A, E> = { kind: "error"; value: E } | { kind: "ok"; value: A };
-
-// type constructor for Either * -> * -> *
-interface TResult extends Kind.binary {
-  return: Result<this["arg0"], this["arg1"]>;
-}
-
-const ok = <A, E>(a: A): Result<A, E> => ({
-  kind: "ok",
-  value: a,
-});
-const fail = <A, E>(e: E): Result<A, E> => ({
-  kind: "error",
-  value: e,
-});
-
-const E: Functor<TResult> = {
-  map: (f) => (fa) =>
-    fa.kind === "error" ? fa : { kind: "ok", value: f(fa.value) },
-};
+import * as R from "@data/result";
+import * as A from "@data/array";
 
 describe("Functor", () => {
   it("should map an array", () => {
@@ -53,24 +27,24 @@ describe("Functor", () => {
   });
 
   it("should map with Either", () => {
-    const data = ok<number, Error>(0);
+    const data: R.Result<number, Error> = R.ok(0);
     const result = pipe(
       data,
-      E.map((x) => x + 1)
+      R.map((x) => x + 1)
     );
-    expectTypeOf(result).toEqualTypeOf<Result<number, Error>>();
-    expect(result).toEqual(ok<number, Error>(1));
+    expectTypeOf(result).toEqualTypeOf<R.Result<number, Error>>();
+    expect(result).toEqual(R.ok(1));
   });
 
   it("should map with Either twice", () => {
-    const data = ok<number, Error>(0);
+    const data: R.Result<number, Error> = R.ok(0);
     const result = pipe(
       data,
-      E.map((x) => x + 1),
-      E.map((x) => x * 2)
+      R.map((x) => x + 1),
+      R.map((x) => x * 2)
     );
-    expectTypeOf(result).toEqualTypeOf<Result<number, Error>>();
-    expect(result).toEqual(ok<number, Error>(2));
+    expectTypeOf(result).toEqualTypeOf<R.Result<number, Error>>();
+    expect(result).toEqual(R.ok(2));
   });
 
   it("should compose two array functors", () => {
@@ -80,8 +54,8 @@ describe("Functor", () => {
     ];
     const result = pipe(
       data,
-      mapComposition(A, A)((x) => x + 1),
-      mapComposition(A, A)((x) => ({ x }))
+      mapComposition(A.functor, A.functor)((x) => x + 1),
+      mapComposition(A.functor, A.functor)((x) => ({ x }))
     );
     expectTypeOf(result).toEqualTypeOf<{ x: number }[][]>();
     expect(result).toEqual([
@@ -100,7 +74,7 @@ describe("Functor", () => {
     }
 
     function mapToX() {
-      return mapComposition(A, A)(toX);
+      return mapComposition(A.functor, A.functor)(toX);
     }
 
     type MapToX = ReturnType<typeof mapToX>;
@@ -120,57 +94,53 @@ describe("Functor", () => {
   });
 
   it("should compose two either functors", () => {
-    const data = ok<Result<number, ErrorConstructor>, Error>(
-      ok<number, ErrorConstructor>(0)
+    const data: R.Result<R.Result<number, ErrorConstructor>, Error> = R.ok(
+      R.ok(0)
     );
     const result = pipe(
       data,
-      E.map(E.map((x) => x + 1)),
-      mapComposition(E, E)((x) => ({ x }))
+      R.map(R.map((x) => x + 1)),
+      mapComposition(R.functor, R.functor)((x) => ({ x }))
     );
     expectTypeOf(result).toEqualTypeOf<
-      Result<Result<{ x: number }, ErrorConstructor>, Error>
+      R.Result<R.Result<{ x: number }, ErrorConstructor>, Error>
     >();
-    expect(result).toEqual(ok(ok({ x: 1 })));
+    expect(result).toEqual(R.ok(R.ok({ x: 1 })));
   });
 
   it("should compose one array and one either functors with generics", () => {
-    const data = [
-      ok<number, Error>(0),
-      ok<number, Error>(1),
-      ok<number, Error>(2),
-    ];
+    const data: R.Result<number, Error>[] = [R.ok(0), R.ok(1), R.ok(2)];
 
     function toX<T>(x: T) {
       return { x };
     }
 
-    const mapToX = <T>() => mapComposition(A, E)(toX<T>);
+    const mapToX = <T>() => mapComposition(A.functor, R.functor)(toX<T>);
 
     type MapToX = typeof mapToX;
 
     expectTypeOf<MapToX>().toEqualTypeOf<
-      <T>() => <GC>(fa: Result<T, GC>[]) => Result<
+      <T>() => <B1>(fa: R.Result<T, B1>[]) => R.Result<
         {
           x: T;
         },
-        GC
+        B1
       >[]
     >();
 
     const result = pipe(
       data,
-      mapComposition(A, E)((x) => x + 1),
-      A.map(E.map((x) => x * 2)),
+      mapComposition(A.functor, R.functor)((x) => x + 1),
+      A.map(R.map((x) => x * 2)),
       mapToX()
     );
-    expectTypeOf(result).toEqualTypeOf<Result<{ x: number }, Error>[]>();
-    expect(result).toEqual([ok({ x: 2 }), ok({ x: 4 }), ok({ x: 6 })]);
+    expectTypeOf(result).toEqualTypeOf<R.Result<{ x: number }, Error>[]>();
+    expect(result).toEqual([R.ok({ x: 2 }), R.ok({ x: 4 }), R.ok({ x: 6 })]);
   });
 
   it("should flap with array", () => {
     const data = [(x: number) => x + 1, (x: number) => x * 2];
-    const result = pipe(data, flap(A)(2));
+    const result = pipe(data, flap(A.functor)(2));
     expectTypeOf(result).toEqualTypeOf<number[]>();
     expect(result).toEqual([3, 4]);
   });

@@ -3,13 +3,13 @@ import type { SplitAt } from "@utils/tuples";
 import type { Add, Dec, Inc } from "@utils/numbers";
 import { type BuildGenericFn, apply } from "@utils/functions";
 
-interface FunctorParams<F extends Kind, A> extends Kind {
+export interface FunctorParams<F extends Kind, A> extends Kind {
   return: this["rawArgs"] extends unknown[]
     ? [fa: $<F, [A, ...this["rawArgs"]]>]
     : never;
 }
 
-interface FunctorResult<F extends Kind, B> extends Kind {
+export interface FunctorResult<F extends Kind, B> extends Kind {
   return: this["rawArgs"] extends unknown[]
     ? $<F, [B, ...this["rawArgs"]]>
     : never;
@@ -77,9 +77,9 @@ interface FlapResult<F extends Kind> extends Kind {
 }
 // <A>(a:A) => <B>(fab: $<F,[(a:A)=> B]>) => $<F, [B]>
 export const flap =
-  <F extends Kind>(Functor: Functor<F>) =>
+  <F extends Kind>(functor: Functor<F>) =>
   <A>(
     a: A
   ): BuildGenericFn<Inc<F["length"]>, FlapParams<F, A>, FlapResult<F>> =>
     // @ts-ignore
-    Functor.map(apply(a));
+    functor.map(apply(a));

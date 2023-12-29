@@ -1,6 +1,8 @@
 import { Kind } from "@kinds";
 import * as tfunctor from "@typeclass/functor";
 
+export type TArray = Kind.Array;
+
 export const functor: tfunctor.Functor<Kind.Array> = {
   map: (f) => (fa) => fa.map(f),
 };

@@ -1,5 +1,7 @@
 import { Kind } from "@kinds";
 import * as tfunctor from "@typeclass/functor";
+import * as tbifunctor from "@typeclass/bifunctor";
+import { identity } from "@utils/functions";
 
 export interface Err<E> {
   readonly _tag: "Err";
@@ -22,12 +24,16 @@ export const isErr = <E>(result: Result<unknown, E>): result is Err<E> =>
 export const isOk = <A>(result: Result<A, unknown>): result is Ok<A> =>
   result._tag === "Ok";
 
-interface TResult extends Kind.binary {
+export interface TResult extends Kind.binary {
   return: Result<this["arg0"], this["arg1"]>;
 }
 
+export const bifunctor: tbifunctor.BiFunctor<TResult> = {
+  bimap: (f, g) => (fa) => (isOk(fa) ? ok(f(fa.ok)) : err(g(fa.err))),
+};
+
 export const functor: tfunctor.Functor<TResult> = {
-  map: (f) => (fa) => (isErr(fa) ? fa : ok(f(fa.ok))),
+  map: tbifunctor.mapLeft(bifunctor),
 };
 
 /**
@@ -68,3 +74,29 @@ export const flap = tfunctor.flap(functor);
  * ```
  */
 export const doubleMap = tfunctor.mapComposition(functor, functor);
+
+/**
+ * bimap :: (a -> b) -> (e1 -> e2) -> Result<a, e1> -> Result<b, e2>
+ * @param f : a -> b
+ * @param g : e1 -> e2
+ * @returns fa: Result<a, e1> -> Result<b, e2>
+ *
+ * @example
+ * ```ts
+ * pipe(ok(0), bimap(x => x + 1, x => x + "!")) // ok(1)
+ * pipe(err("error"), bimap(x => x + 1, x => x + "!")) // err("error!")
+ * ```
+ */
+export const bimap = bifunctor.bimap;
+
+/**
+ * mapErr :: (e1 -> e2) -> Result<a, e1> -> Result<a, e2>
+ * @param f : e1 -> e2
+ * @returns fa: Result<a, e1> -> Result<a, e2>
+ *
+ * @example
+ * ```ts
+ * pipe(ok(0), mapErr(x => x + "!")) // ok(0)
+ * pipe(err("error"), mapErr(x => x + "!")) // err("error!")
+ */
+export const mapErr = tbifunctor.mapRight(bifunctor);

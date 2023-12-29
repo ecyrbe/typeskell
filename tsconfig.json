@@ -108,6 +108,7 @@
     "paths": {
       "@kinds": ["./src/kinds/kinds.ts"],
       "@utils/*": ["./src/utils/*"],
+      "@data/*": ["./src/data/*"],
       "@typeclass/*": ["./src/typeclass/*"]
     }
   }

@@ -6,6 +6,7 @@ export default {
       "@kinds": path.resolve(__dirname, "./src/kinds/kinds.ts"),
       "@utils": path.resolve(__dirname, "./src/utils"),
       "@typeclass": path.resolve(__dirname, "./src/typeclass"),
+      "@data": path.resolve(__dirname, "./src/data"),
     },
   },
 };
