@@ -1,5 +1,5 @@
 import type { Kind, $ } from "@kinds";
-import type { Dec } from "@utils/numbers";
+import type { Dec, Sub } from "@utils/numbers";
 import { type BuildGenericFn, identity } from "@utils/functions";
 import type { FunctorParams, FunctorResult } from "@typeclass/functor";
 
@@ -15,26 +15,46 @@ interface BiFunctorResult<F extends Kind, B, D> extends Kind {
     : never;
 }
 
-// <A,B,C,D>(f: (a: A) => B, g: (c: C) => D) => <...>(fac: $<F, [A,C,...]>) => $<F, [B,D,...]>
 export interface BiFunctor<F> {
+  /**
+   * bimap :: (a -> b) (c -> d) -> F a c -> F b d
+   *
+   * bimap :: <A,B,C,D>(f: (a: A) => B, g: (c: C) => D) => <...>(fac: $<F, [A,C,...]>) => $<F, [B,D,...]>
+   *
+   * @param f : a -> b
+   * @param g : c -> d
+   * @returns F a c -> F b d
+   */
   bimap: F extends Kind
     ? <A, B, C, D>(
         f: (a: A) => B,
         g: (e: C) => D
       ) => BuildGenericFn<
-        Dec<F["length"]>,
+        Sub<F["arity"], 2>,
         BiFunctorParams<F, A, C>,
         BiFunctorResult<F, B, D>
       >
     : never;
 }
 
+/**
+ * mapLeft :: BiFunctor F -> (a -> b) -> F a c -> F b c
+ *
+ * mapLeft :: <F>(bif: BiFunctor<F>) => <A,B>(f: (a: A) => B) => <C,...>(fac: $<F, [A,C,...]>) => $<F, [B,C,...]>
+ *
+ * @param bifunctor : BiFunctor<F>
+ * @returns (a -> b) -> F a c -> F b c
+ */
 export const mapLeft =
   <F extends Kind>(bifunctor: BiFunctor<F>) =>
   <A, B>(
     f: (a: A) => B
-  ): BuildGenericFn<F["length"], FunctorParams<F, A>, FunctorResult<F, B>> =>
-    // @ts-ignore
+  ): BuildGenericFn<
+    Dec<F["arity"]>,
+    FunctorParams<F, A>,
+    FunctorResult<F, B>
+  > =>
+    // @ts-ignore F arity is not known at this time so inference fails
     bifunctor.bimap(f, identity);
 
 export interface BiFunctorRightParams<F extends Kind, A> extends Kind {
@@ -49,14 +69,22 @@ export interface BiFunctorRightResult<F extends Kind, B> extends Kind {
     : never;
 }
 
+/**
+ * mapRight :: BiFunctor F  -> (a -> b) -> F c a -> F c b
+ *
+ * mapRight :: <F>(bif: BiFunctor<F>) => <A,B>(f: (a: A) => B) => <C,...>(fac: $<F, [C,A,...]>) => $<F, [C,B,...]>
+ *
+ * @param bifunctor : BiFunctor<F>
+ * @returns (a -> b) -> F c a -> F c b
+ */
 export const mapRight =
   <F extends Kind>(bifunctor: BiFunctor<F>) =>
   <A, B>(
     f: (a: A) => B
   ): BuildGenericFn<
-    F["length"],
+    Dec<F["arity"]>,
     BiFunctorRightParams<F, A>,
     BiFunctorRightResult<F, B>
   > =>
-    // @ts-ignore
+    // @ts-ignore F arity is not known at this time so inference fails
     bifunctor.bimap(identity, f);

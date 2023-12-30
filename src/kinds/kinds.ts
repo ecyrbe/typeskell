@@ -3,7 +3,7 @@ import { CovariantParam, InvariantParam, Param } from "./variance";
 export interface Kind<params extends Param[] = Param[]> {
   signature: params; // keep track of variance signature
   rawArgs: unknown;
-  length: params["length"];
+  arity: params["length"];
   // arguments in signature are defined with the given variance contraint
   arg0: params[0]["value"];
   arg1: params[1]["value"];

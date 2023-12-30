@@ -15,16 +15,35 @@ export interface FunctorResult<F extends Kind, B> extends Kind {
     : never;
 }
 
-//<A, B>(f: (a: A) => B) => <...>(fa: $<F, [A,...]>) => $<F, [B,...]>
 export interface Functor<F> {
+  /**
+   * map :: (a -> b) -> F a -> F b
+   *
+   * map :: <A,B>(f: (a: A) => B) => <...>(fa: $<F, [A,...]>) => $<F, [B,...]>
+   *
+   * @param f : a -> b
+   * @returns F a -> F b
+   */
   map: F extends Kind
     ? <A, B>(
         f: (a: A) => B
-      ) => BuildGenericFn<F["length"], FunctorParams<F, A>, FunctorResult<F, B>>
+      ) => BuildGenericFn<
+        Dec<F["arity"]>,
+        FunctorParams<F, A>,
+        FunctorResult<F, B>
+      >
     : never;
 }
 
-// <A, B>(f: (a: A) => B) => <...F,...G>(fa: $<F, [$<G,[A,...G]>,...F]>) => $<F, [$<G,[B,...G]>,...F]>
+/**
+ * mapComposition :: Functor<F> Functor<G> -> (a -> b) -> F (G a) -> F (G b)
+ *
+ * mapComposition :: <F,G>(ff: Functor<F> gg: Functor<G>) => <A,B>(f: (a: A) => B) => <...Cf,...Cg>(fa: $<F, [$<G,[A,...Cg]>,...Cf]>) => $<F, [$<G,[B,...Cg]>,...Cf]>
+ *
+ * @param FunctorF : Functor<F>
+ * @param FunctorG : Functor<G>
+ * @returns (a -> b) -> F (G a) -> F (G b)
+ */
 export const mapComposition =
   <F extends Kind, G extends Kind>(
     FunctorF: Functor<F>,
@@ -32,18 +51,18 @@ export const mapComposition =
   ): (<A, B>(
     f: (a: A) => B
   ) => BuildGenericFn<
-    Add<Dec<F["length"]>, G["length"]>,
+    Add<Dec<F["arity"]>, Dec<G["arity"]>>,
     FunctorCompositionParams<F, G, A>,
     FunctorCompositionResult<F, G, B>
   >) =>
-  // @ts-ignore
   (f) =>
+    // @ts-ignore F and G arity are not known at this time so inference fails
     FunctorF.map(FunctorG.map(f));
 
 interface FunctorCompositionParams<F extends Kind, G extends Kind, A>
   extends Kind {
   return: this["rawArgs"] extends unknown[]
-    ? SplitAt<Dec<F["length"]>, this["rawArgs"]> extends [
+    ? SplitAt<Dec<F["arity"]>, this["rawArgs"]> extends [
         infer FB extends unknown[],
         infer GB extends unknown[],
       ]
@@ -55,7 +74,7 @@ interface FunctorCompositionParams<F extends Kind, G extends Kind, A>
 interface FunctorCompositionResult<F extends Kind, G extends Kind, B>
   extends Kind {
   return: this["rawArgs"] extends unknown[]
-    ? SplitAt<Dec<F["length"]>, this["rawArgs"]> extends [
+    ? SplitAt<Dec<F["arity"]>, this["rawArgs"]> extends [
         infer FB extends unknown[],
         infer GB extends unknown[],
       ]
@@ -75,11 +94,16 @@ interface FlapResult<F extends Kind> extends Kind {
     ? $<F, [...this["rawArgs"]]>
     : never;
 }
-// <A>(a:A) => <B>(fab: $<F,[(a:A)=> B]>) => $<F, [B]>
+/**
+ * flap :: Functor<F> -> a -> F (a -> b) -> F b
+ *
+ * flap :: <F>(f: Functor<F>) => <A>(a: A) => <B,...>(fab: $<F, [(a: A) => B, ...]>) => $<F, [B, ...]>
+ *
+ * @param functor : Functor<F>
+ * @returns a -> F (a -> b) -> F b
+ */
 export const flap =
   <F extends Kind>(functor: Functor<F>) =>
-  <A>(
-    a: A
-  ): BuildGenericFn<Inc<F["length"]>, FlapParams<F, A>, FlapResult<F>> =>
-    // @ts-ignore
+  <A>(a: A): BuildGenericFn<F["arity"], FlapParams<F, A>, FlapResult<F>> =>
+    // @ts-ignore F arity is not known at this time so inference fails
     functor.map(apply(a));

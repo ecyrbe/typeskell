@@ -42,9 +42,12 @@ export const Functor: tfunctor.Functor<TResult> = {
 };
 
 /**
- * of :: a -> Result<a, e>
- * @param a : a
- * @returns fa: Result<a, e>
+ * of :: a -> Result<a, never>
+ *
+ * of :: <A>(a: A) => Result<A, never>
+ *
+ * @param a : any value
+ * @returns Result<a, never>
  *
  * @example
  * ```ts
@@ -55,8 +58,11 @@ export const of = Of.of;
 
 /**
  * map :: (a -> b) -> Result<a, e> -> Result<b, e>
+ *
+ * map :: <A, B>(f: (a: A) => B) => <E>(fa: Result<A, E>) => Result<B, E>
+ *
  * @param f : a -> b
- * @returns fa: Result<a, e> -> Result<b, e>
+ * @returns Result<a, e> -> Result<b, e>
  *
  * @example
  * ```ts
@@ -68,8 +74,11 @@ export const map = Functor.map;
 
 /**
  * flap :: a -> Result<(a -> b), e> -> Result<b, e>
+ *
+ * flap :: <A>(a: A) => <B, E>(fab: Result<(a: A) => B, E>) => Result<B, E>
+ *
  * @param a : a
- * @returns fab: Result<(a -> b), e> -> Result<b, e>
+ * @returns Result<(a -> b), e> -> Result<b, e>
  *
  * @example
  * ```ts
@@ -81,8 +90,11 @@ export const flap = tfunctor.flap(Functor);
 
 /**
  * doubleMap :: (a -> b) -> Result<Result<a, e1>, e2> -> Result<Result<b, e1>, e2>
+ *
+ * doubleMap :: <A, B>(f: (a: A) => B) => <E1, E2>(fa: Result<Result<A, E1>, E2>) => Result<Result<B, E1>, E2>
+ *
  * @param f : a -> b
- * @returns fa: Result<Result<a, e1>, e2> -> Result<Result<b, e1>, e2>
+ * @returns Result<Result<a, e1>, e2> -> Result<Result<b, e1>, e2>
  *
  * @example
  * ```ts
@@ -93,10 +105,13 @@ export const flap = tfunctor.flap(Functor);
 export const doubleMap = tfunctor.mapComposition(Functor, Functor);
 
 /**
- * bimap :: (a -> b) -> (e1 -> e2) -> Result<a, e1> -> Result<b, e2>
+ * bimap :: (a -> b) (e1 -> e2) -> Result<a, e1> -> Result<b, e2>
+ *
+ * bimap :: <A, B, E1, E2>(f: (a: A) => B, g: (e: E1) => E2) => (fa: Result<A, E1>) => Result<B, E2>
+ *
  * @param f : a -> b
  * @param g : e1 -> e2
- * @returns fa: Result<a, e1> -> Result<b, e2>
+ * @returns Result<a, e1> -> Result<b, e2>
  *
  * @example
  * ```ts
@@ -108,8 +123,11 @@ export const bimap = Bifunctor.bimap;
 
 /**
  * mapErr :: (e1 -> e2) -> Result<a, e1> -> Result<a, e2>
+ *
+ * mapErr :: <E1, E2>(f: (e: E1) => E2) => <A>(fa: Result<A, E1>) => Result<A, E2>
+ *
  * @param f : e1 -> e2
- * @returns fa: Result<a, e1> -> Result<a, e2>
+ * @returns Result<a, e1> -> Result<a, e2>
  *
  * @example
  * ```ts
