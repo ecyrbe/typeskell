@@ -23,8 +23,6 @@ export interface Kind<params extends Param[] = Param[]> {
   arg15: params[15]["value"];
 }
 
-type Test = Kind<[InvariantParam, CovariantParam]>["arg7"];
-
 interface ReturnKind extends Kind {
   return: any;
 }
