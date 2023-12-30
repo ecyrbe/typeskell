@@ -1,6 +1,6 @@
 import type { Kind, $ } from "@kinds";
 import type { Dec, Sub } from "@utils/numbers";
-import { type BuildGenericFn, identity } from "@utils/functions";
+import { type GenericFn, identity } from "@utils/functions";
 import type { FunctorParams, FunctorResult } from "@typeclass/functor";
 
 interface BiFunctorParams<F extends Kind, A, C> extends Kind {
@@ -29,7 +29,7 @@ export interface BiFunctor<F> {
     ? <A, B, C, D>(
         f: (a: A) => B,
         g: (e: C) => D
-      ) => BuildGenericFn<
+      ) => GenericFn<
         Sub<F["arity"], 2>,
         BiFunctorParams<F, A, C>,
         BiFunctorResult<F, B, D>
@@ -49,11 +49,7 @@ export const mapLeft =
   <F extends Kind>(bifunctor: BiFunctor<F>) =>
   <A, B>(
     f: (a: A) => B
-  ): BuildGenericFn<
-    Dec<F["arity"]>,
-    FunctorParams<F, A>,
-    FunctorResult<F, B>
-  > =>
+  ): GenericFn<Dec<F["arity"]>, FunctorParams<F, A>, FunctorResult<F, B>> =>
     // @ts-ignore F arity is not known at this time so inference fails
     bifunctor.bimap(f, identity);
 
@@ -81,7 +77,7 @@ export const mapRight =
   <F extends Kind>(bifunctor: BiFunctor<F>) =>
   <A, B>(
     f: (a: A) => B
-  ): BuildGenericFn<
+  ): GenericFn<
     Dec<F["arity"]>,
     BiFunctorRightParams<F, A>,
     BiFunctorRightResult<F, B>

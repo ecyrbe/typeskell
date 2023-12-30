@@ -1,7 +1,7 @@
 import { Kind, $, $$ } from "@kinds";
 
 // prettier-ignore
-export type BuildGenericFn<N extends number, FnParams extends Kind, FnResult extends Kind> = N extends 0
+export type GenericFn<N extends number, FnParams extends Kind, FnResult extends Kind> = N extends 0
   ? (...args: $$<FnParams,[]>) => $<FnResult,[]>
   : N extends 1
     ? <B1>(...args: $$<FnParams,[B1]>) => $<FnResult,[B1]>

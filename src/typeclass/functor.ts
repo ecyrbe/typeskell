@@ -1,7 +1,7 @@
 import type { Kind, $ } from "@kinds";
 import type { SplitAt } from "@utils/tuples";
-import type { Add, Dec, Inc } from "@utils/numbers";
-import { type BuildGenericFn, apply } from "@utils/functions";
+import type { Add, Dec } from "@utils/numbers";
+import { type GenericFn, apply } from "@utils/functions";
 
 export interface FunctorParams<F extends Kind, A> extends Kind {
   return: this["rawArgs"] extends unknown[]
@@ -27,11 +27,7 @@ export interface Functor<F> {
   map: F extends Kind
     ? <A, B>(
         f: (a: A) => B
-      ) => BuildGenericFn<
-        Dec<F["arity"]>,
-        FunctorParams<F, A>,
-        FunctorResult<F, B>
-      >
+      ) => GenericFn<Dec<F["arity"]>, FunctorParams<F, A>, FunctorResult<F, B>>
     : never;
 }
 
@@ -50,7 +46,7 @@ export const mapComposition =
     FunctorG: Functor<G>
   ): (<A, B>(
     f: (a: A) => B
-  ) => BuildGenericFn<
+  ) => GenericFn<
     Add<Dec<F["arity"]>, Dec<G["arity"]>>,
     FunctorCompositionParams<F, G, A>,
     FunctorCompositionResult<F, G, B>
@@ -104,6 +100,6 @@ interface FlapResult<F extends Kind> extends Kind {
  */
 export const flap =
   <F extends Kind>(functor: Functor<F>) =>
-  <A>(a: A): BuildGenericFn<F["arity"], FlapParams<F, A>, FlapResult<F>> =>
+  <A>(a: A): GenericFn<F["arity"], FlapParams<F, A>, FlapResult<F>> =>
     // @ts-ignore F arity is not known at this time so inference fails
     functor.map(apply(a));
