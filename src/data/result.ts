@@ -1,4 +1,5 @@
 import { Kind } from "@kinds";
+import { InvariantParam, CovariantParam } from "../kinds/variance";
 import * as tfunctor from "@typeclass/functor";
 import * as tbifunctor from "@typeclass/bifunctor";
 import * as tOf from "@typeclass/of";
@@ -24,7 +25,7 @@ export const isErr = <E>(result: Result<unknown, E>): result is Err<E> =>
 export const isOk = <A>(result: Result<A, unknown>): result is Ok<A> =>
   result._tag === "Ok";
 
-export interface TResult extends Kind.binary {
+export interface TResult extends Kind<[InvariantParam, CovariantParam]> {
   return: Result<this["arg0"], this["arg1"]>;
 }
 
