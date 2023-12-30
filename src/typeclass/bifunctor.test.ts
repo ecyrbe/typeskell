@@ -3,7 +3,7 @@ import * as R from "@data/result";
 import { mapLeft, mapRight } from "@typeclass/bifunctor";
 import { pipe } from "../pipe";
 
-const bifunctor = R.bifunctor;
+const bifunctor = R.Bifunctor;
 
 describe("Result", () => {
   it("should bimap on ok result", () => {

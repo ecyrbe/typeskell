@@ -27,6 +27,7 @@ interface ReturnKind extends Kind {
 export type $<
   kind extends Kind,
   params extends unknown[] = [],
+  strict extends boolean = true,
 > = kind extends ReturnKind
   ? (kind & {
       args: params;
@@ -48,7 +49,18 @@ export type $<
       arg14: params[14];
       arg15: params[15];
     })["return"]
-  : never;
+  : strict extends true
+    ? {
+        kind: kind;
+        args: params;
+      }
+    : never;
+
+export type $$<kind extends Kind, params extends unknown[] = []> = $<
+  kind,
+  params,
+  false
+>;
 
 export namespace Kind {
   export type nullary = Kind<[]>;
@@ -83,60 +95,31 @@ export namespace Kind {
     return: this["arg0"][];
   }
 
-  export interface String extends Kind.nullary {
-    return: string;
-  }
-
-  export interface Number extends Kind.nullary {
-    return: number;
-  }
-
-  export interface Boolean extends Kind.nullary {
-    return: boolean;
-  }
-
-  export interface Null extends Kind.nullary {
-    return: null;
-  }
-
-  export interface Undefined extends Kind.nullary {
-    return: undefined;
-  }
-
-  export interface Symbol extends Kind.nullary {
-    return: symbol;
-  }
-
-  export interface BigInt extends Kind.nullary {
-    return: bigint;
-  }
-
-  export interface Date extends Kind.nullary {
-    return: globalThis.Date;
-  }
-
   export interface Record extends Kind<[string | number | symbol, unknown]> {
     return: globalThis.Record<this["arg0"], this["arg1"]>;
   }
 
-  export interface Any extends Kind.nullary {
-    return: any;
+  export interface Basic<T> extends Kind.nullary {
+    return: T;
   }
 
-  export interface Unknown extends Kind.nullary {
-    return: unknown;
-  }
-
-  export interface Never extends Kind.nullary {
-    return: never;
-  }
-
-  export interface Void extends Kind.nullary {
-    return: void;
-  }
+  export type String = Basic<string>;
+  export type Number = Basic<number>;
+  export type Boolean = Basic<boolean>;
+  export type Null = Basic<null>;
+  export type Undefined = Basic<undefined>;
+  export type Symbol = Basic<symbol>;
+  export type BigInt = Basic<bigint>;
+  export type Date = Basic<globalThis.Date>;
+  export type RegExp = Basic<globalThis.RegExp>;
+  export type Error = Basic<globalThis.Error>;
+  export type Any = Basic<any>;
+  export type Unknown = Basic<unknown>;
+  export type Never = Basic<never>;
+  export type Void = Basic<void>;
 
   export interface Promise extends Kind.unary {
-    return: globalThis.Promise<this["args"][0]>;
+    return: globalThis.Promise<this["arg0"]>;
   }
 }
 

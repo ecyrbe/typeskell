@@ -54,8 +54,8 @@ describe("Functor", () => {
     ];
     const result = pipe(
       data,
-      mapComposition(A.functor, A.functor)((x) => x + 1),
-      mapComposition(A.functor, A.functor)((x) => ({ x }))
+      mapComposition(A.Functor, A.Functor)((x) => x + 1),
+      mapComposition(A.Functor, A.Functor)((x) => ({ x }))
     );
     expectTypeOf(result).toEqualTypeOf<{ x: number }[][]>();
     expect(result).toEqual([
@@ -74,7 +74,7 @@ describe("Functor", () => {
     }
 
     function mapToX() {
-      return mapComposition(A.functor, A.functor)(toX);
+      return mapComposition(A.Functor, A.Functor)(toX);
     }
 
     type MapToX = ReturnType<typeof mapToX>;
@@ -100,7 +100,7 @@ describe("Functor", () => {
     const result = pipe(
       data,
       R.map(R.map((x) => x + 1)),
-      mapComposition(R.functor, R.functor)((x) => ({ x }))
+      mapComposition(R.Functor, R.Functor)((x) => ({ x }))
     );
     expectTypeOf(result).toEqualTypeOf<
       R.Result<R.Result<{ x: number }, ErrorConstructor>, Error>
@@ -115,7 +115,7 @@ describe("Functor", () => {
       return { x };
     }
 
-    const mapToX = <T>() => mapComposition(A.functor, R.functor)(toX<T>);
+    const mapToX = <T>() => mapComposition(A.Functor, R.Functor)(toX<T>);
 
     type MapToX = typeof mapToX;
 
@@ -130,7 +130,7 @@ describe("Functor", () => {
 
     const result = pipe(
       data,
-      mapComposition(A.functor, R.functor)((x) => x + 1),
+      mapComposition(A.Functor, R.Functor)((x) => x + 1),
       A.map(R.map((x) => x * 2)),
       mapToX()
     );
@@ -140,7 +140,7 @@ describe("Functor", () => {
 
   it("should flap with array", () => {
     const data = [(x: number) => x + 1, (x: number) => x * 2];
-    const result = pipe(data, flap(A.functor)(2));
+    const result = pipe(data, flap(A.Functor)(2));
     expectTypeOf(result).toEqualTypeOf<number[]>();
     expect(result).toEqual([3, 4]);
   });
