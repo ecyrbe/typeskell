@@ -13,7 +13,7 @@ export interface Zero<F extends Kind> {
   /**
    * zero :: `() -> F a`
    *
-   * zero :: `<...>() => $<F, [...]>`
+   * zero :: `<A,...>() => $<F, [A,...]>`
    *
    * @returns `F a`
    */
