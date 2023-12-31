@@ -6,7 +6,7 @@ import * as tZero from "@typeclass/zero";
 
 export type TArray = Kind.Array;
 
-export const Zero: tZero.Zero<Kind.Array> = {
+export const Zero: tZero.Zero<TArray> = {
   zero: () => [],
 };
 
@@ -18,7 +18,7 @@ export const To: tTo.To<TArray> = {
   getOrElse: (f) => (fa) => (fa.length === 0 ? f() : fa[0]),
 };
 
-export const Functor: tfunctor.Functor<Kind.Array> = {
+export const Functor: tfunctor.Functor<TArray> = {
   map: (f) => (fa) => fa.map(f),
 };
 
