@@ -56,6 +56,7 @@ export type ZipWithVariance<
   B,
   Params extends Param[],
   $acc extends unknown[] = [],
+  $index extends number = $acc["length"],
 > = A extends [infer AHead, ...infer ATail]
   ? B extends [infer BHead, ...infer BTail]
     ? ZipWithVariance<
@@ -64,7 +65,7 @@ export type ZipWithVariance<
         Params,
         [
           ...$acc,
-          VarianceOf<Params, $acc["length"]> extends "contravariant"
+          VarianceOf<Params, $index> extends "contravariant"
             ? AHead & BHead
             : AHead | BHead,
         ]
