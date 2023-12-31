@@ -15,6 +15,13 @@ export interface FunctorResult<F extends Kind, B> extends Kind {
     : never;
 }
 
+/**
+ * Functor is a typeclass that defines a single operation, map.
+ *
+ * Laws:
+ *  - Identity: map id = id
+ *  - Composition: map (f . g) = map f . map g
+ */
 export interface Functor<F> {
   /**
    * map :: (a -> b) -> F a -> F b

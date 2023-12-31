@@ -15,6 +15,18 @@ interface BiFunctorResult<F extends Kind, B, D> extends Kind {
     : never;
 }
 
+/**
+ * BiFunctor is a typeclass that defines a single operation, bimap.
+ * It is a generalization of Functor.
+ *
+ * Definition for mapLeft and mapRight are derived from bimap.
+ *  - mapLeft f  = bimap f id
+ *  - mapRight f = bimap id f
+ *
+ * Laws:
+ * - Identity: bimap id id = id
+ * - Composition: bimap (f . g) (h . i) = bimap f h  . bimap g i
+ */
 export interface BiFunctor<F> {
   /**
    * bimap :: (a -> b) (c -> d) -> F a c -> F b d
