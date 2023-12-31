@@ -11,7 +11,7 @@ The magic lies in building the correct generic variants of the typeclass automat
 
 All the magic is done thanks to:
 - a new encoding that remembers the parameters variance of a Kind (covariant, contravariant, invariant).
-- a meta programming a compille time that builds generics functions at will (no need to declare exponetially many functions)
+- a lot of meta programming like in HOTScript to builds generics functions at compille time depending on kind instance (no need to declare exponentially many functions)
 
 Then we let this meta-compiler (typescript itself) build the correct generic types for the typeclass at compile time.
 
