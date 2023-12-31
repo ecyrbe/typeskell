@@ -62,6 +62,38 @@ export const Functor: tfunctor.Functor<TResult> = {
 export const of = Of.of;
 
 /**
+ * getOrElse :: (e -> b) -> Result<a, e> -> a | b
+ *
+ * getOrElse :: <A, B>(f: (e: E) => B) => (fa: Result<A, E>) => A | B
+ *
+ * @param f : e -> b
+ * @returns Result<a, e> -> a | b
+ *
+ * @example
+ * ```ts
+ * pipe(ok(0), getOrElse(() => 1)) // 0
+ * pipe(err("error"), getOrElse(() => 1)) // 1
+ * ```
+ */
+export const getOrElse = To.getOrElse;
+
+/**
+ * getOr :: b -> Result<a, e> -> a | b
+ *
+ * getOr :: <B>(b: B) => <A,E>(fa: Result<A, E>) => A | B
+ *
+ * @param b : b
+ * @returns Result<a, e> -> a | b
+ *
+ * @example
+ * ```ts
+ * pipe(ok(0), getOr(1)) // 0
+ * pipe(err("error"), getOr(1)) // 1
+ * ```
+ */
+export const getOr = tTo.getOr(To);
+
+/**
  * map :: (a -> b) -> Result<a, e> -> Result<b, e>
  *
  * map :: <A, B>(f: (a: A) => B) => <E>(fa: Result<A, E>) => Result<B, E>
