@@ -49,12 +49,4 @@ export type Param =
   | ContravariantParam
   | UnknownParam;
 
-export type Variance<
-  Invariant extends number = 0,
-  Covariant extends number = 0,
-  Contravariant extends number = 0,
-> = [
-  ...Tuple<InvariantParam, Invariant>,
-  ...Tuple<CovariantParam, Covariant>,
-  ...Tuple<ContravariantParam, Contravariant>,
-];
+export type VarianceOf<T extends Param[], N extends number> = T[N]["type"];

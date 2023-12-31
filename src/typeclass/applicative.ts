@@ -2,7 +2,8 @@ import type { Kind, $ } from "@kinds";
 import type { Functor } from "@typeclass/functor";
 import type { Of } from "@typeclass/of";
 import type { GenericFn } from "@utils/functions";
-import { Add, Dec, Inc } from "@utils/numbers";
+import { Param, VarianceOf } from "../kinds/variance";
+import { Tail } from "@utils/tuples";
 
 interface ApParams<F extends Kind> extends Kind {
   return: this["rawArgs"] extends unknown[]
@@ -24,19 +25,31 @@ interface ApFabParams<F extends Kind, A> extends Kind {
 
 interface ApFabResult<F extends Kind, Af> extends Kind {
   return: this["rawArgs"] extends [infer B, ...infer Bf]
-    ? $<F, [B, ...ZipWithUnion<Af, Bf>]>
+    ? $<F, [B, ...ZipWithVariance<Af, Bf, Tail<F["signature"]>>]>
     : never;
 }
 
-type ZipWithUnion<A, B, $acc extends unknown[] = []> = A extends [
-  infer AHead,
-  ...infer ATail,
-]
+type ZipWithVariance<
+  A,
+  B,
+  Params extends Param[],
+  $acc extends unknown[] = [],
+> = A extends [infer AHead, ...infer ATail]
   ? B extends [infer BHead, ...infer BTail]
-    ? ZipWithUnion<ATail, BTail, [...$acc, AHead | BHead]>
-    : ZipWithUnion<ATail, [], [...$acc, AHead]>
+    ? ZipWithVariance<
+        ATail,
+        BTail,
+        Params,
+        [
+          ...$acc,
+          VarianceOf<Params, $acc["length"]> extends "contravariant"
+            ? AHead & BHead
+            : AHead | BHead,
+        ]
+      >
+    : ZipWithVariance<ATail, [], Params, [...$acc, AHead]>
   : B extends [infer BHead, ...infer BTail]
-    ? ZipWithUnion<[], BTail, [...$acc, BHead]>
+    ? ZipWithVariance<[], BTail, Params, [...$acc, BHead]>
     : $acc;
 
 export interface Applicative<F extends Kind> extends Functor<F>, Of<F> {
