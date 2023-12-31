@@ -50,3 +50,26 @@ export type Param =
   | UnknownParam;
 
 export type VarianceOf<T extends Param[], N extends number> = T[N]["type"];
+
+export type ZipWithVariance<
+  A,
+  B,
+  Params extends Param[],
+  $acc extends unknown[] = [],
+> = A extends [infer AHead, ...infer ATail]
+  ? B extends [infer BHead, ...infer BTail]
+    ? ZipWithVariance<
+        ATail,
+        BTail,
+        Params,
+        [
+          ...$acc,
+          VarianceOf<Params, $acc["length"]> extends "contravariant"
+            ? AHead & BHead
+            : AHead | BHead,
+        ]
+      >
+    : ZipWithVariance<ATail, [], Params, [...$acc, AHead]>
+  : B extends [infer BHead, ...infer BTail]
+    ? ZipWithVariance<[], BTail, Params, [...$acc, BHead]>
+    : $acc;

@@ -2,7 +2,7 @@ import type { Kind, $ } from "@kinds";
 import type { Functor } from "@typeclass/functor";
 import type { Of } from "@typeclass/of";
 import type { GenericFn } from "@utils/functions";
-import { Param, VarianceOf } from "../kinds/variance";
+import { ZipWithVariance } from "../kinds/variance";
 import { Tail } from "@utils/tuples";
 
 interface ApParams<F extends Kind> extends Kind {
@@ -29,34 +29,14 @@ interface ApFabResult<F extends Kind, Af> extends Kind {
     : never;
 }
 
-type ZipWithVariance<
-  A,
-  B,
-  Params extends Param[],
-  $acc extends unknown[] = [],
-> = A extends [infer AHead, ...infer ATail]
-  ? B extends [infer BHead, ...infer BTail]
-    ? ZipWithVariance<
-        ATail,
-        BTail,
-        Params,
-        [
-          ...$acc,
-          VarianceOf<Params, $acc["length"]> extends "contravariant"
-            ? AHead & BHead
-            : AHead | BHead,
-        ]
-      >
-    : ZipWithVariance<ATail, [], Params, [...$acc, AHead]>
-  : B extends [infer BHead, ...infer BTail]
-    ? ZipWithVariance<[], BTail, Params, [...$acc, BHead]>
-    : $acc;
-
 export interface Applicative<F extends Kind> extends Functor<F>, Of<F> {
   /**
    * ap :: `F a -> F (a -> b) -> F b`
    *
    * ap :: `<A,...Af>(fa: $<F, [A,...Af]>) => <B,...Bf>(fab: $<F, [(a: A) => B,...Bf]>) => $<F, [B,...ZipWithVariance<Af,Bf>]>`
+   *
+   * @param fa `F a`
+   * @returns `F (a -> b) -> F b`
    */
   ap: GenericFn<F["arity"], ApParams<F>, ApResult<F>>;
 }
