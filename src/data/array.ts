@@ -30,6 +30,38 @@ export const Functor: tfunctor.Functor<Kind.Array> = {
 export const of = Of.of;
 
 /**
+ * getOrElse :: (() -> b) -> a[] -> a | b
+ *
+ * getOrElse :: `<B>(f: () => B) => <A>(fa: A[]) => A | B`
+ *
+ * @param f : () -> b
+ * @returns fa: a[] -> a | b
+ *
+ * @example
+ * ```ts
+ * pipe([1], getOrElse(() => 0)) // 1
+ * pipe([], getOrElse(() => 0)) // 0
+ * ```
+ */
+export const getOrElse = To.getOrElse;
+
+/**
+ * getOr :: b -> a[] -> a | b
+ *
+ * getOr :: <B>(b: B) => <A>(fa: A[]) => A | B
+ *
+ * @param b : b
+ * @returns fa: a[] -> a | b
+ *
+ * @example
+ * ```ts
+ * pipe([1], getOr(0)) // 1
+ * pipe([], getOr(0)) // 0
+ * ```
+ */
+export const getOr = tTo.getOr(To);
+
+/**
  * map :: (a -> b) -> a[] -> b[]
  * @param f : a -> b
  * @returns fa: a[] -> b[]
