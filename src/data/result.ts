@@ -196,4 +196,4 @@ export const mapErr = tbifunctor.mapRight(Bifunctor);
  * pipe(of(x => x + 1), ap(err("error"))) // err("error")
  * ```
  */
-const ap = Applicative.ap;
+export const ap = Applicative.ap;
