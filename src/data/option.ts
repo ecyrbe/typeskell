@@ -126,5 +126,11 @@ export const flap = tfunctor.flap(Functor);
  *
  * @param f `a -> b`
  * @returns `Option<Option<a>> -> Option<Option<b>>`
+ *
+ * @example
+ * ```ts
+ * pipe(some(some(1)), doubleMap(x => x + 1)) // some(some(2))
+ * pipe(some(none), doubleMap(x => x + 1)) // some(none)
+ * pipe(none, doubleMap(x => x + 1)) // none
  */
 export const doubleMap = tfunctor.mapCompose(Functor, Functor);
