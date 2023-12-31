@@ -35,7 +35,7 @@ interface ApFabResult<F extends Kind, Af> extends Kind {
  * Laws:
  * - Identity: `pipe(of(id), ap(a)) = a`
  * - Homomorphism: `pipe(of(f), ap(of(a))) = of(f(a))`
- * - Interchange: `pipe(a, ap(of(f))) = pipe(of(f), ap(a))`
+ * - Interchange: `pipe(of(f), ap(of(a))) = pipe(of(g=> g(a)), ap(f))`
  * - Composition: `pipe(a, ap(pipe(b, ap(pipe(c, ap(of(compose))))))) = pipe(pipe(a, ap(b)), ap(c))`
  */
 export interface Applicative<F extends Kind> extends Functor<F>, Of<F> {
