@@ -2,8 +2,13 @@ import { Kind } from "@kinds";
 import * as tfunctor from "@typeclass/functor";
 import { type Of as tOf } from "@typeclass/of";
 import * as tTo from "@typeclass/to";
+import * as tZero from "@typeclass/zero";
 
 export type TArray = Kind.Array;
+
+export const Zero: tZero.Zero<Kind.Array> = {
+  zero: () => [],
+};
 
 export const Of: tOf<TArray> = {
   of: (a) => [a],
@@ -16,6 +21,22 @@ export const To: tTo.To<TArray> = {
 export const Functor: tfunctor.Functor<Kind.Array> = {
   map: (f) => (fa) => fa.map(f),
 };
+
+/**
+ * produce an empty array of type a
+ *
+ * zero :: `() -> a[]`
+ *
+ * zero :: `<A>() => A[]`
+ *
+ * @returns `a[]`
+ *
+ * @example
+ * ```ts
+ * pipe(zero(), map(x => x + 1)) // []
+ * ```
+ */
+export const zero = Zero.zero;
 
 /**
  * of :: a -> a[]

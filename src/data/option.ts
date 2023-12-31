@@ -3,6 +3,7 @@ import { InvariantParam } from "../kinds/variance";
 import * as tfunctor from "@typeclass/functor";
 import * as tOf from "@typeclass/of";
 import * as tTo from "@typeclass/to";
+import * as tZero from "@typeclass/zero";
 
 export interface None {
   readonly _tag: "None";
@@ -28,6 +29,10 @@ export interface TOption extends Kind<[InvariantParam]> {
   return: Option<this["arg0"]>;
 }
 
+export const Zero: tZero.Zero<TOption> = {
+  zero: () => none,
+};
+
 export const Of: tOf.Of<TOption> = {
   of: some,
 };
@@ -39,6 +44,22 @@ export const To: tTo.To<TOption> = {
 export const Functor: tfunctor.Functor<TOption> = {
   map: (f) => (fa) => (isSome(fa) ? some(f(fa.value)) : none),
 };
+
+/**
+ * produce an none Option of type a
+ *
+ * zero :: `() -> Option<a>`
+ *
+ * zero :: `<...>() => none`
+ *
+ * @returns `Option<a>`
+ *
+ * @example
+ * ```ts
+ * pipe(zero(), map(x => x + 1)) // none
+ * ```
+ */
+export const zero = Zero.zero;
 
 /**
  * of :: `a -> Option<a>`
