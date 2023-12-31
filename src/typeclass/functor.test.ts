@@ -1,5 +1,5 @@
 import { describe, it, expect, expectTypeOf } from "vitest";
-import { mapComposition, flap } from "@typeclass/functor";
+import { mapCompose, flap } from "@typeclass/functor";
 import { pipe } from "../pipe";
 import * as R from "@data/result";
 import * as A from "@data/array";
@@ -54,8 +54,8 @@ describe("Functor", () => {
     ];
     const result = pipe(
       data,
-      mapComposition(A.Functor, A.Functor)((x) => x + 1),
-      mapComposition(A.Functor, A.Functor)((x) => ({ x }))
+      mapCompose(A.Functor, A.Functor)((x) => x + 1),
+      mapCompose(A.Functor, A.Functor)((x) => ({ x }))
     );
     expectTypeOf(result).toEqualTypeOf<{ x: number }[][]>();
     expect(result).toEqual([
@@ -74,7 +74,7 @@ describe("Functor", () => {
     }
 
     function mapToX() {
-      return mapComposition(A.Functor, A.Functor)(toX);
+      return mapCompose(A.Functor, A.Functor)(toX);
     }
 
     type MapToX = ReturnType<typeof mapToX>;
@@ -100,7 +100,7 @@ describe("Functor", () => {
     const result = pipe(
       data,
       R.map(R.map((x) => x + 1)),
-      mapComposition(R.Functor, R.Functor)((x) => ({ x }))
+      mapCompose(R.Functor, R.Functor)((x) => ({ x }))
     );
     expectTypeOf(result).toEqualTypeOf<
       R.Result<R.Result<{ x: number }, ErrorConstructor>, Error>
@@ -115,9 +115,11 @@ describe("Functor", () => {
       return { x };
     }
 
-    const mapToX = <T>() => mapComposition(A.Functor, R.Functor)(toX<T>);
-
+    const mapToX = <T>() => mapCompose(A.Functor, R.Functor)(toX<T>);
     type MapToX = typeof mapToX;
+
+    const mapToX2 = <T>() => A.map(R.map(toX<T>));
+    type MapToX2 = typeof mapToX2;
 
     expectTypeOf<MapToX>().toEqualTypeOf<
       <T>() => <B1>(fa: R.Result<T, B1>[]) => R.Result<
@@ -127,10 +129,11 @@ describe("Functor", () => {
         B1
       >[]
     >();
+    expectTypeOf<MapToX2>().toEqualTypeOf<MapToX>();
 
     const result = pipe(
       data,
-      mapComposition(A.Functor, R.Functor)((x) => x + 1),
+      mapCompose(A.Functor, R.Functor)((x) => x + 1),
       A.map(R.map((x) => x * 2)),
       mapToX()
     );

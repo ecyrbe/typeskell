@@ -1,11 +1,16 @@
 import { Kind } from "@kinds";
 import * as tfunctor from "@typeclass/functor";
 import { type Of as tOf } from "@typeclass/of";
+import * as tTo from "@typeclass/to";
 
 export type TArray = Kind.Array;
 
 export const Of: tOf<TArray> = {
   of: (a) => [a],
+};
+
+export const To: tTo.To<TArray> = {
+  getOrElse: (f) => (fa) => (fa.length === 0 ? f() : fa[0]),
 };
 
 export const Functor: tfunctor.Functor<Kind.Array> = {
@@ -58,4 +63,4 @@ export const flap = tfunctor.flap(Functor);
  * pipe([[1,2,3],[4,5,6]], doubleMap(x => x + 1)) // [[2,3,4],[5,6,7]]
  * ```
  */
-export const doubleMap = tfunctor.mapComposition(Functor, Functor);
+export const doubleMap = tfunctor.mapCompose(Functor, Functor);

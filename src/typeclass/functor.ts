@@ -32,15 +32,15 @@ export interface Functor<F> {
 }
 
 /**
- * mapComposition :: Functor<F> Functor<G> -> (a -> b) -> F (G a) -> F (G b)
+ * mapCompose :: Functor<F> Functor<G> -> (a -> b) -> F (G a) -> F (G b)
  *
- * mapComposition :: <F,G>(ff: Functor<F> gg: Functor<G>) => <A,B>(f: (a: A) => B) => <...Cf,...Cg>(fa: $<F, [$<G,[A,...Cg]>,...Cf]>) => $<F, [$<G,[B,...Cg]>,...Cf]>
+ * mapCompose :: <F,G>(ff: Functor<F> gg: Functor<G>) => <A,B>(f: (a: A) => B) => <...Cf,...Cg>(fa: $<F, [$<G,[A,...Cg]>,...Cf]>) => $<F, [$<G,[B,...Cg]>,...Cf]>
  *
  * @param FunctorF : Functor<F>
  * @param FunctorG : Functor<G>
  * @returns (a -> b) -> F (G a) -> F (G b)
  */
-export const mapComposition =
+export const mapCompose =
   <F extends Kind, G extends Kind>(
     FunctorF: Functor<F>,
     FunctorG: Functor<G>

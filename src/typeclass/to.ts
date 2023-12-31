@@ -2,27 +2,27 @@ import type { Kind, $ } from "@kinds";
 import { GenericFn } from "@utils/functions";
 import { Dec } from "@utils/numbers";
 
-export interface ToParams<F extends Kind, A> extends Kind {
-  return: this["rawArgs"] extends unknown[]
-    ? [fa: $<F, [A, ...this["rawArgs"]]>]
+export interface ToParams extends Kind {
+  return: this["rawArgs"] extends [infer A, ...infer Args]
+    ? [f: (...args: Args) => A]
     : never;
 }
 
-export interface ToResult<A> extends Kind {
-  return: A;
+export interface ToResult<F extends Kind> extends Kind {
+  return: this["rawArgs"] extends [infer A, ...infer Args]
+    ? (fa: $<F, [A, ...Args]>) => A
+    : never;
 }
 
 export interface To<F extends Kind> {
   /**
-   * to :: F a -> a
+   * to :: f (e -> a) -> F a -> a
    *
-   * to :: <A,...>(fa: $<F, [A,...]>) => A
+   * to :: <A,...E>(f: (...args: E)=> A) => (fa: $<F, [A,...E]>) => A
    *
-   * @param fa : F a
-   * @returns a
+   * @param f : f (e -> a)
+   * @returns F a -> a
    *
    */
-  getOrElse: <A>(
-    f: () => A
-  ) => GenericFn<Dec<F["arity"]>, ToParams<F, A>, ToResult<A>>;
+  getOrElse: GenericFn<F["arity"], ToParams, ToResult<F>>;
 }

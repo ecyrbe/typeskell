@@ -35,7 +35,7 @@ export const Of: tOf.Of<TResult> = {
 };
 
 export const To: tTo.To<TResult> = {
-  getOrElse: (f) => (fa) => (isOk(fa) ? fa.ok : f()),
+  getOrElse: (f) => (fa) => (isOk(fa) ? fa.ok : f(fa.err)),
 };
 
 export const Bifunctor: tbifunctor.BiFunctor<TResult> = {
@@ -107,7 +107,7 @@ export const flap = tfunctor.flap(Functor);
  * pipe(err("error"), doubleMap(x => x + 1)) // err("error")
  * ```
  */
-export const doubleMap = tfunctor.mapComposition(Functor, Functor);
+export const doubleMap = tfunctor.mapCompose(Functor, Functor);
 
 /**
  * bimap :: (a -> b) (e1 -> e2) -> Result<a, e1> -> Result<b, e2>
