@@ -33,10 +33,10 @@ interface ApFabResult<F extends Kind, Af> extends Kind {
  * Applicative is a typeclass that provides a way to apply a function in a context to a value in a context.
  *
  * Laws:
- * - Identity: `pipe(of(id), ap(a)) = a`
- * - Homomorphism: `pipe(of(f), ap(of(a))) = of(f(a))`
- * - Interchange: `pipe(of(f), ap(of(a))) = pipe(of(g=> g(a)), ap(f))`
- * - Composition: `pipe(a, ap(pipe(b, ap(pipe(c, ap(of(compose))))))) = pipe(pipe(a, ap(b)), ap(c))`
+ * - Identity: ap (pure id) v = v
+ * - Homomorphism: ap (pure f) (pure x) = pure (f x)
+ * - Interchange: ap u (pure y) = ap (pure (\f -> f y)) u
+ * - Composition: ap (ap (ap (pure (.)) u) v) w = ap u (ap v w)
  */
 export interface Applicative<F extends Kind> extends Functor<F>, Of<F> {
   /**
