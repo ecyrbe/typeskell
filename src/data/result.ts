@@ -4,6 +4,8 @@ import * as tfunctor from "@typeclass/functor";
 import * as tbifunctor from "@typeclass/bifunctor";
 import * as tOf from "@typeclass/of";
 import * as tTo from "@typeclass/to";
+import * as tApplicative from "@typeclass/applicative";
+import { pipe } from "../pipe";
 
 export interface Err<E> {
   readonly _tag: "Err";
@@ -44,6 +46,12 @@ export const Bifunctor: tbifunctor.BiFunctor<TResult> = {
 
 export const Functor: tfunctor.Functor<TResult> = {
   map: tbifunctor.mapLeft(Bifunctor),
+};
+
+export const Applicative: tApplicative.Applicative<TResult> = {
+  ...Of,
+  ...Functor,
+  ap: (fa) => (fab) => (isOk(fab) ? pipe(fa, Functor.map(fab.ok)) : fab),
 };
 
 /**
@@ -172,3 +180,20 @@ export const bimap = Bifunctor.bimap;
  * pipe(err("error"), mapErr(x => x + "!")) // err("error!")
  */
 export const mapErr = tbifunctor.mapRight(Bifunctor);
+
+/**
+ * ap :: `Result<a, e1> -> Result<(a -> b), e2> -> Result<b, e1 | e2>`
+ *
+ * ap :: `<A, E1>(fa: Result<A, E1>) => <B, E2>(fab: Result<(a: A) => B, E2>) => Result<B, E1 | E2>`
+ *
+ * @param fa `Result<a, e1>`
+ * @returns fab: `Result<(a -> b), e2> -> Result<b, e1 | e2>`
+ *
+ * @example
+ * ```ts
+ * pipe(of(x => x + 1), ap(ok(0))) // ok(1)
+ * pipe(err("error"), ap(ok(0))) // err("error")
+ * pipe(of(x => x + 1), ap(err("error"))) // err("error")
+ * ```
+ */
+const ap = Applicative.ap;

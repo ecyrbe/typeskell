@@ -3,6 +3,8 @@ import * as tfunctor from "@typeclass/functor";
 import { type Of as tOf } from "@typeclass/of";
 import * as tTo from "@typeclass/to";
 import * as tZero from "@typeclass/zero";
+import * as tApplicative from "@typeclass/applicative";
+import { pipe } from "../pipe";
 
 export type TArray = Kind.Array;
 
@@ -20,6 +22,12 @@ export const To: tTo.To<TArray> = {
 
 export const Functor: tfunctor.Functor<TArray> = {
   map: (f) => (fa) => fa.map(f),
+};
+
+export const Applicative: tApplicative.Applicative<TArray> = {
+  ...Of,
+  ...Functor,
+  ap: (fa) => (fab) => fab.flatMap((f) => fa.map(f)),
 };
 
 /**
@@ -117,3 +125,17 @@ export const flap = tfunctor.flap(Functor);
  * ```
  */
 export const doubleMap = tfunctor.mapCompose(Functor, Functor);
+
+/**
+ * ap :: a[] -> (a -> b)[] -> b[]
+ *
+ * ap :: <A, B>(fa: A[]) => (fab: (a: A) => B[]) => B[]
+ *
+ * @param fa : a[]
+ * @returns fab: (a -> b)[] -> b[]
+ *
+ * @example
+ * ```ts
+ * pipe(of(x=>x+1), ap([1,2,3])) // [2,3,4]
+ */
+const ap = Applicative.ap;

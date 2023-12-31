@@ -4,6 +4,8 @@ import * as tfunctor from "@typeclass/functor";
 import * as tOf from "@typeclass/of";
 import * as tTo from "@typeclass/to";
 import * as tZero from "@typeclass/zero";
+import * as tApplicative from "@typeclass/applicative";
+import { pipe } from "../pipe";
 
 export interface None {
   readonly _tag: "None";
@@ -43,6 +45,12 @@ export const To: tTo.To<TOption> = {
 
 export const Functor: tfunctor.Functor<TOption> = {
   map: (f) => (fa) => (isSome(fa) ? some(f(fa.value)) : none),
+};
+
+export const Applicative: tApplicative.Applicative<TOption> = {
+  ...Of,
+  ...Functor,
+  ap: (fa) => (fab) => (isSome(fab) ? pipe(fa, Functor.map(fab.value)) : none),
 };
 
 /**
@@ -155,3 +163,21 @@ export const flap = tfunctor.flap(Functor);
  * pipe(none, doubleMap(x => x + 1)) // none
  */
 export const doubleMap = tfunctor.mapCompose(Functor, Functor);
+
+/**
+ * ap :: `Option<a> -> Option<(a -> b)> -> Option<b>`
+ *
+ * ap :: `<A>(fa: Option<A>) => <B>(fab: Option<(a: A) => B>) => Option<B>`
+ *
+ * @param fa : Option<a>
+ * @returns fab: Option<(a -> b)> -> Option<b>
+ *
+ * @example
+ * ```ts
+ * pipe(of(x => x + 1), ap(some(1))) // some(2)
+ * pipe(of(x => x + 1), ap(none)) // none
+ * pipe(none, ap(some(1))) // none
+ * pipe(none, ap(none)) // none
+ * ```
+ */
+export const ap = Applicative.ap;
