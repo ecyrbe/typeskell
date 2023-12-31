@@ -55,6 +55,8 @@ export type $<
     ? {
         kind: kind;
         args: params;
+        // TODO: build each arg variance programmatically
+        // argN: Covariance<kind['signature'][N],params[N]>
       }
     : never;
 
