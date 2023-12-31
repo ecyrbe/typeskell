@@ -24,12 +24,12 @@ export interface FunctorResult<F extends Kind, B> extends Kind {
  */
 export interface Functor<F> {
   /**
-   * map :: (a -> b) -> F a -> F b
+   * map :: `(a -> b) -> F a -> F b`
    *
-   * map :: <A,B>(f: (a: A) => B) => <...>(fa: $<F, [A,...]>) => $<F, [B,...]>
+   * map :: `<A,B>(f: (a: A) => B) => <...>(fa: $<F, [A,...]>) => $<F, [B,...]>`
    *
-   * @param f : a -> b
-   * @returns F a -> F b
+   * @param f `a -> b`
+   * @returns `F a -> F b`
    */
   map: F extends Kind
     ? <A, B>(
@@ -39,13 +39,13 @@ export interface Functor<F> {
 }
 
 /**
- * mapCompose :: Functor<F> Functor<G> -> (a -> b) -> F (G a) -> F (G b)
+ * mapCompose :: `Functor<F> Functor<G> -> (a -> b) -> F (G a) -> F (G b)`
  *
- * mapCompose :: <F,G>(ff: Functor<F> gg: Functor<G>) => <A,B>(f: (a: A) => B) => <...Cf,...Cg>(fa: $<F, [$<G,[A,...Cg]>,...Cf]>) => $<F, [$<G,[B,...Cg]>,...Cf]>
+ * mapCompose :: `<F,G>(ff: Functor<F> gg: Functor<G>) => <A,B>(f: (a: A) => B) => <...Cf,...Cg>(fa: $<F, [$<G,[A,...Cg]>,...Cf]>) => $<F, [$<G,[B,...Cg]>,...Cf]>`
  *
- * @param FunctorF : Functor<F>
- * @param FunctorG : Functor<G>
- * @returns (a -> b) -> F (G a) -> F (G b)
+ * @param FunctorF `Functor<F>`
+ * @param FunctorG `Functor<G>`
+ * @returns `(a -> b) -> F (G a) -> F (G b)`
  */
 export const mapCompose =
   <F extends Kind, G extends Kind>(
@@ -98,12 +98,12 @@ interface FlapResult<F extends Kind> extends Kind {
     : never;
 }
 /**
- * flap :: Functor<F> -> a -> F (a -> b) -> F b
+ * flap :: `Functor F -> a -> F (a -> b) -> F b`
  *
- * flap :: <F>(f: Functor<F>) => <A>(a: A) => <B,...>(fab: $<F, [(a: A) => B, ...]>) => $<F, [B, ...]>
+ * flap :: `<F>(f: Functor<F>) => <A>(a: A) => <B,...>(fab: $<F, [(a: A) => B, ...]>) => $<F, [B, ...]>`
  *
- * @param functor : Functor<F>
- * @returns a -> F (a -> b) -> F b
+ * @param functor `Functor<F>`
+ * @returns `a -> F (a -> b) -> F b`
  */
 export const flap =
   <F extends Kind>(functor: Functor<F>) =>

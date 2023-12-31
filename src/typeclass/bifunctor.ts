@@ -29,13 +29,13 @@ interface BiFunctorResult<F extends Kind, B, D> extends Kind {
  */
 export interface BiFunctor<F> {
   /**
-   * bimap :: (a -> b) (c -> d) -> F a c -> F b d
+   * bimap :: `(a -> b) (c -> d) -> F a c -> F b d`
    *
-   * bimap :: <A,B,C,D>(f: (a: A) => B, g: (c: C) => D) => <...>(fac: $<F, [A,C,...]>) => $<F, [B,D,...]>
+   * bimap :: `<A,B,C,D>(f: (a: A) => B, g: (c: C) => D) => <...>(fac: $<F, [A,C,...]>) => $<F, [B,D,...]>`
    *
-   * @param f : a -> b
-   * @param g : c -> d
-   * @returns F a c -> F b d
+   * @param f `a -> b`
+   * @param g `c -> d`
+   * @returns `F a c -> F b d`
    */
   bimap: F extends Kind
     ? <A, B, C, D>(
@@ -50,12 +50,12 @@ export interface BiFunctor<F> {
 }
 
 /**
- * mapLeft :: BiFunctor F -> (a -> b) -> F a c -> F b c
+ * mapLeft :: `BiFunctor F -> (a -> b) -> F a c -> F b c`
  *
- * mapLeft :: <F>(bif: BiFunctor<F>) => <A,B>(f: (a: A) => B) => <C,...>(fac: $<F, [A,C,...]>) => $<F, [B,C,...]>
+ * mapLeft :: `<F>(bif: BiFunctor<F>) => <A,B>(f: (a: A) => B) => <C,...>(fac: $<F, [A,C,...]>) => $<F, [B,C,...]>`
  *
- * @param bifunctor : BiFunctor<F>
- * @returns (a -> b) -> F a c -> F b c
+ * @param bifunctor `BiFunctor<F>`
+ * @returns `(a -> b) -> F a c -> F b c`
  */
 export const mapLeft =
   <F extends Kind>(bifunctor: BiFunctor<F>) =>
@@ -78,12 +78,12 @@ export interface BiFunctorRightResult<F extends Kind, B> extends Kind {
 }
 
 /**
- * mapRight :: BiFunctor F  -> (a -> b) -> F c a -> F c b
+ * mapRight :: `BiFunctor F  -> (a -> b) -> F c a -> F c b`
  *
- * mapRight :: <F>(bif: BiFunctor<F>) => <A,B>(f: (a: A) => B) => <C,...>(fac: $<F, [C,A,...]>) => $<F, [C,B,...]>
+ * mapRight :: `<F>(bif: BiFunctor<F>) => <A,B>(f: (a: A) => B) => <C,...>(fac: $<F, [C,A,...]>) => $<F, [C,B,...]>`
  *
- * @param bifunctor : BiFunctor<F>
- * @returns (a -> b) -> F c a -> F c b
+ * @param bifunctor `BiFunctor<F>`
+ * @returns `(a -> b) -> F c a -> F c b`
  */
 export const mapRight =
   <F extends Kind>(bifunctor: BiFunctor<F>) =>
