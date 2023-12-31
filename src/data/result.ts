@@ -3,6 +3,7 @@ import { InvariantParam, CovariantParam } from "../kinds/variance";
 import * as tfunctor from "@typeclass/functor";
 import * as tbifunctor from "@typeclass/bifunctor";
 import * as tOf from "@typeclass/of";
+import * as tTo from "@typeclass/to";
 
 export interface Err<E> {
   readonly _tag: "Err";
@@ -31,6 +32,10 @@ export interface TResult extends Kind<[InvariantParam, CovariantParam]> {
 
 export const Of: tOf.Of<TResult> = {
   of: ok,
+};
+
+export const To: tTo.To<TResult> = {
+  getOrElse: (f) => (fa) => (isOk(fa) ? fa.ok : f()),
 };
 
 export const Bifunctor: tbifunctor.BiFunctor<TResult> = {
