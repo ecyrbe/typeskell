@@ -22,7 +22,7 @@ export interface FunctorResult<F extends Kind, B> extends Kind {
  *  - Identity: map id = id
  *  - Composition: map (f . g) = map f . map g
  */
-export interface Functor<F> {
+export interface Functor<F extends Kind> {
   /**
    * map :: `(a -> b) -> F a -> F b`
    *
@@ -31,11 +31,9 @@ export interface Functor<F> {
    * @param f `a -> b`
    * @returns `F a -> F b`
    */
-  map: F extends Kind
-    ? <A, B>(
-        f: (a: A) => B
-      ) => GenericFn<Dec<F["arity"]>, FunctorParams<F, A>, FunctorResult<F, B>>
-    : never;
+  map: <A, B>(
+    f: (a: A) => B
+  ) => GenericFn<Dec<F["arity"]>, FunctorParams<F, A>, FunctorResult<F, B>>;
 }
 
 /**

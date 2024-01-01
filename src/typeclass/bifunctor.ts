@@ -27,7 +27,7 @@ interface BiFunctorResult<F extends Kind, B, D> extends Kind {
  * - Identity: bimap id id = id
  * - Composition: bimap (f . g) (h . i) = bimap f h  . bimap g i
  */
-export interface BiFunctor<F> {
+export interface BiFunctor<F extends Kind> {
   /**
    * bimap :: `(a -> b) (c -> d) -> F a c -> F b d`
    *
@@ -37,16 +37,14 @@ export interface BiFunctor<F> {
    * @param g `c -> d`
    * @returns `F a c -> F b d`
    */
-  bimap: F extends Kind
-    ? <A, B, C, D>(
-        f: (a: A) => B,
-        g: (e: C) => D
-      ) => GenericFn<
-        Sub<F["arity"], 2>,
-        BiFunctorParams<F, A, C>,
-        BiFunctorResult<F, B, D>
-      >
-    : never;
+  bimap: <A, B, C, D>(
+    f: (a: A) => B,
+    g: (e: C) => D
+  ) => GenericFn<
+    Sub<F["arity"], 2>,
+    BiFunctorParams<F, A, C>,
+    BiFunctorResult<F, B, D>
+  >;
 }
 
 /**
