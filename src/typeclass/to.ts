@@ -1,5 +1,6 @@
 import type { Kind, $ } from '@kinds';
 import { GenericFn } from '@utils/functions';
+import type { Expect, Equal } from 'type-testing';
 
 export interface ToParams extends Kind {
   return: this['rawArgs'] extends [infer B, ...infer Args] ? [f: (...args: Args) => B] : never;
@@ -33,6 +34,11 @@ export interface GetOrResult<B> extends Kind {
   return: this['arg0'] | B;
 }
 
+const _getOr =
+  (to: To<Kind.F>) =>
+  <B>(b: B) =>
+    to.getOrElse(() => b);
+
 /**
  * getOr :: `To F -> b -> F a -> a | b`
  *
@@ -45,5 +51,9 @@ export interface GetOrResult<B> extends Kind {
 export const getOr =
   <F extends Kind>(to: To<F>) =>
   <B>(b: B): GenericFn<F['arity'], GetOrParams<F>, GetOrResult<B>> =>
-    // @ts-expect-error
-    to.getOrElse(() => b);
+    _getOr(to as any)(b) as any;
+
+/**
+ * TYPE TESTS to check impl and interface are in sync
+ */
+type TestCases = [Expect<Equal<typeof getOr<Kind.F>, typeof _getOr>>];
