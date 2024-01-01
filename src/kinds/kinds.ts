@@ -1,4 +1,4 @@
-import { Covariant, CovariantParam, Invariant, InvariantParam, Param } from './variance';
+import { ContravariantParam, Covariant, CovariantParam, Invariant, InvariantParam, Param } from './variance';
 
 export interface Kind<params extends Param[] = Param[]> {
   signature: params; // keep track of variance signature
@@ -32,26 +32,27 @@ export namespace Kind {
   export type unary = Kind<[InvariantParam]>;
   export type binary = Kind<[InvariantParam, CovariantParam]>;
   export type ternary = Kind<[InvariantParam, CovariantParam, CovariantParam]>;
+  export type quaternary = Kind<[InvariantParam, CovariantParam, CovariantParam, ContravariantParam]>;
 
   // default types constructors
   export interface Array extends Kind.unary {
     return: this['arg0'][];
   }
-
-  export interface Generic<F extends 'F' | 'G' | 'H'> extends Kind.unary {
+  interface Generic<F extends 'F' | 'G' | 'H'> extends Kind.unary {
     return: [F, Invariant<this['arg0']>];
   }
 
-  export type F = Kind.Generic<'F'>;
-  export type G = Kind.Generic<'G'>;
-  export type H = Kind.Generic<'H'>;
-  export interface BiGeneric<F extends 'F' | 'G' | 'H'> extends Kind.binary {
+  export type F = Generic<'F'>;
+  export type G = Generic<'G'>;
+  export type H = Generic<'H'>;
+
+  interface Generic2<F extends 'F' | 'G' | 'H'> extends Kind.binary {
     return: [F, Invariant<this['arg0']>, Covariant<this['arg1']>];
   }
 
-  export type BiF = Kind.BiGeneric<'F'>;
-  export type BiG = Kind.BiGeneric<'G'>;
-  export type BiH = Kind.BiGeneric<'H'>;
+  export type F2 = Generic2<'F'>;
+  export type G2 = Generic2<'G'>;
+  export type H2 = Generic2<'H'>;
 
   export interface Record extends Kind<[InvariantParam<string | number | symbol>, CovariantParam]> {
     return: globalThis.Record<this['arg0'], this['arg1']>;

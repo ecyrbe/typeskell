@@ -55,7 +55,7 @@ export const mapLeft =
     _mapLeft(bifunctor as any)(f) as any;
 
 const _mapLeft =
-  (bifunctor: BiFunctor<Kind.BiF>) =>
+  (bifunctor: BiFunctor<Kind.F2>) =>
   <A, B>(f: (a: A) => B) =>
     bifunctor.bimap(f, identity);
 
@@ -81,11 +81,11 @@ export const mapRight =
     _mapRight(bifunctor as any)(f) as any;
 
 const _mapRight =
-  (bifunctor: BiFunctor<Kind.BiF>) =>
+  (bifunctor: BiFunctor<Kind.F2>) =>
   <A, B>(f: (a: A) => B) =>
     bifunctor.bimap(identity, f);
 
 type TestCases = [
-  Expect<Equal<typeof mapLeft<Kind.BiF>, typeof _mapLeft>>,
-  Expect<Equal<typeof mapRight<Kind.BiF>, typeof _mapRight>>,
+  Expect<Equal<typeof mapLeft<Kind.F2>, typeof _mapLeft>>,
+  Expect<Equal<typeof mapRight<Kind.F2>, typeof _mapRight>>,
 ];
