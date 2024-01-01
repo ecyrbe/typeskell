@@ -1,10 +1,10 @@
-import { Kind } from "@kinds";
-import * as tfunctor from "@typeclass/functor";
-import { type Of as tOf } from "@typeclass/of";
-import * as tTo from "@typeclass/to";
-import * as tZero from "@typeclass/zero";
-import * as tApplicative from "@typeclass/applicative";
-import { pipe } from "../pipe";
+import { Kind } from '@kinds';
+import * as tfunctor from '@typeclass/functor';
+import { type Of as tOf } from '@typeclass/of';
+import * as tTo from '@typeclass/to';
+import * as tZero from '@typeclass/zero';
+import * as tApplicative from '@typeclass/applicative';
+import { pipe } from '../pipe';
 
 export type TArray = Kind.Array;
 
@@ -13,21 +13,21 @@ export const Zero: tZero.Zero<TArray> = {
 };
 
 export const Of: tOf<TArray> = {
-  of: (a) => [a],
+  of: a => [a],
 };
 
 export const To: tTo.To<TArray> = {
-  getOrElse: (f) => (fa) => (fa.length === 0 ? f() : fa[0]),
+  getOrElse: f => fa => (fa.length === 0 ? f() : fa[0]),
 };
 
 export const Functor: tfunctor.Functor<TArray> = {
-  map: (f) => (fa) => fa.map(f),
+  map: f => fa => fa.map(f),
 };
 
 export const Applicative: tApplicative.Applicative<TArray> = {
   ...Of,
   ...Functor,
-  ap: (fa) => (fab) => fab.flatMap((f) => fa.map(f)),
+  ap: fa => fab => fab.flatMap(f => fa.map(f)),
 };
 
 /**

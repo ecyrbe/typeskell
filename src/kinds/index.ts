@@ -1,3 +1,3 @@
-export { $, $$ } from "./apply";
-export * from "./kinds";
-export * from "./variance";
+export { $, $$ } from './apply';
+export * from './kinds';
+export * from './variance';

@@ -1,4 +1,10 @@
-import { CovariantParam, InvariantParam, Param } from "./variance";
+import {
+  Covariant,
+  CovariantParam,
+  Invariant,
+  InvariantParam,
+  Param,
+} from "./variance";
 
 export interface Kind<params extends Param[] = Param[]> {
   signature: params; // keep track of variance signature
@@ -36,6 +42,14 @@ export namespace Kind {
   // default types constructors
   export interface Array extends Kind.unary {
     return: this["arg0"][];
+  }
+
+  export interface Generic extends Kind.unary {
+    return: Invariant<this["arg0"]>;
+  }
+
+  export interface BiGeneric extends Kind.unary {
+    return: [Invariant<this["arg0"]>, Covariant<this["arg1"]>];
   }
 
   export interface Record

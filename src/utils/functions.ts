@@ -1,4 +1,4 @@
-import { Kind, $, $$ } from "@kinds";
+import { Kind, $, $$ } from '@kinds';
 
 // prettier-ignore
 type GenericFnA<N extends number, FnParams extends Kind, FnResult extends Kind> = N extends 0
@@ -144,14 +144,14 @@ export type GenericFn<
   N extends number,
   FnParams extends Kind,
   FnResult extends Kind,
-  Alpha extends "A" | "B" | "C" | "D" = "A",
-> = Alpha extends "A"
+  Alpha extends 'A' | 'B' | 'C' | 'D' = 'A',
+> = Alpha extends 'A'
   ? GenericFnA<N, FnParams, FnResult>
-  : Alpha extends "B"
+  : Alpha extends 'B'
     ? GenericFnB<N, FnParams, FnResult>
-    : Alpha extends "C"
+    : Alpha extends 'C'
       ? GenericFnC<N, FnParams, FnResult>
-      : Alpha extends "D"
+      : Alpha extends 'D'
         ? GenericFnD<N, FnParams, FnResult>
         : never;
 

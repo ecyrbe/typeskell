@@ -1,4 +1,4 @@
-import { type Tuple } from "@utils/tuples";
+import { type Tuple } from '@utils/tuples';
 
 /**
  * In/Out parameter
@@ -18,7 +18,7 @@ export type Contravariant<T> = (_: T) => void;
  * In/Out parameter
  */
 export type InvariantParam<T = unknown> = {
-  type: "invariant";
+  type: 'invariant';
   value: T;
 };
 
@@ -26,7 +26,7 @@ export type InvariantParam<T = unknown> = {
  * Out parameter
  */
 export type CovariantParam<T = unknown> = {
-  type: "covariant";
+  type: 'covariant';
   value: T;
 };
 
@@ -34,7 +34,7 @@ export type CovariantParam<T = unknown> = {
  * In parameter
  */
 export type ContravariantParam<T = unknown> = {
-  type: "contravariant";
+  type: 'contravariant';
   value: T;
 };
 
@@ -43,24 +43,20 @@ export type UnknownParam = {
   value: unknown;
 };
 
-export type Param =
-  | InvariantParam
-  | CovariantParam
-  | ContravariantParam
-  | UnknownParam;
+export type Param = InvariantParam | CovariantParam | ContravariantParam | UnknownParam;
 
-export type VarianceParamOf<T extends Param[], N extends number> = T[N]["type"];
+export type VarianceParamOf<T extends Param[], N extends number> = T[N]['type'];
 
 export type VarianceOf<
   T extends Param[],
   N extends number,
   Value,
   $variance = VarianceParamOf<T, N>,
-> = $variance extends "invariant"
+> = $variance extends 'invariant'
   ? Invariant<Value>
-  : $variance extends "covariant"
+  : $variance extends 'covariant'
     ? Covariant<Value>
-    : $variance extends "contravariant"
+    : $variance extends 'contravariant'
       ? Contravariant<Value>
       : never;
 
@@ -69,19 +65,14 @@ export type ZipWithVariance<
   B,
   Params extends Param[],
   $acc extends unknown[] = [],
-  $index extends number = $acc["length"],
+  $index extends number = $acc['length'],
 > = A extends [infer AHead, ...infer ATail]
   ? B extends [infer BHead, ...infer BTail]
     ? ZipWithVariance<
         ATail,
         BTail,
         Params,
-        [
-          ...$acc,
-          VarianceParamOf<Params, $index> extends "contravariant"
-            ? AHead & BHead
-            : AHead | BHead,
-        ]
+        [...$acc, VarianceParamOf<Params, $index> extends 'contravariant' ? AHead & BHead : AHead | BHead]
       >
     : ZipWithVariance<ATail, [], Params, [...$acc, AHead]>
   : B extends [infer BHead, ...infer BTail]

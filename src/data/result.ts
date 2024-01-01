@@ -1,35 +1,33 @@
-import { Kind } from "@kinds";
-import { InvariantParam, CovariantParam } from "../kinds/variance";
-import * as tfunctor from "@typeclass/functor";
-import * as tbifunctor from "@typeclass/bifunctor";
-import * as tOf from "@typeclass/of";
-import * as tTo from "@typeclass/to";
-import * as tApplicative from "@typeclass/applicative";
-import { pipe } from "../pipe";
+import { Kind } from '@kinds';
+import { InvariantParam, CovariantParam } from '../kinds/variance';
+import * as tfunctor from '@typeclass/functor';
+import * as tbifunctor from '@typeclass/bifunctor';
+import * as tOf from '@typeclass/of';
+import * as tTo from '@typeclass/to';
+import * as tApplicative from '@typeclass/applicative';
+import { pipe } from '../pipe';
 
 export interface Err<E> {
-  readonly _tag: "Err";
+  readonly _tag: 'Err';
   readonly err: E;
 }
 
 export interface Ok<A> {
-  readonly _tag: "Ok";
+  readonly _tag: 'Ok';
   readonly ok: A;
 }
 
 export type Result<A, E> = Ok<A> | Err<E>;
 
-export const err = <E>(e: E): Result<never, E> => ({ _tag: "Err", err: e });
-export const ok = <A>(a: A): Result<A, never> => ({ _tag: "Ok", ok: a });
+export const err = <E>(e: E): Result<never, E> => ({ _tag: 'Err', err: e });
+export const ok = <A>(a: A): Result<A, never> => ({ _tag: 'Ok', ok: a });
 
-export const isErr = <E>(result: Result<unknown, E>): result is Err<E> =>
-  result._tag === "Err";
+export const isErr = <E>(result: Result<unknown, E>): result is Err<E> => result._tag === 'Err';
 
-export const isOk = <A>(result: Result<A, unknown>): result is Ok<A> =>
-  result._tag === "Ok";
+export const isOk = <A>(result: Result<A, unknown>): result is Ok<A> => result._tag === 'Ok';
 
 export interface TResult extends Kind<[InvariantParam, CovariantParam]> {
-  return: Result<this["arg0"], this["arg1"]>;
+  return: Result<this['arg0'], this['arg1']>;
 }
 
 export const Of: tOf.Of<TResult> = {
@@ -37,11 +35,11 @@ export const Of: tOf.Of<TResult> = {
 };
 
 export const To: tTo.To<TResult> = {
-  getOrElse: (f) => (fa) => (isOk(fa) ? fa.ok : f(fa.err)),
+  getOrElse: f => fa => (isOk(fa) ? fa.ok : f(fa.err)),
 };
 
 export const Bifunctor: tbifunctor.BiFunctor<TResult> = {
-  bimap: (f, g) => (fa) => (isOk(fa) ? ok(f(fa.ok)) : err(g(fa.err))),
+  bimap: (f, g) => fa => (isOk(fa) ? ok(f(fa.ok)) : err(g(fa.err))),
 };
 
 export const Functor: tfunctor.Functor<TResult> = {
@@ -51,7 +49,7 @@ export const Functor: tfunctor.Functor<TResult> = {
 export const Applicative: tApplicative.Applicative<TResult> = {
   ...Of,
   ...Functor,
-  ap: (fa) => (fab) => (isOk(fab) ? pipe(fa, Functor.map(fab.ok)) : fab),
+  ap: fa => fab => (isOk(fab) ? pipe(fa, Functor.map(fab.ok)) : fab),
 };
 
 /**

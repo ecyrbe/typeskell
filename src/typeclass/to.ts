@@ -1,16 +1,12 @@
-import type { Kind, $ } from "@kinds";
-import { GenericFn } from "@utils/functions";
+import type { Kind, $ } from '@kinds';
+import { GenericFn } from '@utils/functions';
 
 export interface ToParams extends Kind {
-  return: this["rawArgs"] extends [infer B, ...infer Args]
-    ? [f: (...args: Args) => B]
-    : never;
+  return: this['rawArgs'] extends [infer B, ...infer Args] ? [f: (...args: Args) => B] : never;
 }
 
 export interface ToResult<F extends Kind> extends Kind {
-  return: this["rawArgs"] extends [infer B, ...infer Args]
-    ? <A>(fa: $<F, [A, ...Args]>) => A | B
-    : never;
+  return: this['rawArgs'] extends [infer B, ...infer Args] ? <A>(fa: $<F, [A, ...Args]>) => A | B : never;
 }
 
 /**
@@ -26,17 +22,15 @@ export interface To<F extends Kind> {
    * @returns `F a -> a`
    *
    */
-  getOrElse: GenericFn<F["arity"], ToParams, ToResult<F>>;
+  getOrElse: GenericFn<F['arity'], ToParams, ToResult<F>>;
 }
 
 export interface GetOrParams<F extends Kind> extends Kind {
-  return: this["rawArgs"] extends unknown[]
-    ? [fa: $<F, this["rawArgs"]>]
-    : never;
+  return: this['rawArgs'] extends unknown[] ? [fa: $<F, this['rawArgs']>] : never;
 }
 
 export interface GetOrResult<B> extends Kind {
-  return: this["arg0"] | B;
+  return: this['arg0'] | B;
 }
 
 /**
@@ -50,6 +44,6 @@ export interface GetOrResult<B> extends Kind {
  */
 export const getOr =
   <F extends Kind>(to: To<F>) =>
-  <B>(b: B): GenericFn<F["arity"], GetOrParams<F>, GetOrResult<B>> =>
+  <B>(b: B): GenericFn<F['arity'], GetOrParams<F>, GetOrResult<B>> =>
     // @ts-expect-error
     to.getOrElse(() => b);
