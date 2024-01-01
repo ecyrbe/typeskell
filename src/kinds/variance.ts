@@ -49,7 +49,20 @@ export type Param =
   | ContravariantParam
   | UnknownParam;
 
-export type VarianceOf<T extends Param[], N extends number> = T[N]["type"];
+export type VarianceParamOf<T extends Param[], N extends number> = T[N]["type"];
+
+export type VarianceOf<
+  T extends Param[],
+  N extends number,
+  Value,
+  $variance = VarianceParamOf<T, N>,
+> = $variance extends "invariant"
+  ? Invariant<Value>
+  : $variance extends "covariant"
+    ? Covariant<Value>
+    : $variance extends "contravariant"
+      ? Contravariant<Value>
+      : never;
 
 export type ZipWithVariance<
   A,
@@ -65,7 +78,7 @@ export type ZipWithVariance<
         Params,
         [
           ...$acc,
-          VarianceOf<Params, $index> extends "contravariant"
+          VarianceParamOf<Params, $index> extends "contravariant"
             ? AHead & BHead
             : AHead | BHead,
         ]

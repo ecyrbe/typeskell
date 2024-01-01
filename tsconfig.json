@@ -106,7 +106,8 @@
     // "skipDefaultLibCheck": true,                      /* Skip type checking .d.ts files that are included with TypeScript. */
     "skipLibCheck": true /* Skip type checking all .d.ts files. */,
     "paths": {
-      "@kinds": ["./src/kinds/kinds.ts"],
+      "@kinds": ["./src/kinds/index.ts"],
+      "@kinds/*": ["./src/kinds/*"],
       "@utils/*": ["./src/utils/*"],
       "@data/*": ["./src/data/*"],
       "@typeclass/*": ["./src/typeclass/*"]
