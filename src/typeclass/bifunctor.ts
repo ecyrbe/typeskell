@@ -85,6 +85,9 @@ const _mapRight =
   <A, B>(f: (a: A) => B) =>
     bifunctor.bimap(identity, f);
 
+/**
+ * TYPE TESTS to check impl and interface are in sync
+ */
 type TestCases = [
   Expect<Equal<typeof mapLeft<Kind.F2>, typeof _mapLeft>>,
   Expect<Equal<typeof mapRight<Kind.F2>, typeof _mapRight>>,

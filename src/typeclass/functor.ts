@@ -115,11 +115,22 @@ const _as =
   <B>(b: B): (<A>(fa: $<Kind.F, [A]>) => $<Kind.F, [B]>) =>
     functor.map(() => b);
 
+/**
+ * as :: `Functor F -> b -> F a -> F b`
+ *
+ * as :: `<F>(f: Functor<F>) => <B>(b: B) => <A,...>(fa: $<F, [A,...]>) => $<F, [B,...]>`
+ *
+ * @param functor `Functor<F>`
+ * @returns `b -> F a -> F b`
+ */
 export const as =
   <F extends Kind>(functor: Functor<F>) =>
   <B>(b: B): GenericFn<F['arity'], FunctorAsParams<F>, FunctorAsResult<F, B>> =>
     _as(functor as any)(b) as any;
 
+/**
+ * TYPE TESTS to check impl and interface are in sync
+ */
 type TestCases = [
   Expect<Equal<typeof mapCompose<Kind.F, Kind.G>, typeof _mapCompose>>,
   Expect<Equal<typeof flap<Kind.F>, typeof _flap>>,
