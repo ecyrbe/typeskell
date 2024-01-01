@@ -1,5 +1,5 @@
 import { describe, it, expect, expectTypeOf } from 'vitest';
-import { mapCompose, flap } from '@typeclass/functor';
+import { mapCompose, flap, as } from '@typeclass/functor';
 import { pipe } from '../pipe';
 import * as R from '@data/result';
 import * as A from '@data/array';
@@ -142,5 +142,19 @@ describe('Functor', () => {
     const result = pipe(data, flap(A.Functor)(2));
     expectTypeOf(result).toEqualTypeOf<number[]>();
     expect(result).toEqual([3, 4]);
+  });
+
+  it('should as with array', () => {
+    const data = [1, 2, 3];
+    const result = pipe(data, as(A.Functor)(0));
+    expectTypeOf(result).toEqualTypeOf<number[]>();
+    expect(result).toEqual([0, 0, 0]);
+  });
+
+  it('should as with either', () => {
+    const data: R.Result<number, Error> = R.ok(7);
+    const result = pipe(data, as(R.Functor)(2));
+    expectTypeOf(result).toEqualTypeOf<R.Result<number, Error>>();
+    expect(result).toEqual(R.ok(2));
   });
 });

@@ -132,6 +132,22 @@ export const map = Functor.map;
 export const flap = tfunctor.flap(Functor);
 
 /**
+ * as :: `b -> Result<a, e> -> Result<b, e>`
+ *
+ * as :: `<B>(b: B) => <A,E>(fa: Result<A, E>) => Result<B, E>`
+ *
+ * @param b `b`
+ * @returns `Result<a, e> -> Result<b, e>`
+ *
+ * @example
+ * ```ts
+ * pipe(ok(0), as(1)) // ok(1)
+ * pipe(err("error"), as(1)) // err("error")
+ * ```
+ */
+export const as = tfunctor.as(Functor);
+
+/**
  * doubleMap :: `(a -> b) -> Result<Result<a, e1>, e2> -> Result<Result<b, e1>, e2>`
  *
  * doubleMap :: `<A, B>(f: (a: A) => B) => <E1, E2>(fa: Result<Result<A, E1>, E2>) => Result<Result<B, E1>, E2>`

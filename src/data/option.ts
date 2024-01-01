@@ -147,6 +147,22 @@ export const map = Functor.map;
 export const flap = tfunctor.flap(Functor);
 
 /**
+ * as :: `b -> Option<a> -> Option<b>`
+ *
+ * as :: `<B>(b: B) => <A>(fa: Option<A>) => Option<B>`
+ *
+ * @param b `b`
+ * @returns `Option<a> -> Option<b>`
+ *
+ * @example
+ * ```ts
+ * pipe(some(1), as(0)) // some(0)
+ * pipe(none, as(0)) // none
+ * ```
+ */
+export const as = tfunctor.as(Functor);
+
+/**
  * doubleMap :: `(a -> b) -> Option<Option<a>> -> Option<Option<b>>`
  *
  * doubleMap :: `<A, B>(f: (a: A) => B) => (fa: Option<Option<A>>) => Option<Option<B>>`

@@ -3,6 +3,8 @@ import type { SplitAt } from '@utils/tuples';
 import type { Add, Dec } from '@utils/numbers';
 import { type GenericFn, apply } from '@utils/functions';
 import { Expect, Equal } from 'type-testing';
+import { functor } from 'fp-ts';
+import { pipe } from '../pipe';
 
 export interface FunctorParams<F extends Kind, A> extends Kind {
   return: this['rawArgs'] extends unknown[] ? [fa: $<F, [A, ...this['rawArgs']]>] : never;
@@ -20,7 +22,6 @@ export interface FunctorResult<F extends Kind, B> extends Kind {
  *  - Composition: map (f . g) = map f . map g
  */
 export interface Functor<F extends Kind> {
-  _map?: <A, B>(f: (a: A) => B) => (fa: $<F, [A]>) => $<F, [B]>;
   /**
    * map :: `(a -> b) -> F a -> F b`
    *
@@ -83,6 +84,12 @@ interface FlapParams<F extends Kind, A> extends Kind {
 interface FlapResult<F extends Kind> extends Kind {
   return: this['rawArgs'] extends unknown[] ? $<F, [...this['rawArgs']]> : never;
 }
+
+const _flap =
+  (functor: Functor<Kind.F>) =>
+  <A>(a: A) =>
+    functor.map(apply(a));
+
 /**
  * flap :: `Functor F -> a -> F (a -> b) -> F b`
  *
@@ -96,12 +103,29 @@ export const flap =
   <A>(a: A): GenericFn<F['arity'], FlapParams<F, A>, FlapResult<F>> =>
     _flap(functor as any)(a) as any;
 
-const _flap =
+interface FunctorAsParams<F extends Kind> extends Kind {
+  return: this['rawArgs'] extends unknown[] ? [fa: $<F, this['rawArgs']>] : never;
+}
+interface FunctorAsResult<F extends Kind, B> extends Kind {
+  return: this['rawArgs'] extends [any, ...infer Args] ? $<F, [B, ...Args]> : never;
+}
+
+const _as =
   (functor: Functor<Kind.F>) =>
-  <A>(a: A) =>
-    functor.map(apply(a));
+  <B>(b: B) =>
+  <A>(fa: $<Kind.F, [A]>) =>
+    pipe(
+      fa,
+      functor.map(() => b),
+    );
+
+export const as =
+  <F extends Kind>(functor: Functor<F>) =>
+  <B>(b: B): GenericFn<F['arity'], FunctorAsParams<F>, FunctorAsResult<F, B>> =>
+    _as(functor as any)(b) as any;
 
 type TestCases = [
   Expect<Equal<typeof mapCompose<Kind.F, Kind.G>, typeof _mapCompose>>,
   Expect<Equal<typeof flap<Kind.F>, typeof _flap>>,
+  Expect<Equal<typeof as<Kind.F>, typeof _as>>,
 ];

@@ -115,6 +115,18 @@ export const map = Functor.map;
 export const flap = tfunctor.flap(Functor);
 
 /**
+ * as :: b -> a[] -> b[]
+ * @param b : b
+ * @returns fa: a[] -> b[]
+ *
+ * @example
+ * ```ts
+ * pipe([1,2,3], as(0)) // [0,0,0]
+ * ```
+ */
+export const as = tfunctor.as(Functor);
+
+/**
  * doubleMap :: (a -> b) -> a[][] -> b[][]
  * @param f : a -> b
  * @returns fa: a[][] -> b[][]
