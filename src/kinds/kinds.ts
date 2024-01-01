@@ -38,8 +38,16 @@ export namespace Kind {
   export interface Array extends Kind.unary {
     return: this['arg0'][];
   }
+
+  // we are in the matrix
+  // simulate generics with higher kinded types
+  type $<F, Args> = {
+    F: F;
+    Args: Args;
+  };
+
   interface Generic<F extends 'F' | 'G' | 'H'> extends Kind.unary {
-    return: [F, Invariant<this['arg0']>];
+    return: $<F, [this['arg0']]>;
   }
 
   export type F = Generic<'F'>;
@@ -47,7 +55,7 @@ export namespace Kind {
   export type H = Generic<'H'>;
 
   interface Generic2<F extends 'F' | 'G' | 'H'> extends Kind.binary {
-    return: [F, Invariant<this['arg0']>, Covariant<this['arg1']>];
+    return: $<F, [this['arg0'], this['arg1']]>;
   }
 
   export type F2 = Generic2<'F'>;
