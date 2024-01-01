@@ -2,6 +2,7 @@ import type { Kind, $ } from '@kinds';
 import type { SplitAt } from '@utils/tuples';
 import type { Add, Dec } from '@utils/numbers';
 import { type GenericFn, apply } from '@utils/functions';
+import { Expect, Equal } from 'type-testing';
 
 export interface FunctorParams<F extends Kind, A> extends Kind {
   return: this['rawArgs'] extends unknown[] ? [fa: $<F, [A, ...this['rawArgs']]>] : never;
@@ -55,13 +56,8 @@ export const mapCompose =
     _mapCompose(FunctorF as any, FunctorG as any)(f) as any;
 
 export const _mapCompose =
-  (
-    FunctorF: Functor<Kind.Generic>,
-    FunctorG: Functor<Kind.Generic>,
-  ): (<A, B>(
-    f: (a: A) => B,
-  ) => (fa: $<Kind.Generic, [$<Kind.Generic, [A]>]>) => $<Kind.Generic, [$<Kind.Generic, [B]>]>) =>
-  f =>
+  (FunctorF: Functor<Kind.F>, FunctorG: Functor<Kind.G>) =>
+  <A, B>(f: (a: A) => B) =>
     FunctorF.map(FunctorG.map(f));
 
 interface FunctorCompositionParams<F extends Kind, G extends Kind, A> extends Kind {
@@ -101,6 +97,11 @@ export const flap =
     _flap(functor as any)(a) as any;
 
 const _flap =
-  (functor: Functor<Kind.Generic>) =>
-  <A>(a: A): (<B>(fab: $<Kind.Generic, [(a: A) => B]>) => $<Kind.Generic, [B]>) =>
+  (functor: Functor<Kind.F>) =>
+  <A>(a: A) =>
     functor.map(apply(a));
+
+type TestCases = [
+  Expect<Equal<typeof mapCompose<Kind.F, Kind.G>, typeof _mapCompose>>,
+  Expect<Equal<typeof flap<Kind.F>, typeof _flap>>,
+];

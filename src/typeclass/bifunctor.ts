@@ -3,6 +3,7 @@ import type { Dec, Sub } from '@utils/numbers';
 import { type GenericFn, identity } from '@utils/functions';
 import type { FunctorParams, FunctorResult } from '@typeclass/functor';
 import { A } from 'vitest/dist/reporters-O4LBziQ_';
+import { Equal, Expect } from 'type-testing';
 
 interface BiFunctorParams<F extends Kind, A, C> extends Kind {
   return: this['rawArgs'] extends unknown[] ? [fa: $<F, [A, C, ...this['rawArgs']]>] : never;
@@ -54,12 +55,12 @@ export const mapLeft =
     _mapLeft(bifunctor as any)(f) as any;
 
 const _mapLeft =
-  (bifunctor: BiFunctor<Kind.BiGeneric>) =>
-  <A, B>(f: (a: A) => B): (<C>(fac: $<Kind.BiGeneric, [A, C]>) => $<Kind.BiGeneric, [B, C]>) =>
+  (bifunctor: BiFunctor<Kind.BiF>) =>
+  <A, B>(f: (a: A) => B) =>
     bifunctor.bimap(f, identity);
 
 export interface BiFunctorRightParams<F extends Kind, A> extends Kind {
-  return: this['rawArgs'] extends [infer C, ...infer Args] ? [fa: $<F, [C, A, ...Args]>] : never;
+  return: this['rawArgs'] extends [infer C, ...infer Args] ? [fac: $<F, [C, A, ...Args]>] : never;
 }
 
 export interface BiFunctorRightResult<F extends Kind, B> extends Kind {
@@ -80,6 +81,11 @@ export const mapRight =
     _mapRight(bifunctor as any)(f) as any;
 
 const _mapRight =
-  (bifunctor: BiFunctor<Kind.BiGeneric>) =>
-  <A, B>(f: (a: A) => B): (<C>(fac: $<Kind.BiGeneric, [C, A]>) => $<Kind.BiGeneric, [C, B]>) =>
+  (bifunctor: BiFunctor<Kind.BiF>) =>
+  <A, B>(f: (a: A) => B) =>
     bifunctor.bimap(identity, f);
+
+type TestCases = [
+  Expect<Equal<typeof mapLeft<Kind.BiF>, typeof _mapLeft>>,
+  Expect<Equal<typeof mapRight<Kind.BiF>, typeof _mapRight>>,
+];
