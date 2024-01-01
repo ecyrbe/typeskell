@@ -1,8 +1,8 @@
 import type { Kind, $ } from '@kinds';
+import { ZipWithVariance } from '@kinds/variance';
 import type { Functor } from '@typeclass/functor';
 import type { Of } from '@typeclass/of';
 import type { GenericFn } from '@utils/functions';
-import { ZipWithVariance } from '../kinds/variance';
 import { Tail } from '@utils/tuples';
 
 interface ApParams<F extends Kind> extends Kind {

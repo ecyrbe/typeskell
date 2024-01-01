@@ -4,7 +4,6 @@ import { type Of as tOf } from '@typeclass/of';
 import * as tTo from '@typeclass/to';
 import * as tZero from '@typeclass/zero';
 import * as tApplicative from '@typeclass/applicative';
-import { pipe } from '../pipe';
 
 export type TArray = Kind.Array;
 

@@ -1,4 +1,4 @@
-import { ContravariantParam, Covariant, CovariantParam, Invariant, InvariantParam, Param } from './variance';
+import { ContravariantParam, CovariantParam, InvariantParam, Param } from './variance';
 
 export interface Kind<params extends Param[] = Param[]> {
   signature: params; // keep track of variance signature

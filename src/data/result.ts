@@ -1,5 +1,4 @@
-import { Kind } from '@kinds';
-import { InvariantParam, CovariantParam } from '../kinds/variance';
+import { Kind, InvariantParam, CovariantParam } from '@kinds';
 import * as tfunctor from '@typeclass/functor';
 import * as tbifunctor from '@typeclass/bifunctor';
 import * as tOf from '@typeclass/of';

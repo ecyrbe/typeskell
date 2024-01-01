@@ -1,9 +1,8 @@
-import type { Kind, $, ConcreteKind } from '@kinds';
+import { Equal, Expect } from 'type-testing';
+import type { Kind, $ } from '@kinds';
 import type { Dec, Sub } from '@utils/numbers';
 import { type GenericFn, identity } from '@utils/functions';
 import type { FunctorParams, FunctorResult } from '@typeclass/functor';
-import { A } from 'vitest/dist/reporters-O4LBziQ_';
-import { Equal, Expect } from 'type-testing';
 
 interface BiFunctorParams<F extends Kind, A, C> extends Kind {
   return: this['rawArgs'] extends unknown[] ? [fa: $<F, [A, C, ...this['rawArgs']]>] : never;

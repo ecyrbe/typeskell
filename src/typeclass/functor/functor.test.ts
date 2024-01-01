@@ -1,8 +1,8 @@
 import { describe, it, expect, expectTypeOf } from 'vitest';
 import { mapCompose, flap, as } from '@typeclass/functor';
-import { pipe } from '../pipe';
 import * as R from '@data/result';
 import * as A from '@data/array';
+import { pipe } from '../../pipe';
 
 describe('Functor', () => {
   it('should map an array', () => {

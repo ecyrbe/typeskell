@@ -1,6 +1,6 @@
+import type { Expect, Equal } from 'type-testing';
 import type { Kind, $ } from '@kinds';
 import { GenericFn } from '@utils/functions';
-import type { Expect, Equal } from 'type-testing';
 
 export interface ToParams extends Kind {
   return: this['rawArgs'] extends [infer B, ...infer Args] ? [f: (...args: Args) => B] : never;

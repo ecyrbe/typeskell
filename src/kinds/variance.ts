@@ -1,5 +1,3 @@
-import { type Tuple } from '@utils/tuples';
-
 /**
  * In/Out parameter
  */

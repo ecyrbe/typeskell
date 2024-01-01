@@ -1,10 +1,8 @@
+import { Expect, Equal } from 'type-testing';
 import type { Kind, $ } from '@kinds';
 import type { SplitAt } from '@utils/tuples';
 import type { Add, Dec } from '@utils/numbers';
 import { type GenericFn, apply } from '@utils/functions';
-import { Expect, Equal } from 'type-testing';
-import { functor } from 'fp-ts';
-import { pipe } from '../pipe';
 
 export interface FunctorParams<F extends Kind, A> extends Kind {
   return: this['rawArgs'] extends unknown[] ? [fa: $<F, [A, ...this['rawArgs']]>] : never;

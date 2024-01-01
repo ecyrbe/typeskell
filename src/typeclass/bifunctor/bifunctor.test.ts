@@ -1,7 +1,7 @@
 import { describe, it, expect, expectTypeOf } from 'vitest';
 import * as R from '@data/result';
 import { mapLeft, mapRight } from '@typeclass/bifunctor';
-import { pipe } from '../pipe';
+import { pipe } from '../../pipe';
 
 const bifunctor = R.Bifunctor;
 

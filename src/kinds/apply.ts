@@ -1,4 +1,4 @@
-import { ConcreteKind } from '@kinds';
+import { ConcreteKind } from '@kinds/kinds';
 
 export type $<kind, params extends unknown[] = [], strict extends boolean = true> = kind extends ConcreteKind
   ? (kind & {
