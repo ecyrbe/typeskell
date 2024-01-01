@@ -1,4 +1,4 @@
-import { Kind, $ } from '@kinds';
+import { Kind } from '@kinds';
 import { Functor } from './functor';
 import { apply } from '@utils/functions';
 
@@ -14,5 +14,5 @@ export const flap =
 
 export const as =
   (functor: Functor<Kind.F>) =>
-  <B>(b: B): (<A>(fa: $<Kind.F, [A]>) => $<Kind.F, [B]>) =>
-    functor.map(() => b);
+  <B>(b: B) =>
+    functor.map(<A>(_: A) => b);
