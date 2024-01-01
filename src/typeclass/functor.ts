@@ -112,12 +112,8 @@ interface FunctorAsResult<F extends Kind, B> extends Kind {
 
 const _as =
   (functor: Functor<Kind.F>) =>
-  <B>(b: B) =>
-  <A>(fa: $<Kind.F, [A]>) =>
-    pipe(
-      fa,
-      functor.map(() => b),
-    );
+  <B>(b: B): (<A>(fa: $<Kind.F, [A]>) => $<Kind.F, [B]>) =>
+    functor.map(() => b);
 
 export const as =
   <F extends Kind>(functor: Functor<F>) =>
