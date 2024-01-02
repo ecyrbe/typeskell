@@ -40,6 +40,11 @@ export interface BiFunctor<F extends Kind> {
   ) => GenericFn<Sub<F['arity'], 2>, BiFunctorParams<F, A, C>, BiFunctorResult<F, B, D>>;
 }
 
+const _mapLeft =
+  (bifunctor: BiFunctor<Kind.F2>) =>
+  <A, B>(f: (a: A) => B) =>
+    bifunctor.bimap(f, identity);
+
 /**
  * mapLeft :: `BiFunctor F -> (a -> b) -> F a c -> F b c`
  *
@@ -48,15 +53,9 @@ export interface BiFunctor<F extends Kind> {
  * @param bifunctor `BiFunctor<F>`
  * @returns `(a -> b) -> F a c -> F b c`
  */
-export const mapLeft =
-  <F extends Kind>(bifunctor: BiFunctor<F>) =>
-  <A, B>(f: (a: A) => B): GenericFn<Dec<F['arity']>, FunctorParams<F, A>, FunctorResult<F, B>> =>
-    _mapLeft(bifunctor as any)(f) as any;
-
-const _mapLeft =
-  (bifunctor: BiFunctor<Kind.F2>) =>
-  <A, B>(f: (a: A) => B) =>
-    bifunctor.bimap(f, identity);
+export const mapLeft: <F extends Kind>(
+  bifunctor: BiFunctor<F>,
+) => <A, B>(f: (a: A) => B) => GenericFn<Dec<F['arity']>, FunctorParams<F, A>, FunctorResult<F, B>> = _mapLeft as any;
 
 export interface BiFunctorRightParams<F extends Kind, A> extends Kind {
   return: this['rawArgs'] extends [infer C, ...infer Args] ? [fac: $<F, [C, A, ...Args]>] : never;
@@ -66,6 +65,11 @@ export interface BiFunctorRightResult<F extends Kind, B> extends Kind {
   return: this['rawArgs'] extends [infer C, ...infer Args] ? $<F, [C, B, ...Args]> : never;
 }
 
+const _mapRight =
+  (bifunctor: BiFunctor<Kind.F2>) =>
+  <A, B>(f: (a: A) => B) =>
+    bifunctor.bimap(identity, f);
+
 /**
  * mapRight :: `BiFunctor F  -> (a -> b) -> F c a -> F c b`
  *
@@ -74,15 +78,10 @@ export interface BiFunctorRightResult<F extends Kind, B> extends Kind {
  * @param bifunctor `BiFunctor<F>`
  * @returns `(a -> b) -> F c a -> F c b`
  */
-export const mapRight =
-  <F extends Kind>(bifunctor: BiFunctor<F>) =>
-  <A, B>(f: (a: A) => B): GenericFn<Dec<F['arity']>, BiFunctorRightParams<F, A>, BiFunctorRightResult<F, B>> =>
-    _mapRight(bifunctor as any)(f) as any;
-
-const _mapRight =
-  (bifunctor: BiFunctor<Kind.F2>) =>
-  <A, B>(f: (a: A) => B) =>
-    bifunctor.bimap(identity, f);
+export const mapRight: <F extends Kind>(
+  bifunctor: BiFunctor<F>,
+) => <A, B>(f: (a: A) => B) => GenericFn<Dec<F['arity']>, BiFunctorRightParams<F, A>, BiFunctorRightResult<F, B>> =
+  _mapRight as any;
 
 /**
  * TYPE TESTS to check impl and interface are in sync

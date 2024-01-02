@@ -48,10 +48,8 @@ const _getOr =
  * @param b `b`
  * @returns `F a -> a | b`
  */
-export const getOr =
-  <F extends Kind>(to: To<F>) =>
-  <B>(b: B): GenericFn<F['arity'], GetOrParams<F>, GetOrResult<B>> =>
-    _getOr(to as any)(b) as any;
+export const getOr: <F extends Kind>(to: To<F>) => <B>(b: B) => GenericFn<F['arity'], GetOrParams<F>, GetOrResult<B>> =
+  _getOr as any;
 
 /**
  * TYPE TESTS to check impl and interface are in sync

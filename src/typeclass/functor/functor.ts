@@ -42,19 +42,16 @@ export interface Functor<F extends Kind> {
  * @param FunctorG `Functor<G>`
  * @returns `(a -> b) -> F (G a) -> F (G b)`
  */
-export const mapCompose =
-  <F extends Kind, G extends Kind>(
-    FunctorF: Functor<F>,
-    FunctorG: Functor<G>,
-  ): (<A, B>(
-    f: (a: A) => B,
-  ) => GenericFn<
-    Add<Dec<F['arity']>, Dec<G['arity']>>,
-    FunctorCompositionParams<F, G, A>,
-    FunctorCompositionResult<F, G, B>
-  >) =>
-  f =>
-    mapComposeImpl(FunctorF as any, FunctorG as any)(f) as any;
+export const mapCompose: <F extends Kind, G extends Kind>(
+  FunctorF: Functor<F>,
+  FunctorG: Functor<G>,
+) => <A, B>(
+  f: (a: A) => B,
+) => GenericFn<
+  Add<Dec<F['arity']>, Dec<G['arity']>>,
+  FunctorCompositionParams<F, G, A>,
+  FunctorCompositionResult<F, G, B>
+> = mapComposeImpl as any;
 
 /**
  * flap :: `Functor F -> a -> F (a -> b) -> F b`
@@ -64,10 +61,9 @@ export const mapCompose =
  * @param functor `Functor<F>`
  * @returns `a -> F (a -> b) -> F b`
  */
-export const flap =
-  <F extends Kind>(functor: Functor<F>) =>
-  <A>(a: A): GenericFn<F['arity'], FlapParams<F, A>, FlapResult<F>> =>
-    flapImpl(functor as any)(a) as any;
+export const flap: <F extends Kind>(
+  functor: Functor<F>,
+) => <A>(a: A) => GenericFn<F['arity'], FlapParams<F, A>, FlapResult<F>> = flapImpl as any;
 
 /**
  * as :: `Functor F -> b -> F a -> F b`
@@ -77,10 +73,9 @@ export const flap =
  * @param functor `Functor<F>`
  * @returns `b -> F a -> F b`
  */
-export const as =
-  <F extends Kind>(functor: Functor<F>) =>
-  <B>(b: B): GenericFn<F['arity'], FunctorAsParams<F>, FunctorAsResult<F, B>> =>
-    asImpl(functor as any)(b) as any;
+export const as: <F extends Kind>(
+  functor: Functor<F>,
+) => <B>(b: B) => GenericFn<F['arity'], FunctorAsParams<F>, FunctorAsResult<F, B>> = asImpl as any;
 
 /**
  * TYPE TESTS to check impl and interface are in sync
