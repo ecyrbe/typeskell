@@ -1,5 +1,5 @@
 import { Expect, Equal } from 'type-testing';
-import type { Kind } from '@kinds';
+import type { HKT } from '@kinds';
 import type { Add, Dec } from '@utils/numbers';
 import { type GenericFn } from '@utils/functions';
 import {
@@ -21,7 +21,7 @@ import { as as asImpl, flap as flapImpl, mapCompose as mapComposeImpl } from './
  *  - Identity: map id = id
  *  - Composition: map (f . g) = map f . map g
  */
-export interface Functor<F extends Kind> {
+export interface Functor<F extends HKT> {
   /**
    * map :: `(a -> b) -> F a -> F b`
    *
@@ -42,7 +42,7 @@ export interface Functor<F extends Kind> {
  * @param FunctorG `Functor<G>`
  * @returns `(a -> b) -> F (G a) -> F (G b)`
  */
-export const mapCompose: <F extends Kind, G extends Kind>(
+export const mapCompose: <F extends HKT, G extends HKT>(
   FunctorF: Functor<F>,
   FunctorG: Functor<G>,
 ) => <A, B>(
@@ -61,7 +61,7 @@ export const mapCompose: <F extends Kind, G extends Kind>(
  * @param functor `Functor<F>`
  * @returns `a -> F (a -> b) -> F b`
  */
-export const flap: <F extends Kind>(
+export const flap: <F extends HKT>(
   functor: Functor<F>,
 ) => <A>(a: A) => GenericFn<F['arity'], FlapParams<F, A>, FlapResult<F>> = flapImpl as any;
 
@@ -73,7 +73,7 @@ export const flap: <F extends Kind>(
  * @param functor `Functor<F>`
  * @returns `b -> F a -> F b`
  */
-export const as: <F extends Kind>(
+export const as: <F extends HKT>(
   functor: Functor<F>,
 ) => <B>(b: B) => GenericFn<F['arity'], FunctorAsParams<F>, FunctorAsResult<F, B>> = asImpl as any;
 
@@ -81,7 +81,7 @@ export const as: <F extends Kind>(
  * TYPE TESTS to check impl and interface are in sync
  */
 type TestCases = [
-  Expect<Equal<typeof mapCompose<Kind.F, Kind.G>, typeof mapComposeImpl>>,
-  Expect<Equal<typeof flap<Kind.F>, typeof flapImpl>>,
-  Expect<Equal<typeof as<Kind.F>, typeof asImpl>>,
+  Expect<Equal<typeof mapCompose<HKT.F, HKT.G>, typeof mapComposeImpl>>,
+  Expect<Equal<typeof flap<HKT.F>, typeof flapImpl>>,
+  Expect<Equal<typeof as<HKT.F>, typeof asImpl>>,
 ];

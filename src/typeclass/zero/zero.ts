@@ -1,15 +1,15 @@
-import type { Kind, $ } from '@kinds';
+import type { HKT, $ } from '@kinds';
 import { GenericFn } from '@utils/functions';
 
-export interface ZeroParams extends Kind {
+export interface ZeroParams extends HKT {
   return: [];
 }
 
-export interface ZeroResult<F extends Kind> extends Kind {
+export interface ZeroResult<F extends HKT> extends HKT {
   return: this['rawArgs'] extends unknown[] ? $<F, this['rawArgs']> : never;
 }
 
-export interface Zero<F extends Kind> {
+export interface Zero<F extends HKT> {
   /**
    * zero :: `() -> F a`
    *

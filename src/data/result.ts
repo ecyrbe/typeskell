@@ -1,4 +1,4 @@
-import { Kind, InvariantParam, CovariantParam } from '@kinds';
+import { HKT, InvariantParam, CovariantParam } from '@kinds';
 import * as tfunctor from '@typeclass/functor';
 import * as tbifunctor from '@typeclass/bifunctor';
 import * as tOf from '@typeclass/of';
@@ -25,7 +25,7 @@ export const isErr = <E>(result: Result<unknown, E>): result is Err<E> => result
 
 export const isOk = <A>(result: Result<A, unknown>): result is Ok<A> => result._tag === 'Ok';
 
-export interface TResult extends Kind<[InvariantParam, CovariantParam]> {
+export interface TResult extends HKT<[InvariantParam, CovariantParam]> {
   return: Result<this['arg0'], this['arg1']>;
 }
 

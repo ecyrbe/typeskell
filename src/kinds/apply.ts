@@ -1,7 +1,7 @@
-import { ConcreteKind } from '@kinds/kinds';
+import { ConcreteKind } from '@kinds/hkt';
 
-export type $<kind, params extends unknown[] = [], strict extends boolean = true> = kind extends ConcreteKind
-  ? (kind & {
+export type $<F, params extends unknown[] = [], strict extends boolean = true> = F extends ConcreteKind
+  ? (F & {
       rawArgs: params;
       arg0: params[0];
       arg1: params[1];
@@ -22,7 +22,7 @@ export type $<kind, params extends unknown[] = [], strict extends boolean = true
     })['return']
   : strict extends true
     ? {
-        kind: kind;
+        F: F;
         arg0: params[0];
         //        params: params;
       }

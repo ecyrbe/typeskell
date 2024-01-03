@@ -1,11 +1,11 @@
-import { Kind } from '@kinds';
+import { HKT } from '@kinds';
 import * as tfunctor from '@typeclass/functor';
 import { type Of as tOf } from '@typeclass/of';
 import * as tTo from '@typeclass/to';
 import * as tZero from '@typeclass/zero';
 import * as tApplicative from '@typeclass/applicative';
 
-export type TArray = Kind.Array;
+export type TArray = HKT.Array;
 
 export const Zero: tZero.Zero<TArray> = {
   zero: () => [],

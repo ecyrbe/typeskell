@@ -1,6 +1,6 @@
 import { ContravariantParam, CovariantParam, InvariantParam, Param } from './variance';
 
-export interface Kind<params extends Param[] = Param[]> {
+export interface HKT<params extends Param[] = Param[]> {
   signature: params; // keep track of variance signature
   rawArgs: unknown;
   arity: params['length'];
@@ -23,19 +23,19 @@ export interface Kind<params extends Param[] = Param[]> {
   arg15: params[15]['value'];
 }
 
-export interface ConcreteKind extends Kind {
+export interface ConcreteKind extends HKT {
   return: any;
 }
 
-export namespace Kind {
-  export type nullary = Kind<[]>;
-  export type unary = Kind<[InvariantParam]>;
-  export type binary = Kind<[InvariantParam, CovariantParam]>;
-  export type ternary = Kind<[InvariantParam, CovariantParam, CovariantParam]>;
-  export type quaternary = Kind<[InvariantParam, CovariantParam, CovariantParam, ContravariantParam]>;
+export namespace HKT {
+  export type nullary = HKT<[]>;
+  export type unary = HKT<[InvariantParam]>;
+  export type binary = HKT<[InvariantParam, CovariantParam]>;
+  export type ternary = HKT<[InvariantParam, CovariantParam, CovariantParam]>;
+  export type quaternary = HKT<[InvariantParam, CovariantParam, CovariantParam, ContravariantParam]>;
 
   // default types constructors
-  export interface Array extends Kind.unary {
+  export interface Array extends HKT.unary {
     return: this['arg0'][];
   }
 
@@ -46,7 +46,7 @@ export namespace Kind {
     Args: Args;
   };
 
-  interface Generic<F extends 'F' | 'G' | 'H'> extends Kind.unary {
+  interface Generic<F extends 'F' | 'G' | 'H'> extends HKT.unary {
     return: $<F, [this['arg0']]>;
   }
 
@@ -54,7 +54,7 @@ export namespace Kind {
   export type G = Generic<'G'>;
   export type H = Generic<'H'>;
 
-  interface Generic2<F extends 'F' | 'G' | 'H'> extends Kind.binary {
+  interface Generic2<F extends 'F' | 'G' | 'H'> extends HKT.binary {
     return: $<F, [this['arg0'], this['arg1']]>;
   }
 
@@ -62,15 +62,15 @@ export namespace Kind {
   export type G2 = Generic2<'G'>;
   export type H2 = Generic2<'H'>;
 
-  export interface Record extends Kind<[InvariantParam<string | number | symbol>, CovariantParam]> {
+  export interface Record extends HKT<[InvariantParam<string | number | symbol>, CovariantParam]> {
     return: globalThis.Record<this['arg0'], this['arg1']>;
   }
 
-  export interface Promise extends Kind.unary {
+  export interface Promise extends HKT.unary {
     return: globalThis.Promise<this['arg0']>;
   }
 
-  export interface Basic<T> extends Kind.nullary {
+  export interface Basic<T> extends HKT.nullary {
     return: T;
   }
 
