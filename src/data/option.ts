@@ -1,4 +1,4 @@
-import { HKT, InvariantParam } from '@kinds';
+import { Kind, InvariantParam } from '@kinds';
 import * as tfunctor from '@typeclass/functor';
 import * as tOf from '@typeclass/of';
 import * as tTo from '@typeclass/to';
@@ -24,7 +24,7 @@ export const isNone = <A>(option: Option<A>): option is None => option._tag === 
 
 export const isSome = <A>(option: Option<A>): option is Some<A> => option._tag === 'Some';
 
-export interface TOption extends HKT<[InvariantParam]> {
+export interface TOption extends Kind<[InvariantParam]> {
   return: Option<this['arg0']>;
 }
 

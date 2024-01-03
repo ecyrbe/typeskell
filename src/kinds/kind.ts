@@ -1,6 +1,12 @@
 import { ContravariantParam, CovariantParam, InvariantParam, Param } from './variance';
 
-export interface HKT<params extends Param[] = Param[]> {
+/**
+ * Higher Kinded Type (HKT) is a type constructor of a type constructor
+ * @see https://en.wikipedia.org/wiki/Kind_(type_theory)
+ * Here we use Kind is a way to encode a type constructor with variance
+ * Using Kind we can declare HKTs like typeclasses
+ */
+export interface Kind<params extends Param[] = Param[]> {
   signature: params; // keep track of variance signature
   rawArgs: unknown;
   arity: params['length'];
@@ -23,19 +29,19 @@ export interface HKT<params extends Param[] = Param[]> {
   arg15: params[15]['value'];
 }
 
-export interface ConcreteKind extends HKT {
+export interface TypeConstructor extends Kind {
   return: any;
 }
 
-export namespace HKT {
-  export type nullary = HKT<[]>;
-  export type unary = HKT<[InvariantParam]>;
-  export type binary = HKT<[InvariantParam, CovariantParam]>;
-  export type ternary = HKT<[InvariantParam, CovariantParam, CovariantParam]>;
-  export type quaternary = HKT<[InvariantParam, CovariantParam, CovariantParam, ContravariantParam]>;
+export namespace Kind {
+  export type nullary = Kind<[]>;
+  export type unary = Kind<[InvariantParam]>;
+  export type binary = Kind<[InvariantParam, CovariantParam]>;
+  export type ternary = Kind<[InvariantParam, CovariantParam, CovariantParam]>;
+  export type quaternary = Kind<[InvariantParam, CovariantParam, CovariantParam, ContravariantParam]>;
 
   // default types constructors
-  export interface Array extends HKT.unary {
+  export interface Array extends Kind.unary {
     return: this['arg0'][];
   }
 
@@ -46,7 +52,7 @@ export namespace HKT {
     Args: Args;
   };
 
-  interface Generic<F extends 'F' | 'G' | 'H'> extends HKT.unary {
+  interface Generic<F extends 'F' | 'G' | 'H'> extends Kind.unary {
     return: $<F, [this['arg0']]>;
   }
 
@@ -54,7 +60,7 @@ export namespace HKT {
   export type G = Generic<'G'>;
   export type H = Generic<'H'>;
 
-  interface Generic2<F extends 'F' | 'G' | 'H'> extends HKT.binary {
+  interface Generic2<F extends 'F' | 'G' | 'H'> extends Kind.binary {
     return: $<F, [this['arg0'], this['arg1']]>;
   }
 
@@ -62,15 +68,15 @@ export namespace HKT {
   export type G2 = Generic2<'G'>;
   export type H2 = Generic2<'H'>;
 
-  export interface Record extends HKT<[InvariantParam<string | number | symbol>, CovariantParam]> {
+  export interface Record extends Kind<[InvariantParam<string | number | symbol>, CovariantParam]> {
     return: globalThis.Record<this['arg0'], this['arg1']>;
   }
 
-  export interface Promise extends HKT.unary {
+  export interface Promise extends Kind.unary {
     return: globalThis.Promise<this['arg0']>;
   }
 
-  export interface Basic<T> extends HKT.nullary {
+  export interface Basic<T> extends Kind.nullary {
     return: T;
   }
 

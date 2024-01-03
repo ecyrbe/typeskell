@@ -1,3 +1,3 @@
 export { $, $$ } from './apply';
-export * from './hkt';
+export * from './kind';
 export * from './variance';

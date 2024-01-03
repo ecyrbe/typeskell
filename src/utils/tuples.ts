@@ -1,4 +1,4 @@
-import { HKT, $ } from '@kinds';
+import { Kind, $ } from '@kinds';
 
 export type Tuple<T, N extends number, $acc extends unknown[] = []> = $acc['length'] extends N
   ? $acc
@@ -12,10 +12,10 @@ export type SplitAt<N extends number, T extends unknown[], $acc extends unknown[
     ? SplitAt<N, R, [...$acc, H]>
     : [$acc, []];
 
-type MapImpl<T, Fn extends HKT> = {
+type MapImpl<T, Fn extends Kind> = {
   [K in keyof T]: $<Fn, [T[K]]>;
 };
 
-export interface Map<Fn extends HKT> extends HKT {
+export interface Map<Fn extends Kind> extends Kind {
   return: MapImpl<this['rawArgs'], Fn>;
 }

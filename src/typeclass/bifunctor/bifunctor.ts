@@ -1,14 +1,14 @@
 import { Equal, Expect } from 'type-testing';
-import type { HKT, $ } from '@kinds';
+import type { Kind, $ } from '@kinds';
 import type { Dec, Sub } from '@utils/numbers';
 import { type GenericFn, identity } from '@utils/functions';
 import type { FunctorParams, FunctorResult } from '@typeclass/functor/functor.types';
 
-interface BiFunctorParams<F extends HKT, A, C> extends HKT {
+interface BiFunctorParams<F extends Kind, A, C> extends Kind {
   return: this['rawArgs'] extends unknown[] ? [fa: $<F, [A, C, ...this['rawArgs']]>] : never;
 }
 
-interface BiFunctorResult<F extends HKT, B, D> extends HKT {
+interface BiFunctorResult<F extends Kind, B, D> extends Kind {
   return: this['rawArgs'] extends unknown[] ? $<F, [B, D, ...this['rawArgs']]> : never;
 }
 
@@ -24,7 +24,7 @@ interface BiFunctorResult<F extends HKT, B, D> extends HKT {
  * - Identity: bimap id id = id
  * - Composition: bimap (f . g) (h . i) = bimap f h  . bimap g i
  */
-export interface BiFunctor<F extends HKT> {
+export interface BiFunctor<F extends Kind> {
   /**
    * bimap :: `(a -> b) (c -> d) -> F a c -> F b d`
    *
@@ -41,7 +41,7 @@ export interface BiFunctor<F extends HKT> {
 }
 
 const _mapLeft =
-  (bifunctor: BiFunctor<HKT.F2>) =>
+  (bifunctor: BiFunctor<Kind.F2>) =>
   <A, B>(f: (a: A) => B) =>
     bifunctor.bimap(f, identity);
 
@@ -53,20 +53,20 @@ const _mapLeft =
  * @param bifunctor `BiFunctor<F>`
  * @returns `(a -> b) -> F a c -> F b c`
  */
-export const mapLeft: <F extends HKT>(
+export const mapLeft: <F extends Kind>(
   bifunctor: BiFunctor<F>,
 ) => <A, B>(f: (a: A) => B) => GenericFn<Dec<F['arity']>, FunctorParams<F, A>, FunctorResult<F, B>> = _mapLeft as any;
 
-export interface BiFunctorRightParams<F extends HKT, A> extends HKT {
+export interface BiFunctorRightParams<F extends Kind, A> extends Kind {
   return: this['rawArgs'] extends [infer C, ...infer Args] ? [fac: $<F, [C, A, ...Args]>] : never;
 }
 
-export interface BiFunctorRightResult<F extends HKT, B> extends HKT {
+export interface BiFunctorRightResult<F extends Kind, B> extends Kind {
   return: this['rawArgs'] extends [infer C, ...infer Args] ? $<F, [C, B, ...Args]> : never;
 }
 
 const _mapRight =
-  (bifunctor: BiFunctor<HKT.F2>) =>
+  (bifunctor: BiFunctor<Kind.F2>) =>
   <A, B>(f: (a: A) => B) =>
     bifunctor.bimap(identity, f);
 
@@ -78,7 +78,7 @@ const _mapRight =
  * @param bifunctor `BiFunctor<F>`
  * @returns `(a -> b) -> F c a -> F c b`
  */
-export const mapRight: <F extends HKT>(
+export const mapRight: <F extends Kind>(
   bifunctor: BiFunctor<F>,
 ) => <A, B>(f: (a: A) => B) => GenericFn<Dec<F['arity']>, BiFunctorRightParams<F, A>, BiFunctorRightResult<F, B>> =
   _mapRight as any;
@@ -87,6 +87,6 @@ export const mapRight: <F extends HKT>(
  * TYPE TESTS to check impl and interface are in sync
  */
 type TestCases = [
-  Expect<Equal<typeof mapLeft<HKT.F2>, typeof _mapLeft>>,
-  Expect<Equal<typeof mapRight<HKT.F2>, typeof _mapRight>>,
+  Expect<Equal<typeof mapLeft<Kind.F2>, typeof _mapLeft>>,
+  Expect<Equal<typeof mapRight<Kind.F2>, typeof _mapRight>>,
 ];

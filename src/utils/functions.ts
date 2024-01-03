@@ -1,7 +1,7 @@
-import { HKT, $, $$ } from '@kinds';
+import { Kind, $, $$ } from '@kinds';
 
 // prettier-ignore
-type GenericFnA<N extends number, FnParams extends HKT, FnResult extends HKT> = N extends 0
+type GenericFnA<N extends number, FnParams extends Kind, FnResult extends Kind> = N extends 0
   ? (...args: $$<FnParams,[]>) => $<FnResult,[]>
   : N extends 1
     ? <A1>(...args: $$<FnParams,[A1]>) => $<FnResult,[A1]>
@@ -36,7 +36,7 @@ type GenericFnA<N extends number, FnParams extends HKT, FnResult extends HKT> = 
                       : never;
 
 // prettier-ignore
-type GenericFnB<N extends number, FnParams extends HKT, FnResult extends HKT> = N extends 0
+type GenericFnB<N extends number, FnParams extends Kind, FnResult extends Kind> = N extends 0
   ? (...args: $$<FnParams,[]>) => $<FnResult,[]>
   : N extends 1
     ? <B1>(...args: $$<FnParams,[B1]>) => $<FnResult,[B1]>
@@ -71,7 +71,7 @@ type GenericFnB<N extends number, FnParams extends HKT, FnResult extends HKT> = 
                       : never;
 
 // prettier-ignore
-type GenericFnC<N extends number, FnParams extends HKT, FnResult extends HKT> = N extends 0
+type GenericFnC<N extends number, FnParams extends Kind, FnResult extends Kind> = N extends 0
 ? (...args: $$<FnParams,[]>) => $<FnResult,[]>
 : N extends 1
   ? <C1>(...args: $$<FnParams,[C1]>) => $<FnResult,[C1]>
@@ -106,7 +106,7 @@ type GenericFnC<N extends number, FnParams extends HKT, FnResult extends HKT> = 
                     : never;
 
 // prettier-ignore
-type GenericFnD<N extends number, FnParams extends HKT, FnResult extends HKT> = N extends 0
+type GenericFnD<N extends number, FnParams extends Kind, FnResult extends Kind> = N extends 0
 ? (...args: $$<FnParams,[]>) => $<FnResult,[]>
 : N extends 1
   ? <D1>(...args: $$<FnParams,[D1]>) => $<FnResult,[D1]>
@@ -142,8 +142,8 @@ type GenericFnD<N extends number, FnParams extends HKT, FnResult extends HKT> = 
 
 export type GenericFn<
   N extends number,
-  FnParams extends HKT,
-  FnResult extends HKT,
+  FnParams extends Kind,
+  FnResult extends Kind,
   Alpha extends 'A' | 'B' | 'C' | 'D' = 'A',
 > = Alpha extends 'A'
   ? GenericFnA<N, FnParams, FnResult>

@@ -1,6 +1,6 @@
-import { ConcreteKind } from '@kinds/hkt';
+import { TypeConstructor } from '@kinds/kind';
 
-export type $<F, params extends unknown[] = [], strict extends boolean = true> = F extends ConcreteKind
+export type $<F, params extends unknown[] = [], strict extends boolean = true> = F extends TypeConstructor
   ? (F & {
       rawArgs: params;
       arg0: params[0];
