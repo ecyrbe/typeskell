@@ -4,6 +4,7 @@ import * as tOf from '@typeclass/of';
 import * as tTo from '@typeclass/to';
 import * as tZero from '@typeclass/zero';
 import * as tApplicative from '@typeclass/applicative';
+import * as tMonad from '@typeclass/monad';
 import { pipe } from '../pipe';
 
 export interface None {
@@ -48,6 +49,11 @@ export const Applicative: tApplicative.Applicative<TOption> = {
   ...Of,
   ...Functor,
   ap: fa => fab => (isSome(fab) ? pipe(fa, Functor.map(fab.value)) : none),
+};
+
+export const Monad: tMonad.Monad<TOption> = {
+  ...Applicative,
+  flatMap: f => fa => (isSome(fa) ? f(fa.value) : none),
 };
 
 /**
@@ -194,3 +200,36 @@ export const doubleMap = tfunctor.mapCompose(Functor, Functor);
  * ```
  */
 export const ap = Applicative.ap;
+
+/**
+ * flatMap :: `(a -> Option<b>) -> Option<a> -> Option<b>`
+ *
+ * flatMap :: `<A, B>(f: (a: A) => Option<B>) => (fa: Option<A>) => Option<B>`
+ *
+ * @param f `a -> Option<b>`
+ * @returns `Option<a> -> Option<b>`
+ *
+ * @example
+ * ```ts
+ * pipe(some(1), flatMap(x => some(x + 1))) // some(2)
+ * pipe(none, flatMap(x => some(x + 1))) // none
+ * ```
+ */
+export const flatMap = Monad.flatMap;
+
+/**
+ * flatten :: `Option<Option<a>> -> Option<a>`
+ *
+ * flatten :: `<A>(ffa: Option<Option<A>>) => Option<A>`
+ *
+ * @param ffa `Option<Option<a>>`
+ * @returns `Option<a>`
+ *
+ * @example
+ * ```ts
+ * pipe(some(some(1)), flatten) // some(1)
+ * pipe(some(none), flatten) // none
+ * pipe(none, flatten) // none
+ * ```
+ */
+export const flatten = tMonad.flatten(Monad);

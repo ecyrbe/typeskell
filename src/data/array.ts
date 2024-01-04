@@ -4,6 +4,7 @@ import { type Of as tOf } from '@typeclass/of';
 import * as tTo from '@typeclass/to';
 import * as tZero from '@typeclass/zero';
 import * as tApplicative from '@typeclass/applicative';
+import * as tMonad from '@typeclass/monad';
 
 export type TArray = Kind.Array;
 
@@ -27,6 +28,11 @@ export const Applicative: tApplicative.Applicative<TArray> = {
   ...Of,
   ...Functor,
   ap: fa => fab => fab.flatMap(f => fa.map(f)),
+};
+
+export const Monad: tMonad.Monad<TArray> = {
+  ...Applicative,
+  flatMap: f => fa => fa.flatMap(f),
 };
 
 /**
@@ -138,15 +144,45 @@ export const as = tfunctor.as(Functor);
 export const doubleMap = tfunctor.mapCompose(Functor, Functor);
 
 /**
- * ap :: a[] -> (a -> b)[] -> b[]
+ * ap :: `a[] -> (a -> b)[] -> b[]`
  *
- * ap :: <A, B>(fa: A[]) => (fab: (a: A) => B[]) => B[]
+ * ap :: `<A, B>(fa: A[]) => (fab: (a: A) => B[]) => B[]`
  *
- * @param fa : a[]
- * @returns fab: (a -> b)[] -> b[]
+ * @param fa `a[]`
+ * @returns `(a -> b)[] -> b[]`
  *
  * @example
  * ```ts
  * pipe(of(x=>x+1), ap([1,2,3])) // [2,3,4]
  */
-const ap = Applicative.ap;
+export const ap = Applicative.ap;
+
+/**
+ * flatMap :: `(a -> b[]) -> a[] -> b[]`
+ *
+ * flatMap :: `<A, B>(f: (a: A) => B[]) => (fa: A[]) => B[]`
+ *
+ * @param f `(a -> b[])`
+ * @returns `a[] -> b[]`
+ *
+ * @example
+ * ```ts
+ * pipe([1,2,3], flatMap(x => [x, x+1])) // [1,2,2,3,3,4]
+ * ```
+ */
+export const flatMap = Monad.flatMap;
+
+/**
+ * flatten :: a[][] -> a[]
+ *
+ * flatten :: `<A>(faa: A[][]) => A[]`
+ *
+ * @param faa `a[][]`
+ * @returns `a[]`
+ *
+ * @example
+ * ```ts
+ * pipe([[1,2,3],[4,5,6]], flatten) // [1,2,3,4,5,6]
+ * ```
+ */
+export const flatten = tMonad.flatten(Monad);

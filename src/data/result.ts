@@ -4,6 +4,7 @@ import * as tbifunctor from '@typeclass/bifunctor';
 import * as tOf from '@typeclass/of';
 import * as tTo from '@typeclass/to';
 import * as tApplicative from '@typeclass/applicative';
+import * as tMonad from '@typeclass/monad';
 import { pipe } from '../pipe';
 
 export interface Err<E> {
@@ -49,6 +50,11 @@ export const Applicative: tApplicative.Applicative<TResult> = {
   ...Of,
   ...Functor,
   ap: fa => fab => (isOk(fab) ? pipe(fa, Functor.map(fab.ok)) : fab),
+};
+
+export const Monad: tMonad.Monad<TResult> = {
+  ...Applicative,
+  flatMap: f => fa => (isOk(fa) ? f(fa.ok) : fa),
 };
 
 /**
@@ -210,3 +216,37 @@ export const mapErr = tbifunctor.mapRight(Bifunctor);
  * ```
  */
 export const ap = Applicative.ap;
+
+/**
+ * flatMap :: `(a -> Result<b, e1>) -> Result<a, e2> -> Result<b, e1 | e2>`
+ *
+ * flatMap :: `<A, B, E1>(f: (a: A) => Result<B, E1>) => <E2>(fa: Result<A, E2>) => Result<B, E1 | E2>`
+ *
+ * @param f `a -> Result<b, e1>`
+ * @returns `Result<a, e2> -> Result<b, e1 | e2>`
+ *
+ * @example
+ * ```ts
+ * pipe(ok(5), flatMap(x => ok(x + 1))) // ok(6)
+ * pipe(err("error"), flatMap(x => ok(x + 1))) // err("error")
+ * pipe(ok(5), flatMap(x => err("error"))) // err("error")
+ * ```
+ */
+export const flatMap = Monad.flatMap;
+
+/**
+ * flatten :: `Result<Result<a, e1>, e2> -> Result<a, e1 | e2>`
+ *
+ * flatten :: `<A, E1, E2>(ffa: Result<Result<A, E1>, E2>) => Result<A, E1 | E2>`
+ *
+ * @param ffa `Result<Result<a, e1>, e2>`
+ * @returns `Result<a, e1 | e2>`
+ *
+ * @example
+ * ```ts
+ * pipe(ok(ok(0)), flatten) // ok(0)
+ * pipe(ok(err("error")), flatten) // err("error")
+ * pipe(err("error"), flatten) // err("error")
+ * ```
+ */
+export const flatten = tMonad.flatten(Monad);
