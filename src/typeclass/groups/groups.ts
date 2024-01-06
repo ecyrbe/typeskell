@@ -1,5 +1,3 @@
-import { Kind, $ } from '@kinds';
-
 /**
  * A Magma is a set `A` with a binary operation `concat` that is closed on `A`.
  *
