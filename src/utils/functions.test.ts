@@ -115,11 +115,12 @@ type GreekChars =
   | 'ψ'
   | 'ω';
 
+type DoubleGreekChars = `${GreekChars}${GreekChars}`;
 type TypeContructorAST = {
   type: 'typeconstructor';
   name: UppercaseChars;
   params: HaskellAST[];
-  spread?: GreekChars;
+  spread?: GreekChars | DoubleGreekChars;
 };
 
 type TypeAST = {
@@ -142,7 +143,6 @@ type ChainAST = {
 type HaskellAST = FunctionAST | ChainAST | TypeAST | TypeContructorAST;
 
 function parseTypeConstructorAST(type: string): HaskellAST {
-  console.log('type constructor: ', type);
   const [typeconstructor, ...params] = splitWithParens(type, ' ');
   const lastParam = params[params.length - 1];
   if (isSpreadName(lastParam)) {
@@ -151,7 +151,7 @@ function parseTypeConstructorAST(type: string): HaskellAST {
       type: 'typeconstructor',
       name: typeconstructor as UppercaseChars,
       params: params.map(arg => parseAST(trimParens(arg))),
-      spread: lastParam[2] as GreekChars,
+      spread: lastParam.slice(2) as GreekChars,
     };
   }
   return {
@@ -169,7 +169,7 @@ function isTypeName(char: string): char is LowercaseChars {
   return /[a-z]/.test(char);
 }
 
-function isSpreadName(param: string): param is `..${GreekChars}` {
+function isSpreadName(param: string): param is `..${GreekChars}` | `..${GreekChars}${GreekChars}` {
   return param.startsWith('..');
 }
 
@@ -185,8 +185,6 @@ function parseFromArrayToManyAST([type, ...rest]: string[]): HaskellAST[] {
     return parseArgsAST(type);
   }
   if (rest.length === 1) {
-    console.log('last fn args: ', type);
-    console.log('last fn result: ', rest[0]);
     return [
       {
         type: 'function',
@@ -226,10 +224,11 @@ function getGenericTypeListAST(
     for (const param of ast.params) {
       getGenericTypeListAST(param, typeConstructorMap, typeMap, set);
     }
-    if (ast.name in typeConstructorMap && ast.spread) {
+    if (ast.name in typeConstructorMap && ast.spread && ast.spread.length === 1) {
       const spreadLength = typeConstructorMap[ast.name] - ast.params.length;
       for (let i = 0; i < spreadLength; i++) {
-        set.add(`${ast.spread}${i}`);
+        const greek = `${ast.spread}${i}`;
+        if (!(greek in typeMap)) set.add(greek);
       }
     }
   }
@@ -275,10 +274,28 @@ const getSpreadParams = (spread: GreekChars, typemap: TypeMap): string[] => {
   return types;
 };
 
+const mergeSpreadParams = (A: GreekChars, B: GreekChars, typemap: TypeMap) => {
+  const spreadA = getSpreadParams(A, typemap);
+  const spreadB = getSpreadParams(B, typemap);
+  const types: string[] = [];
+  const max = Math.max(spreadA.length, spreadB.length);
+  for (let i = 0; i < max; i++) {
+    types.push(`${spreadA[i]} | ${spreadB[i]}`);
+  }
+  return types;
+};
+
 const buildTypeContructor = (ast: TypeContructorAST, typeConstructorMap: TypeConstructorMap, typeMap: TypeMap) => {
   const params = ast.params.map(param => parseHaskellWithAST(param, typeConstructorMap, typeMap));
   if (!(ast.name in typeConstructorMap) || !ast.spread) return `${ast.name}<${params.join(', ')}>`;
-  return `${ast.name}<${[...params, ...getSpreadParams(ast.spread, typeMap)].join(', ')}>`;
+  console.log('build type constructor', ast.name, ast.spread, params);
+  if (ast.spread.length === 1)
+    return `${ast.name}<${[...params, ...getSpreadParams(ast.spread as GreekChars, typeMap)].join(', ')}>`;
+
+  return `${ast.name}<${[
+    ...params,
+    ...mergeSpreadParams(ast.spread[0] as GreekChars, ast.spread[1] as GreekChars, typeMap),
+  ].join(', ')}>`;
 };
 
 const unique = <T>(arr: T[]) => [...new Set(arr)];
@@ -290,11 +307,9 @@ function parseHaskellWithAST(
   alpha: UppercaseChars = 'A',
 ): string {
   if (ast.type === 'typeconstructor') {
-    console.log('ast type constructor: ', ast.name, ast.params);
     return buildTypeContructor(ast, typeConstructorMap, typeMap);
   }
   if (ast.type === 'type') {
-    console.log('ast type: ', ast.name, typeMap[ast.name]);
     return typeMap[ast.name];
   }
   if (ast.type === 'function' || ast.type === 'chain') {
@@ -305,7 +320,6 @@ function parseHaskellWithAST(
       const genericArgs = ast.args.flatMap(arg => [...getGenericTypeListAST(arg, typeConstructorMap, typeMap)]);
       genericLetters = unique([...genericArgs]);
     }
-    console.log('generic letters: ', genericLetters);
     return genGenericFunction(
       genericLetters.length,
       types => genericLetters.reduce((typemap, letter, i) => ((typemap[letter] = types[i]), typemap), typeMap),
@@ -523,6 +537,21 @@ describe('genGenericFunction', () => {
         },
       },
     });
+    expect(parseAST('(a -> F b ..β) -> F a ..α -> F b ..αβ')).toEqual({
+      type: 'chain',
+      args: [
+        {
+          type: 'function',
+          args: [{ type: 'type', name: 'a' }],
+          result: { type: 'typeconstructor', name: 'F', params: [{ type: 'type', name: 'b' }], spread: 'β' },
+        },
+      ],
+      result: {
+        type: 'function',
+        args: [{ type: 'typeconstructor', name: 'F', params: [{ type: 'type', name: 'a' }], spread: 'α' }],
+        result: { type: 'typeconstructor', name: 'F', params: [{ type: 'type', name: 'b' }], spread: 'αβ' },
+      },
+    });
   });
 
   it('should generate a generic function with type params', () => {
@@ -565,6 +594,9 @@ describe('genGenericFunction', () => {
     );
     expect(parseHaskell('(a -> b) -> F (G a ..α) ..β -> F (G b ..α) ..β', { F: 2, G: 3 })).toEqual(
       '<A1, A2>(arg0: (arg0: A1) => A2) => <B1, B2, B3>(arg0: F<G<A1, B1, B2>, B3>) => F<G<A2, B1, B2>, B3>',
+    );
+    expect(parseHaskell('(a -> F b ..β) -> F a ..α -> F b ..αβ', { F: 3 })).toEqual(
+      '<A1, A2, A3, A4>(arg0: (arg0: A1) => F<A2, A3, A4>) => <B1, B2>(arg0: F<A1, B1, B2>) => F<A2, B1 | A3, B2 | A4>',
     );
   });
 });
