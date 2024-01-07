@@ -1,7 +1,7 @@
 import { Inc, Dec } from '@utils/numbers';
 import { Tail } from '@utils/tuples';
 
-type TrimParens<T extends string> = T extends `(${infer U})` ? U : T;
+export type TrimParens<T extends string> = T extends `(${infer U})` ? U : T;
 
 type StringToTuple<T extends string, $acc extends unknown[] = []> = T extends `${infer A}${infer B}`
   ? StringToTuple<B, [...$acc, A]>
@@ -9,7 +9,7 @@ type StringToTuple<T extends string, $acc extends unknown[] = []> = T extends `$
 
 type TrimLeft<T extends string> = T extends ` ${infer U}` ? TrimLeft<U> : T;
 type TrimRight<T extends string> = T extends `${infer U} ` ? TrimRight<U> : T;
-type Trim<T extends string> = TrimLeft<TrimRight<T>>;
+export type Trim<T extends string> = TrimLeft<TrimRight<T>>;
 
 type SplitTupleFnWithParens<
   T extends string[],
@@ -28,7 +28,7 @@ type SplitTupleFnWithParens<
         : SplitTupleFnWithParens<Rest, $accTuple, `${$acc}${Char}`, $nested>
   : [...$accTuple, Trim<$acc>];
 
-type SplitFnWithParens<Input extends string> = SplitTupleFnWithParens<StringToTuple<Input>>;
+export type SplitFnWithParens<Input extends string> = SplitTupleFnWithParens<StringToTuple<Input>>;
 
 type SplitTupleParamWithParens<
   T extends string[],
@@ -51,4 +51,4 @@ type SplitTupleParamWithParens<
     ? $accTuple
     : [...$accTuple, Trim<$acc>];
 
-type SplitParamWithParens<Input extends string> = SplitTupleParamWithParens<StringToTuple<Input>>;
+export type SplitParamWithParens<Input extends string> = SplitTupleParamWithParens<StringToTuple<Input>>;
