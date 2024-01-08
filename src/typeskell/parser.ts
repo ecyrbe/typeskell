@@ -75,7 +75,7 @@ const mergeSpreadParams = (A: GreekChars, B: GreekChars, typemap: TypeMap) => {
 };
 
 const buildTypeContructor = (ast: TypeContructorAST, typeConstructorMap: TypeConstructorMap, typeMap: TypeMap) => {
-  const params = ast.params.map(param => parseHaskellWithAST(param, typeConstructorMap, typeMap));
+  const params = ast.params.map(param => parseTypeskell(param, typeConstructorMap, typeMap));
   if (!(ast.name in typeConstructorMap) || !ast.spread) return `${ast.name}<${params.join(', ')}>`;
   console.log('build type constructor', ast.name, ast.spread, params);
   if (ast.spread.length === 1)
@@ -89,7 +89,7 @@ const buildTypeContructor = (ast: TypeContructorAST, typeConstructorMap: TypeCon
 
 const unique = <T>(arr: T[]) => [...new Set(arr)];
 
-function parseHaskellWithAST(
+function parseTypeskell(
   ast: HaskellAST,
   typeConstructorMap: TypeConstructorMap,
   typeMap: TypeMap,
@@ -112,9 +112,9 @@ function parseHaskellWithAST(
     return genGenericFunction(
       genericLetters.length,
       types => genericLetters.reduce((typemap, letter, i) => ((typemap[letter] = types[i]), typemap), typeMap),
-      typemap => ast.args.map(arg => parseHaskellWithAST(arg, typeConstructorMap, typemap)),
+      typemap => ast.args.map(arg => parseTypeskell(arg, typeConstructorMap, typemap)),
       typemap =>
-        parseHaskellWithAST(
+        parseTypeskell(
           ast.result,
           typeConstructorMap,
           typemap,
@@ -131,21 +131,21 @@ function parseHaskellWithAST(
 // it should handle nested functions and nested type constructors inside parens
 // example:
 // ```ts
-// parseHaskell('a -> b -> c') // '<A1>(a1: A1) => <B1, B2>(b1: B1) => B2'
-// parseHaskell('a -> b -> c', { a: 'string }) // '(a: string) => <A1, A2>(a1: A1) => A2'
-// parseHaskell('a -> b -> c', { a: 'string', b: 'number' }) // '(a: string) => <A1>(b: number) => A1'
-// parseHaskell('a -> b -> c',  { b: 'number' }) // '<A1>(a1: A1) => <B1>(b: number) => B1'
-// parseHaskell('a -> b -> c',  { c: 'string' }) // '<A1>(a1: A1) => <B1>(b: B1) => string'
-// parseHaskell('a -> (a -> b) -> b') // '<A1>(a1: A1) => <B1>(fab: (a: A1) => B1) => B1'
-// parseHaskell('a -> F b ..α -> c', {F: 3}) // '<A1>(a1: A1) => <B1, B2, B3, B4>(fb: F<B1, B2, B3>) => B4'
-// parseHaskell('a -> F (a -> b) ..α -> F b ..α', {F: 2}) // '<A1>(a1: A1) => <B1, B2, B3>(fb: F<(a1: A1) => B1, B2>) => F<B3, B2>'
-// bimap: parseHaskell('(a -> b) -> F a c ..α -> F b c ..α', {F: 3}) // '<A1, A2>(f: (a: A1) => A2) => <B1, B2>(fa: F<A1, B1, B2>) => F<A2, B1, B2>'
-// ap: parseHaskell('F a -> F (a -> b) ..α -> F b ..α', {F: 2}) // '<A1, A2>(fa: F<A1, A2>) => <B1>(fab: F<(a: A1) => B1, A2>) => F<B1, A2>'
-// flapmap: parseHaskell('(a -> F b ..β) -> F a ..α -> F b ..αβ', {F: 3}) // '<A1, A2, A3, A4>(f: (a: A1) => F<A2, A3, A4>) => <B1, B2>(fa: F<A1, B1, B2>) => F<A2, A3|B1, A4|B2>'
-// flatten: parseHaskell('F (F a ..α) ..β-> F a ..αβ', {F: 3}) // '<A1, A2, A3, A4, A5>(ffa: F<F<A1, A2, A3>, A4, A5>) => F<A1, A2 | A4, A3 | A5>'
-// compose: parseHaskell('(a -> b) -> F (G a ..α) ..β -> F (G b ..α) ..β', {F: 2}) // '<A1, A2>(f: (a: A1) => A2) => <B1, B2>(fga: F<G<A1, B1>, B2>) => F<G<A2, B1>, B2>'
+// typeskell('a -> b -> c') // '<A1>(a1: A1) => <B1, B2>(b1: B1) => B2'
+// typeskell('a -> b -> c', { a: 'string }) // '(a: string) => <A1, A2>(a1: A1) => A2'
+// typeskell('a -> b -> c', { a: 'string', b: 'number' }) // '(a: string) => <A1>(b: number) => A1'
+// typeskell('a -> b -> c',  { b: 'number' }) // '<A1>(a1: A1) => <B1>(b: number) => B1'
+// typeskell('a -> b -> c',  { c: 'string' }) // '<A1>(a1: A1) => <B1>(b: B1) => string'
+// typeskell('a -> (a -> b) -> b') // '<A1>(a1: A1) => <B1>(fab: (a: A1) => B1) => B1'
+// typeskell('a -> F b ..α -> c', {F: 3}) // '<A1>(a1: A1) => <B1, B2, B3, B4>(fb: F<B1, B2, B3>) => B4'
+// typeskell('a -> F (a -> b) ..α -> F b ..α', {F: 2}) // '<A1>(a1: A1) => <B1, B2, B3>(fb: F<(a1: A1) => B1, B2>) => F<B3, B2>'
+// bimap: typeskell('(a -> b) -> F a c ..α -> F b c ..α', {F: 3}) // '<A1, A2>(f: (a: A1) => A2) => <B1, B2>(fa: F<A1, B1, B2>) => F<A2, B1, B2>'
+// ap: typeskell('F a -> F (a -> b) ..α -> F b ..α', {F: 2}) // '<A1, A2>(fa: F<A1, A2>) => <B1>(fab: F<(a: A1) => B1, A2>) => F<B1, A2>'
+// flapmap: typeskell('(a -> F b ..β) -> F a ..α -> F b ..αβ', {F: 3}) // '<A1, A2, A3, A4>(f: (a: A1) => F<A2, A3, A4>) => <B1, B2>(fa: F<A1, B1, B2>) => F<A2, A3|B1, A4|B2>'
+// flatten: typeskell('F (F a ..α) ..β-> F a ..αβ', {F: 3}) // '<A1, A2, A3, A4, A5>(ffa: F<F<A1, A2, A3>, A4, A5>) => F<A1, A2 | A4, A3 | A5>'
+// compose: typeskell('(a -> b) -> F (G a ..α) ..β -> F (G b ..α) ..β', {F: 2}) // '<A1, A2>(f: (a: A1) => A2) => <B1, B2>(fga: F<G<A1, B1>, B2>) => F<G<A2, B1>, B2>'
 // ```
-export function parseHaskell(input: string, typeConstructorMap: TypeConstructorMap = {}, typeMap: TypeMap = {}) {
+export function typeskell(input: string, typeConstructorMap: TypeConstructorMap = {}, typeMap: TypeMap = {}) {
   const ast = parseAST(input);
-  return parseHaskellWithAST(ast, typeConstructorMap, typeMap);
+  return parseTypeskell(ast, typeConstructorMap, typeMap);
 }
