@@ -33,6 +33,10 @@ function getGenericTypeListAST(
   return set;
 }
 
+function buildGenericTypeList(ast: HaskellAST, typeConstructorMap: TypeConstructorMap, typeMap: TypeMap): string[] {
+  return [...getGenericTypeListAST(ast, typeConstructorMap, typeMap)];
+}
+
 function genGenericFunction(
   arity: number,
   buildTypeMap: (types: string[]) => Record<string, string>,
@@ -77,7 +81,6 @@ const mergeSpreadParams = (A: GreekChars, B: GreekChars, typemap: TypeMap) => {
 const buildTypeContructor = (ast: TypeContructorAST, typeConstructorMap: TypeConstructorMap, typeMap: TypeMap) => {
   const params = ast.params.map(param => parseTypeskell(param, typeConstructorMap, typeMap));
   if (!(ast.name in typeConstructorMap) || !ast.spread) return `${ast.name}<${params.join(', ')}>`;
-  console.log('build type constructor', ast.name, ast.spread, params);
   if (ast.spread.length === 1)
     return `${ast.name}<${[...params, ...getSpreadParams(ast.spread as GreekChars, typeMap)].join(', ')}>`;
 
@@ -104,10 +107,10 @@ function parseTypeskell(
   if (ast.type === 'function' || ast.type === 'chain') {
     let genericLetters: string[];
     if (ast.type === 'function') {
-      genericLetters = [...getGenericTypeListAST(ast, typeConstructorMap, typeMap)];
+      genericLetters = buildGenericTypeList(ast, typeConstructorMap, typeMap);
     } else {
-      const genericArgs = ast.args.flatMap(arg => [...getGenericTypeListAST(arg, typeConstructorMap, typeMap)]);
-      genericLetters = unique([...genericArgs]);
+      const genericArgs = ast.args.flatMap(arg => buildGenericTypeList(arg, typeConstructorMap, typeMap));
+      genericLetters = unique(genericArgs);
     }
     return genGenericFunction(
       genericLetters.length,
