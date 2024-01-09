@@ -114,7 +114,7 @@ type MapGetGenericTypeListAST<
   [K in keyof T]: GetGenericTypeListAST<T[K], typeconstructorMap, typeMap>;
 };
 
-export type GetGenericTypeListAST<
+type GetGenericTypeListAST<
   ast,
   typeconstructorMap extends TypeConstructorMapCompiler,
   typeMap extends TypeMapCompiler,
@@ -132,3 +132,15 @@ export type GetGenericTypeListAST<
           ? []
           : [ast['name']]
         : [];
+
+type Unique<T, $map = never, $acc extends unknown[] = []> = T extends [infer Head, ...infer Tail]
+  ? Head extends $map
+    ? Unique<Tail, $map, $acc>
+    : Unique<Tail, $map | Head, [...$acc, Head]>
+  : $acc;
+
+export type BuildGenericTypeList<
+  ast,
+  typeconstructorMap extends TypeConstructorMapCompiler,
+  typeMap extends TypeMapCompiler,
+> = Unique<GetGenericTypeListAST<ast, typeconstructorMap, typeMap>>;
