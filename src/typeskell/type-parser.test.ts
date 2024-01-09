@@ -1,7 +1,7 @@
 import { expectTypeOf, describe, it } from 'vitest';
-import { GetNextAlpha, GetSpreadParams, MergeSpreadParams, BuildGenericTypeList } from './type-parser';
+import { GetNextAlpha, BuildGenericTypeList, TypeSkell, BuildSpreadParams } from './type-parser';
 import { ParseAST } from './ast/type-parser';
-import { Kind, InvariantParam, ContravariantParam, CovariantParam } from '@kinds';
+import { Kind, $ } from '@kinds';
 
 describe('Type parser', () => {
   it('should get next alpha', () => {
@@ -10,39 +10,14 @@ describe('Type parser', () => {
     expectTypeOf<GetNextAlpha<'Z'>>().toEqualTypeOf<'A'>();
   });
 
-  it('should get spread params', () => {
-    expectTypeOf<GetSpreadParams<'a', { b: 'B'; a1: 'A1'; a2: 'A2'; a3: 'A3'; c: 'C' }>>().toEqualTypeOf<
-      ['A1', 'A2', 'A3']
-    >();
-  });
-
-  interface FContravariant extends Kind<[InvariantParam, CovariantParam, ContravariantParam]> {
-    return: 0;
-  }
-
-  it('should merge spread params', () => {
+  it('should build spread params', () => {
     expectTypeOf<
-      MergeSpreadParams<'F', 'a', 'b', { b: 'B'; a1: 'A1'; a2: 'A2'; b1: 'A3'; b2: 'A4' }, { F: Kind.F2 }>
-    >().toEqualTypeOf<['A1' | 'A3', 'A2' | 'A4']>();
-    expectTypeOf<
-      MergeSpreadParams<
-        'F',
-        'a',
-        'b',
-        { b: 'B'; a1: 'A1'; a2: 'A2'; a3: { 0: 'A3' }; b1: 'B1'; b2: 'B2'; b3: { 1: 'B3' } },
-        { F: FContravariant }
+      BuildSpreadParams<
+        'β',
+        { type: 'typeconstructor'; name: 'F'; params: [{ type: 'type'; name: 'b' }]; spread: 'β' },
+        { F: Kind.F4 }
       >
-    >().toEqualTypeOf<
-      [
-        'A1' | 'B1',
-        'A2' | 'B2',
-        {
-          0: 'A3';
-        } & {
-          1: 'B3';
-        },
-      ]
-    >();
+    >().toEqualTypeOf<['β0', 'β1', 'β2']>();
   });
 
   it('should get generic type list AST', () => {
@@ -59,7 +34,26 @@ describe('Type parser', () => {
     >().toEqualTypeOf<['α0']>();
 
     expectTypeOf<
-      BuildGenericTypeList<ParseAST<'(a b -> F b ..β) -> F a ..α -> F b ..αβ'>, { F: FContravariant }, {}>
+      BuildGenericTypeList<ParseAST<'(a b -> F b ..β) -> F a ..α -> F b ..αβ'>, { F: Kind.F3 }, {}>
     >().toEqualTypeOf<['a', 'b', 'β0', 'β1']>();
+  });
+
+  it('should parse typeskell', () => {
+    expectTypeOf<TypeSkell<'a -> b'>>().toEqualTypeOf<<A1, A2>(args_0: A1) => A2>();
+    expectTypeOf<TypeSkell<'(a -> F b ..β) -> F a ..α -> F b ..αβ', { F: Kind.F2 }>>().toEqualTypeOf<
+      <A1, A2, A3>(
+        args_0: (args_0: A1) => $<Kind.F2, [A2, A3]>,
+      ) => <B1>(args_0: $<Kind.F2, [A1, B1]>) => $<Kind.F2, [A2, A3 | B1]>
+    >();
+    expectTypeOf<TypeSkell<'(a -> F b ..β) -> F a ..α -> F b ..αβ', { F: Kind.F3 }>>().toEqualTypeOf<
+      <A1, A2, A3, A4>(
+        args_0: (args_0: A1) => $<Kind.F3, [A2, A3, A4]>,
+      ) => <B1, B2>(args_0: $<Kind.F3, [A1, B1, B2]>) => $<Kind.F3, [A2, A3 | B1, A4 | B2]>
+    >();
+    expectTypeOf<TypeSkell<'(a -> F b ..β) -> F a ..α -> F b ..αβ', { F: Kind.F4 }>>().toEqualTypeOf<
+      <A1, A2, A3, A4, A5>(
+        args_0: (args_0: A1) => $<Kind.F4, [A2, A3, A4, A5]>,
+      ) => <B1, B2, B3>(args_0: $<Kind.F4, [A1, B1, B2, B3]>) => $<Kind.F4, [A2, A3 | B1, A4 | B2, A5 & B3]>
+    >();
   });
 });
