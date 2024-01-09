@@ -144,7 +144,7 @@ export type GenericFn<
   N extends number,
   FnParams extends Kind,
   FnResult extends Kind,
-  Alpha extends 'A' | 'B' | 'C' | 'D' = 'A',
+  Alpha extends string = 'A',
 > = Alpha extends 'A'
   ? GenericFnA<N, FnParams, FnResult>
   : Alpha extends 'B'
