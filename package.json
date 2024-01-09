@@ -2,21 +2,25 @@
   "name": "typeskell",
   "version": "0.0.1",
   "description": "",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc"
+    "prebuild": "rimraf dist",
+    "build": "tsc -p tsconfig.build.json",
+    "test": "vitest"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "fp-ts": "3.0.0-alpha.26",
+  "author": "ecyrbe",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {
+    "rimraf": "^5.0.5",
+    "type-testing": "^0.2.0",
     "prettier": "^3.1.1",
     "typescript": "^5.3.3",
     "vitest": "^1.1.0"
-  },
-  "devDependencies": {
-    "type-testing": "^0.2.0"
   }
 }
