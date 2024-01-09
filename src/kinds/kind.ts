@@ -68,6 +68,22 @@ export namespace Kind {
   export type G2 = Generic2<'G'>;
   export type H2 = Generic2<'H'>;
 
+  interface Generic3<F extends 'F' | 'G' | 'H'> extends Kind.ternary {
+    return: $<F, [this['arg0'], this['arg1'], this['arg2']]>;
+  }
+
+  export type F3 = Generic3<'F'>;
+  export type G3 = Generic3<'G'>;
+  export type H3 = Generic3<'H'>;
+
+  interface Generic4<F extends 'F' | 'G' | 'H'> extends Kind.quaternary {
+    return: $<F, [this['arg0'], this['arg1'], this['arg2'], this['arg3']]>;
+  }
+
+  export type F4 = Generic4<'F'>;
+  export type G4 = Generic4<'G'>;
+  export type H4 = Generic4<'H'>;
+
   export interface Record extends Kind<[InvariantParam<string | number | symbol>, CovariantParam]> {
     return: globalThis.Record<this['arg0'], this['arg1']>;
   }
