@@ -14,6 +14,12 @@ export type Range<Max extends number, $acc extends unknown[] = []> = $acc['lengt
 
 export type Tail<T extends unknown[]> = T extends [unknown, ...infer R] ? R : [];
 
+export type Drop<N extends number, T extends unknown[], $droped extends unknown[] = []> = $droped['length'] extends N
+  ? T
+  : T extends [infer H, ...infer R]
+    ? Drop<N, R, [...$droped, H]>
+    : T;
+
 export type SplitAt<N extends number, T extends unknown[], $acc extends unknown[] = []> = $acc['length'] extends N
   ? [$acc, T]
   : T extends [infer H, ...infer R]
