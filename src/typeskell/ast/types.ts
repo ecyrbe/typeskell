@@ -11,8 +11,15 @@ export type DoubleGreekChars = `${GreekChars}${GreekChars}`;
 export type TypeContructorAST = {
   type: 'typeconstructor';
   name: UppercaseChars;
-  params: HaskellAST[];
+  params: TypeskellAST[];
   spread?: GreekChars | DoubleGreekChars;
+};
+
+export type TypeContructorASTCompiler = {
+  type: 'typeconstructor';
+  name: string;
+  params: unknown[];
+  spread?: string;
 };
 
 export type TypeAST = {
@@ -20,16 +27,35 @@ export type TypeAST = {
   name: LowercaseChars;
 };
 
+export type TypeASTCompiler = {
+  type: 'type';
+  name: string;
+};
+
 export type FunctionAST = {
   type: 'function';
-  args: HaskellAST[];
-  result: HaskellAST;
+  args: TypeskellAST[];
+  result: TypeskellAST;
+};
+
+export type FunctionASTCompiler = {
+  type: 'function';
+  args: unknown[];
+  result: unknown;
 };
 
 export type ChainAST = {
   type: 'chain';
-  args: HaskellAST[];
-  result: HaskellAST;
+  args: TypeskellAST[];
+  result: TypeskellAST;
 };
 
-export type HaskellAST = FunctionAST | ChainAST | TypeAST | TypeContructorAST;
+export type ChainASTCompiler = {
+  type: 'chain';
+  args: unknown[];
+  result: unknown;
+};
+
+export type TypeskellAST = FunctionAST | ChainAST | TypeAST | TypeContructorAST;
+
+export type TypeskellASTCompiler = FunctionASTCompiler | ChainASTCompiler | TypeASTCompiler | TypeContructorASTCompiler;

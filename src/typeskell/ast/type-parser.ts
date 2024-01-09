@@ -1,12 +1,8 @@
 import { Inc, Dec } from '@utils/numbers';
-import { Tail } from '@utils/tuples';
-import { GreekChars, LowercaseChars, UppercaseChars } from './types';
+import { Tail, StringToTuple } from '@utils/tuples';
+import { LowercaseChars, UppercaseChars } from './types';
 
 export type TrimParens<T> = T extends `(${infer U})` ? U : T;
-
-type StringToTuple<T extends string, $acc extends unknown[] = []> = T extends `${infer A}${infer B}`
-  ? StringToTuple<B, [...$acc, A]>
-  : $acc;
 
 type TrimLeft<T extends string> = T extends ` ${infer U}` ? TrimLeft<U> : T;
 type TrimRight<T extends string> = T extends `${infer U} ` ? TrimRight<U> : T;

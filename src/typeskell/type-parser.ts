@@ -1,7 +1,8 @@
-import type { HaskellAST, TypeContructorAST, UppercaseChars, GreekChars } from './ast/types';
-import { ParseAST } from './ast/type-parser';
-import type { TypeConstructorMap, TypeConstructorMapCompiler, TypeMap, TypeMapCompiler } from './types';
+import type { TypeContructorASTCompiler, ChainASTCompiler, FunctionASTCompiler, TypeASTCompiler } from './ast/types';
+import type { TypeConstructorMapCompiler, TypeMapCompiler } from './types';
 import { ZipWithVariance } from '@kinds/variance';
+import { StringToTuple, Range, Flatten } from '@utils/tuples';
+import { Sub } from '@utils/numbers';
 
 type NextAlphaMap = {
   A: 'B';
@@ -83,3 +84,51 @@ export type MergeSpreadParams<
   $spreadA = GetSpreadParams<A, typemap>,
   $spreadB = GetSpreadParams<B, typemap>,
 > = ZipWithVariance<$spreadA, $spreadB, typeconstructorMap[F]['signature']>;
+
+type MapSpread<T extends number[], Spread extends string> = {
+  [K in keyof T]: `${Spread}${T[K]}`;
+};
+
+type BuildSpreadTypes<
+  ast extends TypeContructorASTCompiler,
+  typeconstructorMap extends TypeConstructorMapCompiler,
+  typeMap extends TypeMapCompiler,
+> = ast['name'] extends keyof typeconstructorMap
+  ? ast['spread'] extends infer spread extends string
+    ? StringToTuple<spread>['length'] extends 1
+      ? `${spread}0` extends keyof typeMap
+        ? []
+        : Sub<typeconstructorMap[ast['name']]['arity'], ast['params']['length']> extends infer spreadLength extends
+              number
+          ? MapSpread<Range<spreadLength>, spread>
+          : []
+      : []
+    : []
+  : [];
+
+type MapGetGenericTypeListAST<
+  T,
+  typeconstructorMap extends TypeConstructorMapCompiler,
+  typeMap extends TypeMapCompiler,
+> = {
+  [K in keyof T]: GetGenericTypeListAST<T[K], typeconstructorMap, typeMap>;
+};
+
+export type GetGenericTypeListAST<
+  ast,
+  typeconstructorMap extends TypeConstructorMapCompiler,
+  typeMap extends TypeMapCompiler,
+> = ast extends TypeContructorASTCompiler
+  ? [
+      ...Flatten<MapGetGenericTypeListAST<ast['params'], typeconstructorMap, typeMap>>,
+      ...BuildSpreadTypes<ast, typeconstructorMap, typeMap>,
+    ]
+  : ast extends ChainASTCompiler
+    ? Flatten<MapGetGenericTypeListAST<ast['args'], typeconstructorMap, typeMap>>
+    : ast extends FunctionASTCompiler
+      ? Flatten<MapGetGenericTypeListAST<[...ast['args'], ast['result']], typeconstructorMap, typeMap>>
+      : ast extends TypeASTCompiler
+        ? ast['name'] extends keyof typeMap
+          ? []
+          : [ast['name']]
+        : [];

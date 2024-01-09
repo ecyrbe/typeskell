@@ -1,5 +1,6 @@
 import { expectTypeOf, describe, it } from 'vitest';
-import { GetNextAlpha, GetSpreadParams, MergeSpreadParams } from './type-parser';
+import { GetNextAlpha, GetSpreadParams, MergeSpreadParams, GetGenericTypeListAST } from './type-parser';
+import { ParseAST } from './ast/type-parser';
 import { Kind, InvariantParam, ContravariantParam, CovariantParam } from '@kinds';
 
 describe('Type parser', () => {
@@ -42,5 +43,23 @@ describe('Type parser', () => {
         },
       ]
     >();
+  });
+
+  it('should get generic type list AST', () => {
+    expectTypeOf<
+      GetGenericTypeListAST<ParseAST<'(a -> F b ..β) -> F a ..α -> F b ..αβ'>, { F: Kind.F2 }, {}>
+    >().toEqualTypeOf<['a', 'b', 'β0']>();
+
+    expectTypeOf<
+      GetGenericTypeListAST<
+        ParseAST<'(a -> F b ..β) -> F a ..α -> F b ..αβ'>['result'],
+        { F: Kind.F2 },
+        { a: 'a'; b: 'b' }
+      >
+    >().toEqualTypeOf<['α0']>();
+
+    expectTypeOf<
+      GetGenericTypeListAST<ParseAST<'(a -> F b ..β) -> F a ..α -> F b ..αβ'>, { F: FContravariant }, {}>
+    >().toEqualTypeOf<['a', 'b', 'β0', 'β1']>();
   });
 });

@@ -1,4 +1,4 @@
-import { HaskellAST, LowercaseChars, UppercaseChars, GreekChars } from './types';
+import { TypeskellAST, LowercaseChars, UppercaseChars, GreekChars } from './types';
 
 function trimParens(input: string): string {
   if (input[0] !== '(' || input[input.length - 1] !== ')') return input;
@@ -17,7 +17,7 @@ export function splitWithParens(input: string, split: string): string[] {
   return [input.trim()];
 }
 
-function parseTypeConstructorAST(type: string): HaskellAST {
+function parseTypeConstructorAST(type: string): TypeskellAST {
   const [typeconstructor, ...params] = splitWithParens(type, ' ');
   const lastParam = params[params.length - 1];
   if (isSpreadName(lastParam)) {
@@ -48,12 +48,12 @@ function isSpreadName(param: string): param is `..${GreekChars}` | `..${GreekCha
   return param.startsWith('..');
 }
 
-function parseArgsAST(input: string): HaskellAST[] {
+function parseArgsAST(input: string): TypeskellAST[] {
   if (isTypeConstructor(input[0])) return [parseTypeConstructorAST(input)];
   return splitWithParens(input, ' ').map(arg => parseAST(trimParens(arg)));
 }
 
-function parseFromArrayToManyAST([type, ...rest]: string[]): HaskellAST[] {
+function parseFromArrayToManyAST([type, ...rest]: string[]): TypeskellAST[] {
   if (rest.length === 0) {
     if (isTypeConstructor(type[0])) return [parseTypeConstructorAST(type)];
     if (type.length <= 1) return [{ type: 'type', name: type as LowercaseChars }];
@@ -77,10 +77,10 @@ function parseFromArrayToManyAST([type, ...rest]: string[]): HaskellAST[] {
   ];
 }
 
-function parseToManyAST(input: string): HaskellAST[] {
+function parseToManyAST(input: string): TypeskellAST[] {
   return parseFromArrayToManyAST(splitWithParens(input, '->'));
 }
 
-export function parseAST(input: string): HaskellAST {
+export function parseAST(input: string): TypeskellAST {
   return parseToManyAST(input)[0];
 }

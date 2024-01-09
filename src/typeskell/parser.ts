@@ -1,40 +1,43 @@
-import type { HaskellAST, TypeContructorAST, UppercaseChars, GreekChars } from './ast/types';
+import type { TypeskellAST, TypeContructorAST, UppercaseChars, GreekChars } from './ast/types';
 import { parseAST } from './ast/parser';
 import type { TypeConstructorMap, TypeMap } from './types';
 
 // don't return duplicates
-function getGenericTypeListAST(
-  ast: HaskellAST,
-  typeConstructorMap: TypeConstructorMap,
-  typeMap: TypeMap,
-  set = new Set<string>(),
-): Set<string> {
+function getGenericTypeListAST(ast: TypeskellAST, typeConstructorMap: TypeConstructorMap, typeMap: TypeMap): string[] {
   if (ast.type === 'typeconstructor') {
-    for (const param of ast.params) {
-      getGenericTypeListAST(param, typeConstructorMap, typeMap, set);
-    }
-    if (ast.name in typeConstructorMap && ast.spread && ast.spread.length === 1) {
-      const spreadLength = typeConstructorMap[ast.name] - ast.params.length;
-      for (let i = 0; i < spreadLength; i++) {
-        const greek = `${ast.spread}${i}`;
-        if (!(greek in typeMap)) set.add(greek);
-      }
-    }
+    return [
+      ...ast.params.flatMap(param => getGenericTypeListAST(param, typeConstructorMap, typeMap)),
+      ...buildSpreadTypes(ast, typeConstructorMap, typeMap),
+    ];
   }
-  if (ast.type === 'function' || ast.type === 'chain') {
-    for (const arg of ast.args) {
-      getGenericTypeListAST(arg, typeConstructorMap, typeMap, set);
-    }
-    getGenericTypeListAST(ast.result, typeConstructorMap, typeMap, set);
+  if (ast.type === 'chain') {
+    return ast.args.flatMap(arg => getGenericTypeListAST(arg, typeConstructorMap, typeMap));
   }
-  if (ast.type === 'type' && !(ast.name in typeMap) && !set.has(ast.name)) {
-    set.add(ast.name);
+  if (ast.type === 'function') {
+    return [...ast.args, ast.result].flatMap(arg => getGenericTypeListAST(arg, typeConstructorMap, typeMap));
   }
-  return set;
+  if (ast.type === 'type' && !(ast.name in typeMap)) {
+    return [ast.name];
+  }
+  return [];
 }
 
-function buildGenericTypeList(ast: HaskellAST, typeConstructorMap: TypeConstructorMap, typeMap: TypeMap): string[] {
-  return [...getGenericTypeListAST(ast, typeConstructorMap, typeMap)];
+const unique = <T>(arr: T[]) => [...new Set(arr)];
+
+function buildSpreadTypes(ast: TypeContructorAST, typeConstructorMap: TypeConstructorMap, typeMap: TypeMap) {
+  const tuple: string[] = [];
+  if (ast.name in typeConstructorMap && ast.spread && ast.spread.length === 1 && !(`${ast.spread}0` in typeMap)) {
+    const spreadLength = typeConstructorMap[ast.name] - ast.params.length;
+    for (let i = 0; i < spreadLength; i++) {
+      const greek = `${ast.spread}${i}`;
+      tuple.push(greek);
+    }
+  }
+  return tuple;
+}
+
+function buildGenericTypeList(ast: TypeskellAST, typeConstructorMap: TypeConstructorMap, typeMap: TypeMap): string[] {
+  return unique(getGenericTypeListAST(ast, typeConstructorMap, typeMap));
 }
 
 function genGenericFunction(
@@ -90,10 +93,8 @@ const buildTypeContructor = (ast: TypeContructorAST, typeConstructorMap: TypeCon
   ].join(', ')}>`;
 };
 
-const unique = <T>(arr: T[]) => [...new Set(arr)];
-
 function parseTypeskell(
-  ast: HaskellAST,
+  ast: TypeskellAST,
   typeConstructorMap: TypeConstructorMap,
   typeMap: TypeMap,
   alpha: UppercaseChars = 'A',
@@ -105,13 +106,7 @@ function parseTypeskell(
     return typeMap[ast.name];
   }
   if (ast.type === 'function' || ast.type === 'chain') {
-    let genericLetters: string[];
-    if (ast.type === 'function') {
-      genericLetters = buildGenericTypeList(ast, typeConstructorMap, typeMap);
-    } else {
-      const genericArgs = ast.args.flatMap(arg => buildGenericTypeList(arg, typeConstructorMap, typeMap));
-      genericLetters = unique(genericArgs);
-    }
+    const genericLetters = buildGenericTypeList(ast, typeConstructorMap, typeMap);
     return genGenericFunction(
       genericLetters.length,
       types => genericLetters.reduce((typemap, letter, i) => ((typemap[letter] = types[i]), typemap), typeMap),
