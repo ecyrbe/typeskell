@@ -9,7 +9,7 @@ describe('Functor', () => {
     const data = [1, 2, 3];
     const result = pipe(
       data,
-      A.map((x: number) => x + 1),
+      A.map(x => x + 1),
     );
     expectTypeOf(result).toEqualTypeOf<number[]>();
     expect(result).toEqual([2, 3, 4]);

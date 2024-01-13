@@ -1,6 +1,6 @@
 {
   "name": "typeskell",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -9,17 +9,17 @@
   ],
   "scripts": {
     "prebuild": "rimraf dist",
-    "build": "tsc -p tsconfig.build.json",
+    "build": "tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json",
     "test": "vitest"
   },
   "keywords": [],
   "author": "ecyrbe",
   "license": "MIT",
-  "dependencies": {},
   "devDependencies": {
-    "rimraf": "^5.0.5",
-    "type-testing": "^0.2.0",
     "prettier": "^3.1.1",
+    "rimraf": "^5.0.5",
+    "tsc-alias": "^1.8.8",
+    "type-testing": "^0.2.0",
     "typescript": "^5.3.3",
     "vitest": "^1.1.0"
   }

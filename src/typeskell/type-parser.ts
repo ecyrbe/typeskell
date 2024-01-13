@@ -1,7 +1,7 @@
 import type { TypeContructorASTCompiler, ChainASTCompiler, FunctionASTCompiler, TypeASTCompiler } from './ast/types';
 import type { TypeConstructorMapCompiler, TypeMapCompiler } from './types';
 import { ZipWithVariance } from '@kinds/variance';
-import { StringToTuple, Range, Flatten, Drop } from '@utils/tuples';
+import { StringToTuple, Range, Flatten, Drop, Zip } from '@utils/tuples';
 import { Sub } from '@utils/numbers';
 import { Kind, $ } from '@kinds';
 import { GenericFn } from '@utils/functions';
@@ -123,7 +123,7 @@ type Unique<T, $map = never, $acc extends unknown[] = []> = T extends [infer Hea
     : Unique<Tail, $map | Head, [...$acc, Head]>
   : $acc;
 
-export type BuildGenericTypeList<
+export type BuildKeys<
   ast,
   typeconstructorMap extends TypeConstructorMapCompiler,
   typeMap extends TypeMapCompiler,
@@ -165,50 +165,57 @@ type ParseTypeskell<
   : ast extends TypeASTCompiler
     ? typeMap[ast['name']]
     : ast extends FunctionASTCompiler | ChainASTCompiler
-      ? BuildGenericTypeList<ast, typeconstructorMap, typeMap> extends infer genericLetters extends unknown[]
+      ? BuildKeys<ast, typeconstructorMap, typeMap> extends infer keys extends string[]
         ? GenericFn<
-            genericLetters['length'],
-            BuildTypeskellParams<ast['args'], genericLetters, typeMap, typeconstructorMap>,
+            keys['length'],
+            BuildTypeskellParams<ast['args'], keys, typeMap, typeconstructorMap>,
             BuildTypeskellResult<
               ast['result'],
-              genericLetters,
+              keys,
               typeMap,
               typeconstructorMap,
-              genericLetters['length'] extends 0 ? alpha : GetNextAlpha<alpha>
+              keys['length'] extends 0 ? alpha : GetNextAlpha<alpha>
             >,
             alpha
           >
         : never
       : never;
 
-type ReduceGenerics<mapped, generics, typeMap extends TypeMapCompiler> = mapped extends [
-  infer MappedHead extends string,
-  ...infer MappedTail,
-]
-  ? generics extends [infer GenericHead, ...infer GenericTail]
-    ? MappedHead extends keyof typeMap
-      ? ReduceGenerics<MappedTail, GenericTail, typeMap>
-      : ReduceGenerics<MappedTail, GenericTail, typeMap & { [K in MappedHead]: GenericHead }>
-    : typeMap
-  : typeMap;
+type ZipToMap<T extends [string, unknown][]> = {
+  [K in T[number] as K[0]]: K[1];
+};
+
+type BuildTypeMap<
+  mapKeys extends string[],
+  generics extends unknown[],
+  typeMap extends TypeMapCompiler,
+> = mapKeys['length'] extends 0
+  ? typeMap
+  : Zip<mapKeys, generics> extends infer zip extends [string, unknown][]
+    ? ZipToMap<zip> & typeMap
+    : typeMap;
 
 interface BuildTypeskellParams<
   args,
-  mapped,
+  mapKeys extends string[],
   typeMap extends TypeMapCompiler,
   typeConstructorMap extends TypeConstructorMapCompiler,
 > extends Kind {
-  return: MapTypeskell<args, typeConstructorMap, ReduceGenerics<mapped, this['rawArgs'], typeMap>>;
+  return: this['rawArgs'] extends unknown[]
+    ? MapTypeskell<args, typeConstructorMap, BuildTypeMap<mapKeys, this['rawArgs'], typeMap>>
+    : never;
 }
 
 interface BuildTypeskellResult<
   ast,
-  mapped,
+  mapKeys extends string[],
   typeMap extends TypeMapCompiler,
   typeconstructorMap extends TypeConstructorMapCompiler,
   alpha extends string,
 > extends Kind {
-  return: ParseTypeskell<ast, typeconstructorMap, ReduceGenerics<mapped, this['rawArgs'], typeMap>, alpha>;
+  return: this['rawArgs'] extends unknown[]
+    ? ParseTypeskell<ast, typeconstructorMap, BuildTypeMap<mapKeys, this['rawArgs'], typeMap>, alpha>
+    : never;
 }
 
 export type TypeSkell<

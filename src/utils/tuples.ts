@@ -20,6 +20,12 @@ export type Drop<N extends number, T extends unknown[], $droped extends unknown[
     ? Drop<N, R, [...$droped, H]>
     : T;
 
+export type Zip<T, U, $acc extends unknown[] = []> = T extends [infer TH, ...infer TR]
+  ? U extends [infer UH, ...infer UR]
+    ? Zip<TR, UR, [...$acc, [TH, UH]]>
+    : $acc
+  : $acc;
+
 export type SplitAt<N extends number, T extends unknown[], $acc extends unknown[] = []> = $acc['length'] extends N
   ? [$acc, T]
   : T extends [infer H, ...infer R]

@@ -13,6 +13,7 @@ import {
   FunctorResult,
 } from './functor.types';
 import { as as asImpl, flap as flapImpl, mapCompose as mapComposeImpl } from './functor.impl';
+import { TypeSkell } from '@typeskell';
 
 /**
  * Functor is a typeclass that defines a single operation, map.
@@ -30,7 +31,7 @@ export interface Functor<F extends Kind> {
    * @param f `a -> b`
    * @returns `F a -> F b`
    */
-  map: <A, B>(f: (a: A) => B) => GenericFn<Dec<F['arity']>, FunctorParams<F, A>, FunctorResult<F, B>>;
+  map: TypeSkell<'(a -> b) -> F a ..e -> F b ..e', { F: F }>;
 }
 
 /**

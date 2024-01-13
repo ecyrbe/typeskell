@@ -23,7 +23,7 @@ export type $<F, params extends unknown[] = [], strict extends boolean = true> =
   : strict extends true
     ? {
         F: F;
-        arg0: params[0];
+        rawArgs: params;
         //        params: params;
       }
     : never;
