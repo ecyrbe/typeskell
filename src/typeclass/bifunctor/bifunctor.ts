@@ -1,16 +1,7 @@
 import { Equal, Expect } from 'type-testing';
-import type { Kind, $ } from '@kinds';
-import type { Dec, Sub } from '@utils/numbers';
-import { type GenericFn, identity } from '@utils/functions';
-import type { FunctorParams, FunctorResult } from '@typeclass/functor/functor.types';
-
-interface BiFunctorParams<F extends Kind, A, C> extends Kind {
-  return: this['rawArgs'] extends unknown[] ? [fa: $<F, [A, C, ...this['rawArgs']]>] : never;
-}
-
-interface BiFunctorResult<F extends Kind, B, D> extends Kind {
-  return: this['rawArgs'] extends unknown[] ? $<F, [B, D, ...this['rawArgs']]> : never;
-}
+import type { Kind } from '@kinds';
+import { identity } from '@utils/functions';
+import { TypeSkell } from '@typeskell';
 
 /**
  * BiFunctor is a typeclass that defines a single operation, bimap.
@@ -34,10 +25,7 @@ export interface BiFunctor<F extends Kind> {
    * @param g `c -> d`
    * @returns `F a c -> F b d`
    */
-  bimap: <A, B, C, D>(
-    f: (a: A) => B,
-    g: (e: C) => D,
-  ) => GenericFn<Sub<F['arity'], 2>, BiFunctorParams<F, A, C>, BiFunctorResult<F, B, D>>;
+  bimap: TypeSkell<'(a -> b) (c -> d) -> F a c ..e -> F b d ..e', { F: F }>;
 }
 
 const _mapLeft =
@@ -55,15 +43,7 @@ const _mapLeft =
  */
 export const mapLeft: <F extends Kind>(
   bifunctor: BiFunctor<F>,
-) => <A, B>(f: (a: A) => B) => GenericFn<Dec<F['arity']>, FunctorParams<F, A>, FunctorResult<F, B>> = _mapLeft as any;
-
-export interface BiFunctorRightParams<F extends Kind, A> extends Kind {
-  return: this['rawArgs'] extends [infer C, ...infer Args] ? [fac: $<F, [C, A, ...Args]>] : never;
-}
-
-export interface BiFunctorRightResult<F extends Kind, B> extends Kind {
-  return: this['rawArgs'] extends [infer C, ...infer Args] ? $<F, [C, B, ...Args]> : never;
-}
+) => TypeSkell<'(a -> b) -> F a c ..e -> F b c ..e', { F: F }> = _mapLeft as any;
 
 const _mapRight =
   (bifunctor: BiFunctor<Kind.F2>) =>
@@ -80,8 +60,7 @@ const _mapRight =
  */
 export const mapRight: <F extends Kind>(
   bifunctor: BiFunctor<F>,
-) => <A, B>(f: (a: A) => B) => GenericFn<Dec<F['arity']>, BiFunctorRightParams<F, A>, BiFunctorRightResult<F, B>> =
-  _mapRight as any;
+) => TypeSkell<'(a -> b) -> F c a ..e -> F c b ..e', { F: F }> = _mapRight as any;
 
 /**
  * TYPE TESTS to check impl and interface are in sync
