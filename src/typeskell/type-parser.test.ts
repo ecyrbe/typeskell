@@ -1,5 +1,5 @@
 import { expectTypeOf, describe, it } from 'vitest';
-import { GetNextAlpha, BuildKeys, TypeSkell, BuildSpreadParams } from './type-parser';
+import { GetNextAlpha, BuildGenericKeys, TypeSkell, BuildSpreadParams, GetKeys } from './type-parser';
 import { ParseAST } from './ast/type-parser';
 import { Kind, $ } from '@kinds';
 
@@ -21,17 +21,17 @@ describe('Type parser', () => {
   });
 
   it('should get generic type list AST', () => {
-    expectTypeOf<BuildKeys<ParseAST<'(a -> F b ..β) -> F a ..α -> F b ..αβ'>, { F: Kind.F2 }, {}>>().toEqualTypeOf<
-      ['a', 'b', 'β0']
-    >();
+    expectTypeOf<
+      BuildGenericKeys<ParseAST<'(a -> F b ..β) -> F a ..α -> F b ..αβ'>, { F: Kind.F2 }, []>
+    >().toEqualTypeOf<['a', 'b', 'β0']>();
 
     expectTypeOf<
-      BuildKeys<ParseAST<'(a -> F b ..β) -> F a ..α -> F b ..αβ'>['result'], { F: Kind.F2 }, { a: 'a'; b: 'b' }>
+      BuildGenericKeys<ParseAST<'(a -> F b ..β) -> F a ..α -> F b ..αβ'>['result'], { F: Kind.F2 }, ['a', 'b']>
     >().toEqualTypeOf<['α0']>();
 
-    expectTypeOf<BuildKeys<ParseAST<'(a b -> F b ..β) -> F a ..α -> F b ..αβ'>, { F: Kind.F3 }, {}>>().toEqualTypeOf<
-      ['a', 'b', 'β0', 'β1']
-    >();
+    expectTypeOf<
+      BuildGenericKeys<ParseAST<'(a b -> F b ..β) -> F a ..α -> F b ..αβ'>, { F: Kind.F3 }, []>
+    >().toEqualTypeOf<['a', 'b', 'β0', 'β1']>();
   });
 
   it('should parse typeskell', () => {

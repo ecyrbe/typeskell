@@ -1,6 +1,6 @@
 import { TypeConstructor } from '@kinds/kind';
 
-export type $<F, params extends unknown[] = [], strict extends boolean = true> = F extends TypeConstructor
+export type $<F, params extends unknown[] = []> = F extends TypeConstructor
   ? (F & {
       rawArgs: params;
       arg0: params[0];
@@ -20,12 +20,4 @@ export type $<F, params extends unknown[] = [], strict extends boolean = true> =
       arg14: params[14];
       arg15: params[15];
     })['return']
-  : strict extends true
-    ? {
-        F: F;
-        rawArgs: params;
-        //        params: params;
-      }
-    : never;
-
-export type $$<kind, params extends unknown[] = []> = $<kind, params, false>;
+  : never;

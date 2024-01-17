@@ -9,8 +9,6 @@ import {
   FunctorAsResult,
   FunctorCompositionParams,
   FunctorCompositionResult,
-  FunctorParams,
-  FunctorResult,
 } from './functor.types';
 import { as as asImpl, flap as flapImpl, mapCompose as mapComposeImpl } from './functor.impl';
 import { TypeSkell } from '@typeskell';
