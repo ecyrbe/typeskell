@@ -16,8 +16,6 @@ export interface Applicative<F extends Kind> extends Functor<F>, Of<F> {
   /**
    * ap :: `F a -> F (a -> b) -> F b`
    *
-   * ap :: `<A,...Af>(fa: $<F, [A,...Af]>) => <B,...Bf>(fab: $<F, [(a: A) => B,...Bf]>) => $<F, [B,...ZipWithVariance<Af,Bf>]>`
-   *
    * @param fa `F a`
    * @returns `F (a -> b) -> F b`
    */

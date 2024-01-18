@@ -1,15 +1,5 @@
 import { Expect, Equal } from 'type-testing';
 import type { Kind } from '@kinds';
-import type { Add, Dec } from '@utils/numbers';
-import { type GenericFn } from '@utils/functions';
-import {
-  FlapParams,
-  FlapResult,
-  FunctorAsParams,
-  FunctorAsResult,
-  FunctorCompositionParams,
-  FunctorCompositionResult,
-} from './functor.types';
 import { as as asImpl, flap as flapImpl, mapCompose as mapComposeImpl } from './functor.impl';
 import { TypeSkell } from '@typeskell';
 
@@ -24,8 +14,6 @@ export interface Functor<F extends Kind> {
   /**
    * map :: `(a -> b) -> F a -> F b`
    *
-   * map :: `<A,B>(f: (a: A) => B) => <...>(fa: $<F, [A,...]>) => $<F, [B,...]>`
-   *
    * @param f `a -> b`
    * @returns `F a -> F b`
    */
@@ -34,8 +22,6 @@ export interface Functor<F extends Kind> {
 
 /**
  * mapCompose :: `Functor<F> Functor<G> -> (a -> b) -> F (G a) -> F (G b)`
- *
- * mapCompose :: `<F,G>(ff: Functor<F> gg: Functor<G>) => <A,B>(f: (a: A) => B) => <...Cf,...Cg>(fa: $<F, [$<G,[A,...Cg]>,...Cf]>) => $<F, [$<G,[B,...Cg]>,...Cf]>`
  *
  * @param FunctorF `Functor<F>`
  * @param FunctorG `Functor<G>`
@@ -49,8 +35,6 @@ export const mapCompose: <F extends Kind, G extends Kind>(
 /**
  * flap :: `Functor F -> a -> F (a -> b) -> F b`
  *
- * flap :: `<F>(f: Functor<F>) => <A>(a: A) => <B,...>(fab: $<F, [(a: A) => B, ...]>) => $<F, [B, ...]>`
- *
  * @param functor `Functor<F>`
  * @returns `a -> F (a -> b) -> F b`
  */
@@ -59,8 +43,6 @@ export const flap: <F extends Kind>(functor: Functor<F>) => TypeSkell<'a -> F (a
 
 /**
  * as :: `Functor F -> b -> F a -> F b`
- *
- * as :: `<F>(f: Functor<F>) => <B>(b: B) => <A,...>(fa: $<F, [A,...]>) => $<F, [B,...]>`
  *
  * @param functor `Functor<F>`
  * @returns `b -> F a -> F b`

@@ -19,8 +19,6 @@ export interface BiFunctor<F extends Kind> {
   /**
    * bimap :: `(a -> b) (c -> d) -> F a c -> F b d`
    *
-   * bimap :: `<A,B,C,D>(f: (a: A) => B, g: (c: C) => D) => <...>(fac: $<F, [A,C,...]>) => $<F, [B,D,...]>`
-   *
    * @param f `a -> b`
    * @param g `c -> d`
    * @returns `F a c -> F b d`
@@ -36,8 +34,6 @@ const _mapLeft =
 /**
  * mapLeft :: `BiFunctor F -> (a -> b) -> F a c -> F b c`
  *
- * mapLeft :: `<F>(bif: BiFunctor<F>) => <A,B>(f: (a: A) => B) => <C,...>(fac: $<F, [A,C,...]>) => $<F, [B,C,...]>`
- *
  * @param bifunctor `BiFunctor<F>`
  * @returns `(a -> b) -> F a c -> F b c`
  */
@@ -52,8 +48,6 @@ const _mapRight =
 
 /**
  * mapRight :: `BiFunctor F  -> (a -> b) -> F c a -> F c b`
- *
- * mapRight :: `<F>(bif: BiFunctor<F>) => <A,B>(f: (a: A) => B) => <C,...>(fac: $<F, [C,A,...]>) => $<F, [C,B,...]>`
  *
  * @param bifunctor `BiFunctor<F>`
  * @returns `(a -> b) -> F c a -> F c b`
