@@ -1,5 +1,5 @@
 import type { TypeContructorASTCompiler, ChainASTCompiler, FunctionASTCompiler, TypeASTCompiler } from './ast/types';
-import type { TypeConstructorMapCompiler, TypeNameList } from './types';
+import type { TypeConstructorMapCompiler, TypeList, TypeNameList } from './types';
 import { ZipWithVariance } from '@kinds/variance';
 import { StringToTuple, Range, Flatten, Drop } from '@utils/tuples';
 import { Sub } from '@utils/numbers';
@@ -39,11 +39,11 @@ type NextAlphaMap = {
 export type GetNextAlpha<alpha> = alpha extends keyof NextAlphaMap ? NextAlphaMap[alpha] : never;
 
 type GetFromList<key, typeNameList extends TypeNameList, typeList> = typeNameList extends [
-  ...infer Rest extends string[],
+  ...infer Rest extends TypeNameList,
   infer Last,
 ]
   ? Last extends key
-    ? typeList extends unknown[]
+    ? typeList extends TypeList
       ? typeList[Rest['length']]
       : never
     : GetFromList<key, Rest, typeList>
@@ -194,7 +194,7 @@ export type BuildTypeContructor<
   typeNameList extends TypeNameList,
   typeList,
 > = ast extends TypeContructorASTCompiler
-  ? MapTypeskell<ast['params'], typeconstructorMap, typeNameList, typeList> extends infer params extends unknown[]
+  ? MapTypeskell<ast['params'], typeconstructorMap, typeNameList, typeList> extends infer params extends TypeNameList
     ? ast['name'] extends keyof typeconstructorMap
       ? ast['spread'] extends string
         ? StringToTuple<ast['spread']> extends [infer spreadA extends string, infer spreadB extends string]
@@ -208,7 +208,7 @@ export type BuildTypeContructor<
                 typeconstructorMap,
                 typeNameList,
                 typeList
-              > extends infer SpreadParams extends unknown[]
+              > extends infer SpreadParams extends TypeNameList
             ? $<typeconstructorMap[ast['name']], [...params, ...SpreadParams]>
             : never
         : $<typeconstructorMap[ast['name']], params>
@@ -217,12 +217,12 @@ export type BuildTypeContructor<
   : never;
 
 type Filter<
-  Keys extends string[],
+  Keys,
   typeNameList extends TypeNameList,
   typeList,
-  $accKeys extends string[] = [],
-  $accTypes extends unknown[] = [],
-> = Keys extends [infer H extends string, ...infer R extends string[]]
+  $accKeys extends TypeNameList = [],
+  $accTypes extends TypeList = [],
+> = Keys extends [infer H, ...infer R extends TypeNameList]
   ? H extends typeNameList[number]
     ? Filter<R, typeNameList, typeList, [...$accKeys, H], [...$accTypes, GetFromList<H, typeNameList, typeList>]>
     : Filter<R, typeNameList, typeList, $accKeys, $accTypes>
@@ -230,13 +230,13 @@ type Filter<
 
 type MapKeysToFn<
   ast extends FunctionASTCompiler | ChainASTCompiler,
-  generickeys extends string[],
+  generickeys extends TypeNameList,
   typeconstructorMap extends TypeConstructorMapCompiler,
   typeNameList extends TypeNameList,
   typeList,
   alpha extends string,
-  $argKeys extends string[] = BuildKeys<ast, typeconstructorMap, 'args'>,
-  $filteredArgKeysAndTypes extends [string[], unknown[]] = Filter<$argKeys, typeNameList, typeList>,
+  $argKeys extends TypeNameList = BuildKeys<ast, typeconstructorMap, 'args'>,
+  $filteredArgKeysAndTypes extends [TypeNameList, TypeList] = Filter<$argKeys, typeNameList, typeList>,
 > = GenericFn<
   generickeys['length'],
   BuildTypeskellParams<
@@ -268,20 +268,20 @@ type ParseTypeskell<
   : ast extends TypeASTCompiler
     ? GetFromList<ast['name'], typeNameList, typeList>
     : ast extends FunctionASTCompiler | ChainASTCompiler
-      ? BuildGenericKeys<ast, typeconstructorMap, typeNameList> extends infer generickeys extends string[]
+      ? BuildGenericKeys<ast, typeconstructorMap, typeNameList> extends infer generickeys extends TypeNameList
         ? MapKeysToFn<ast, generickeys, typeconstructorMap, typeNameList, typeList, alpha>
         : never
       : never;
 
 interface BuildTypeskellParams<
   args,
-  mapKeys extends string[],
+  mapKeys extends TypeNameList,
   typeConstructorMap extends TypeConstructorMapCompiler,
   typeNameList extends TypeNameList,
   typeList,
 > extends Kind {
-  return: this['rawArgs'] extends unknown[]
-    ? typeList extends unknown[]
+  return: this['rawArgs'] extends TypeList
+    ? typeList extends TypeList
       ? MapTypeskell<args, typeConstructorMap, [...typeNameList, ...mapKeys], [...typeList, ...this['rawArgs']]>
       : never
     : never;
@@ -289,14 +289,14 @@ interface BuildTypeskellParams<
 
 interface BuildTypeskellResult<
   ast,
-  mapKeys extends string[],
+  mapKeys extends TypeNameList,
   typeconstructorMap extends TypeConstructorMapCompiler,
   typeNameList extends TypeNameList,
   typeList,
   alpha extends string,
 > extends Kind {
-  return: this['rawArgs'] extends unknown[]
-    ? typeList extends unknown[]
+  return: this['rawArgs'] extends TypeList
+    ? typeList extends TypeList
       ? ParseTypeskell<ast, typeconstructorMap, [...typeNameList, ...mapKeys], [...typeList, ...this['rawArgs']], alpha>
       : never
     : never;

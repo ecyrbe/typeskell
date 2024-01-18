@@ -1,5 +1,5 @@
 import { expectTypeOf, describe, it } from 'vitest';
-import { GetNextAlpha, BuildGenericKeys, TypeSkell, BuildSpreadParams, GetKeys } from './type-parser';
+import { GetNextAlpha, BuildGenericKeys, TypeSkell, BuildSpreadParams } from './type-parser';
 import { ParseAST } from './ast/type-parser';
 import { Kind, $ } from '@kinds';
 
