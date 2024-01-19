@@ -5,6 +5,7 @@ import * as tOf from '@typeclass/of';
 import * as tTo from '@typeclass/to';
 import * as tApplicative from '@typeclass/applicative';
 import * as tMonad from '@typeclass/monad';
+import * as tBiFlatMap from '@typeclass/biflatmap';
 import { pipe } from '../pipe';
 
 export interface Err<E> {
@@ -36,6 +37,11 @@ export const Of: tOf.Of<TResult> = {
 
 export const To: tTo.To<TResult> = {
   getOrElse: f => fa => (isOk(fa) ? fa.ok : f(fa.err)),
+};
+
+export const BiFlatMap: tBiFlatMap.BiFlapMap<TResult> = {
+  ...Of,
+  biFlapMap: (f, g) => fa => (isOk(fa) ? f(fa.ok) : g(fa.err)),
 };
 
 export const Bifunctor: tbifunctor.BiFunctor<TResult> = {
@@ -103,6 +109,23 @@ export const getOrElse = To.getOrElse;
  * ```
  */
 export const getOr = tTo.getOr(To);
+
+/**
+ * orElse :: `(e1 -> Result<a, e2>) -> Result<a, e1> -> Result<a, e2>`
+ *
+ * orElse :: `<A, E1, E2>(f: (e: E1) => Result<A, E2>) => (fa: Result<A, E1>) => Result<A, E2>`
+ *
+ * @param f `e1 -> Result<a, e2>`
+ * @returns `Result<a, e1> -> Result<a, e2>`
+ *
+ * @example
+ * ```ts
+ * pipe(ok(0), orElse(() => ok(1))) // ok(0)
+ * pipe(err("error"), orElse(() => ok(1))) // ok(1)
+ * pipe(err("error"), orElse((e) => err(`${e}!`))) // err("error!")
+ * ```
+ */
+export const orElse = tBiFlatMap.orElse(BiFlatMap);
 
 /**
  * map :: `(a -> b) -> Result<a, e> -> Result<b, e>`
@@ -250,3 +273,20 @@ export const flatMap = Monad.flatMap;
  * ```
  */
 export const flatten = tMonad.flatten(Monad);
+
+/**
+ * biFlapMap :: `(a -> Result<b, e2>) (e1 -> Result<b, e2>) -> Result<a, e1> -> Result<b, e2>`
+ *
+ * biFlapMap :: `<A, B, E1, E2>(f: (a: A) => Result<B, E2>, g: (e: E1) => Result<B, E2>) => (fa: Result<A, E1>) => Result<B, E2>`
+ *
+ * @param f `a -> Result<b, e2>`
+ * @param g `e1 -> Result<b, e2>`
+ * @returns `Result<a, e1> -> Result<b, e2>`
+ *
+ * @example
+ * ```ts
+ * pipe(ok(0), biFlapMap(x => ok(x + 1), x => err("error"))) // ok(1)
+ * pipe(err("error"), biFlapMap(x => ok(x + 1), x => err("error!"))) // err("error!")
+ * ```
+ */
+export const biFlapMap = BiFlatMap.biFlapMap;
