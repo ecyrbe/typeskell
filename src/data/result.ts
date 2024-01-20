@@ -44,13 +44,14 @@ export const Flip: tFlip.Flip<TResult> = {
   flip: fa => (isOk(fa) ? err(fa.ok) : ok(fa.err)),
 };
 
-export const BiFlatMap: tBiFlatMap.BiFlapMap<TResult> = {
-  ...Of,
-  biFlapMap: (f, g) => fa => (isOk(fa) ? f(fa.ok) : g(fa.err)),
-};
-
 export const Bifunctor: tbifunctor.BiFunctor<TResult> = {
   bimap: (f, g) => fa => (isOk(fa) ? ok(f(fa.ok)) : err(g(fa.err))),
+};
+
+export const BiFlatMap: tBiFlatMap.BiFlapMap<TResult> = {
+  ...Of,
+  ...Bifunctor,
+  biFlapMap: (f, g) => fa => (isOk(fa) ? f(fa.ok) : g(fa.err)),
 };
 
 export const Functor: tfunctor.Functor<TResult> = {
