@@ -1,6 +1,7 @@
-import { Kind, $ } from '@kinds';
-import { Of } from '@typeclass/of';
-import { TypeSkell } from '@typeskell';
+import type { Kind } from '@kinds';
+import type { Of } from '@typeclass/of';
+import type { TypeSkell } from '@typeskell';
+import { orElse as orElseImpl } from './biflatmap.impl';
 
 /**
  * BiFlatMap is a typeclass that defines a single operation, biFlatMap.
@@ -9,12 +10,6 @@ import { TypeSkell } from '@typeskell';
 export interface BiFlapMap<F extends Kind> extends Of<F> {
   biFlapMap: TypeSkell<'(a -> F b e ..x) (c -> F b e ..x) -> F a c ..y -> F b e ..xy', { F: F }>;
 }
-
-const orElseImpl: (
-  biflatmap: BiFlapMap<Kind.F2>,
-) => <A, E1, E2>(f: (e: E1) => $<Kind.F2, [A, E2]>) => (args_0: $<Kind.F2, [A, E1]>) => $<Kind.F2, [A, E2]> =
-  biflatmap => f =>
-    biflatmap.biFlapMap(biflatmap.of, f);
 
 /**
  * orElse :: `BiFlatMap F => (e1 -> F a e2) -> F a e1 -> F a e2`
