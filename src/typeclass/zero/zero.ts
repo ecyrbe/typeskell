@@ -1,13 +1,5 @@
-import type { Kind, $ } from '@kinds';
-import { GenericFn } from '@utils/functions';
-
-export interface ZeroParams extends Kind {
-  return: [];
-}
-
-export interface ZeroResult<F extends Kind> extends Kind {
-  return: this['rawArgs'] extends unknown[] ? $<F, this['rawArgs']> : never;
-}
+import type { Kind } from '@kinds';
+import type { TypeSkell } from '@typeskell';
 
 export interface Zero<F extends Kind> {
   /**
@@ -17,5 +9,5 @@ export interface Zero<F extends Kind> {
    *
    * @returns `F a`
    */
-  zero: GenericFn<F['arity'], ZeroParams, ZeroResult<F>>;
+  zero: TypeSkell<' -> F a ..e', { F: F }>;
 }
