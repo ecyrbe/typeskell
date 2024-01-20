@@ -3,6 +3,7 @@ import * as tfunctor from '@typeclass/functor';
 import * as tbifunctor from '@typeclass/bifunctor';
 import * as tOf from '@typeclass/of';
 import * as tTo from '@typeclass/to';
+import * as tFlip from '@typeclass/flip';
 import * as tApplicative from '@typeclass/applicative';
 import * as tMonad from '@typeclass/monad';
 import * as tBiFlatMap from '@typeclass/biflatmap';
@@ -39,6 +40,10 @@ export const To: tTo.To<TResult> = {
   getOrElse: f => fa => (isOk(fa) ? fa.ok : f(fa.err)),
 };
 
+export const Flip: tFlip.Flip<TResult> = {
+  flip: fa => (isOk(fa) ? err(fa.ok) : ok(fa.err)),
+};
+
 export const BiFlatMap: tBiFlatMap.BiFlapMap<TResult> = {
   ...Of,
   biFlapMap: (f, g) => fa => (isOk(fa) ? f(fa.ok) : g(fa.err)),
@@ -62,7 +67,6 @@ export const Monad: tMonad.Monad<TResult> = {
   ...Applicative,
   flatMap: f => fa => (isOk(fa) ? f(fa.ok) : fa),
 };
-
 /**
  * of :: `a -> Result<a, never>`
  *
@@ -109,6 +113,20 @@ export const getOrElse = To.getOrElse;
  * ```
  */
 export const getOr = tTo.getOr(To);
+
+/**
+ * flip :: `Result<a, e> -> Result<e, a>`
+ *
+ * @param fa `Result<a, e>`
+ * @returns `Result<e, a>`
+ *
+ * @example
+ * ```ts
+ * pipe(ok(0), flip) // err(0)
+ * pipe(err("error"), flip) // ok("error")
+ * ```
+ */
+export const flip = Flip.flip;
 
 /**
  * orElse :: `(e1 -> Result<a, e2>) -> Result<a, e1> -> Result<a, e2>`
