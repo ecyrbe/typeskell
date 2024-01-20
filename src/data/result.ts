@@ -21,8 +21,8 @@ export interface Ok<A> {
 
 export type Result<A, E> = Ok<A> | Err<E>;
 
-export const err = <E>(e: E): Result<never, E> => ({ _tag: 'Err', err: e });
-export const ok = <A>(a: A): Result<A, never> => ({ _tag: 'Ok', ok: a });
+export const err = <E, A = never>(e: E): Result<A, E> => ({ _tag: 'Err', err: e });
+export const ok = <A, E = never>(a: A): Result<A, E> => ({ _tag: 'Ok', ok: a });
 
 export const isErr = <E>(result: Result<unknown, E>): result is Err<E> => result._tag === 'Err';
 
