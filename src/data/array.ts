@@ -6,6 +6,8 @@ import * as tZero from '@typeclass/zero';
 import * as tApplicative from '@typeclass/applicative';
 import * as tMonad from '@typeclass/monad';
 import * as tFoldable from '@typeclass/foldable';
+import * as tFilterable from '@typeclass/filterable';
+import { Option, isSome } from './option';
 
 export type TArray = Kind.Array;
 
@@ -27,6 +29,21 @@ export const Functor: tfunctor.Functor<TArray> = {
 
 export const Foldable: tFoldable.Foldable<TArray> = {
   reduce: (f, b) => fa => fa.reduce(f, b),
+};
+
+export const Filterable: tFilterable.Filterable<TArray> = {
+  ...Zero,
+  ...Functor,
+  filterMap: f => fa => {
+    const result: (ReturnType<typeof f> extends Option<infer A> ? A : never)[] = [];
+    for (const a of fa) {
+      const b = f(a);
+      if (isSome(b)) {
+        result.push(b.value);
+      }
+    }
+    return result;
+  },
 };
 
 export const Applicative: tApplicative.Applicative<TArray> = {
@@ -207,3 +224,33 @@ export const flatten = tMonad.flatten(Monad);
  * ```
  */
 export const reduce = Foldable.reduce;
+
+/**
+ * filterMap :: `(a -> Option<b>) -> a[] -> b[]`
+ *
+ * filterMap :: `<A, B>(f: (a: A) => Option<B>) => (fa: A[]) => B[]`
+ *
+ * @param f `(a -> Option<b>)`
+ * @returns `a[] -> b[]`
+ *
+ * @example
+ * ```ts
+ * pipe([1,2,3], filterMap(x => x > 1 ? some(x) : none)) // [2,3]
+ * ```
+ */
+export const filterMap = Filterable.filterMap;
+
+/**
+ * filter :: `(a -> boolean) -> a[] -> a[]`
+ *
+ * filter :: `<A>(f: (a: A) => boolean) => (fa: A[]) => A[]`
+ *
+ * @param f `(a -> boolean)`
+ * @returns `a[] -> a[]`
+ *
+ * @example
+ * ```ts
+ * pipe([1,2,3], filter(x => x > 1)) // [2,3]
+ * ```
+ */
+export const filter = (f => fa => fa.filter(f)) as tFilterable.FilterSignature<TArray>;

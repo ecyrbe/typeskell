@@ -306,5 +306,10 @@ export type TypeSkell<
   Input extends string,
   typeconstructorMap extends TypeConstructorMapCompiler = {},
   typeNameList extends TypeNameList = [],
-  typeList = [],
-> = ParseTypeskell<ParseAST<Input>, typeconstructorMap, typeNameList, typeList>;
+  typeList extends unknown[] = [],
+> = ParseTypeskell<
+  ParseAST<Input>,
+  typeconstructorMap,
+  ['boolean', 'number', 'string', ...typeNameList],
+  [boolean, number, string, ...typeList]
+>;
