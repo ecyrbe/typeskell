@@ -6,6 +6,7 @@ import * as tZero from '@typeclass/zero';
 import * as tApplicative from '@typeclass/applicative';
 import * as tMonad from '@typeclass/monad';
 import * as tFoldable from '@typeclass/foldable';
+import * as tFilterable from '@typeclass/filterable';
 import { pipe } from '../pipe';
 
 export interface None {
@@ -48,6 +49,12 @@ export const Functor: tfunctor.Functor<TOption> = {
 
 export const Foldable: tFoldable.Foldable<TOption> = {
   reduce: (f, b) => fa => (isSome(fa) ? f(b, fa.value) : b),
+};
+
+export const Filterable: tFilterable.Filterable<TOption> = {
+  ...Zero,
+  ...Functor,
+  filterMap: f => fa => (isSome(fa) ? f(fa.value) : none),
 };
 
 export const Applicative: tApplicative.Applicative<TOption> = {
@@ -255,3 +262,7 @@ export const flatten = tMonad.flatten(Monad);
  * ```
  */
 export const reduce = Foldable.reduce;
+
+export const filterMap = Filterable.filterMap;
+
+export const filter = tFilterable.filter(Filterable);
