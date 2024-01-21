@@ -263,6 +263,36 @@ export const flatten = tMonad.flatten(Monad);
  */
 export const reduce = Foldable.reduce;
 
+/**
+ * filterMap :: `(a -> Option<b>) -> Option<a> -> Option<b>`
+ *
+ * filterMap :: `<A, B>(f: (a: A) => Option<B>) => (fa: Option<A>) => Option<B>`
+ *
+ * @param f `(a -> Option<b>)`
+ * @returns `Option<a> -> Option<b>`
+ *
+ * @example
+ * ```ts
+ * pipe(some(1), filterMap(x => x > 1 ? some(x) : none)) // none
+ * pipe(some(2), filterMap(x => x > 1 ? some(x) : none)) // some(2)
+ * pipe(none, filterMap(x => x > 1 ? some(x) : none)) // none
+ * ```
+ */
 export const filterMap = Filterable.filterMap;
 
+/**
+ * filter :: `(a -> boolean) -> Option<a> -> Option<a>`
+ *
+ * filter :: `<A>(f: (a: A) => boolean) => (fa: Option<A>) => Option<A>`
+ *
+ * @param f `(a -> boolean)`
+ * @returns `Option<a> -> Option<a>`
+ *
+ * @example
+ * ```ts
+ * pipe(some(1), filter(x => x > 1)) // none
+ * pipe(some(2), filter(x => x > 1)) // some(2)
+ * pipe(none, filter(x => x > 1)) // none
+ * ```
+ */
 export const filter = tFilterable.filter(Filterable);
