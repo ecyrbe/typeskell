@@ -8,6 +8,7 @@ import * as tApplicative from '@typeclass/applicative';
 import * as tMonad from '@typeclass/monad';
 import * as tBiFlatMap from '@typeclass/biflatmap';
 import * as tFoldable from '@typeclass/foldable';
+import { Option, some, none } from './option';
 import { pipe } from '../pipe';
 
 export interface Err<E> {
@@ -39,6 +40,11 @@ export const Of: tOf.Of<TResult> = {
 
 export const To: tTo.To<TResult> = {
   getOrElse: f => fa => (isOk(fa) ? fa.ok : f(fa.err)),
+};
+
+export const OptionalTo: tTo.OptionalTo<TResult> = {
+  ...To,
+  get: fa => (isOk(fa) ? some(fa.ok) : none),
 };
 
 export const Flip: tFlip.Flip<TResult> = {
@@ -133,6 +139,40 @@ export const getOr = tTo.getOr(To);
  * ```
  */
 export const flip = Flip.flip;
+
+/**
+ * get :: `Result<a, e> -> Option<a>`
+ *
+ * get :: `<A, E>(fa: Result<A, E>) => Option<A>`
+ *
+ * @param fa `Result<a, e>`
+ * @returns `Option<a>`
+ *
+ * @example
+ * ```ts
+ * pipe(ok(0), get) // some(0)
+ * pipe(err("error"), get) // none
+ * ```
+ */
+export const get = OptionalTo.get;
+
+/**
+ * alias of {@link get}
+ *
+ * toOption :: `Result<a, e> -> Option<a>`
+ *
+ * toOption :: `<A, E>(fa: Result<A, E>) => Option<A>`
+ *
+ * @param fa `Result<a, e>`
+ * @returns `Option<a>`
+ *
+ * @example
+ * ```ts
+ * pipe(ok(0), toOption) // some(0)
+ * pipe(err("error"), toOption) // none
+ * ```
+ */
+export const toOption = get;
 
 /**
  * orElse :: `(e1 -> Result<a, e2>) -> Result<a, e1> -> Result<a, e2>`

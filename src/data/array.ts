@@ -7,7 +7,7 @@ import * as tApplicative from '@typeclass/applicative';
 import * as tMonad from '@typeclass/monad';
 import * as tFoldable from '@typeclass/foldable';
 import * as tFilterable from '@typeclass/filterable';
-import { Option, isSome } from './option';
+import { Option, isSome, none, some } from './option';
 
 export type TArray = Kind.Array;
 
@@ -21,6 +21,11 @@ export const Of: tOf<TArray> = {
 
 export const To: tTo.To<TArray> = {
   getOrElse: f => fa => (fa.length === 0 ? f() : fa[0]),
+};
+
+export const OptionalTo: tTo.OptionalTo<TArray> = {
+  ...To,
+  get: fa => (fa.length === 0 ? none : some(fa[0])),
 };
 
 export const Functor: tfunctor.Functor<TArray> = {
@@ -100,6 +105,22 @@ export const of = Of.of;
  * ```
  */
 export const getOrElse = To.getOrElse;
+
+/**
+ * get :: a[] -> Option<a>
+ *
+ * get :: `<A>(fa: A[]) => Option<A>`
+ *
+ * @param fa: a[]
+ * @returns Option<a>
+ *
+ * @example
+ * ```ts
+ * pipe([1], get) // some(1)
+ * pipe([], get) // none
+ * ```
+ */
+export const get = OptionalTo.get;
 
 /**
  * getOr :: b -> a[] -> a | b

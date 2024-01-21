@@ -1,6 +1,8 @@
 import type { Expect, Equal } from 'type-testing';
 import type { Kind, $ } from '@kinds';
 import { GenericFn } from '@utils/functions';
+import { TOption } from '@data/option';
+import { TypeSkell } from '@typeskell';
 
 export interface ToParams extends Kind {
   return: this['rawArgs'] extends [infer B, ...infer Args] ? [f: (...args: Args) => B] : never;
@@ -24,6 +26,10 @@ export interface To<F extends Kind> {
    *
    */
   getOrElse: GenericFn<F['arity'], ToParams, ToResult<F>>;
+}
+
+export interface OptionalTo<F extends Kind> extends To<F> {
+  get: TypeSkell<'F a ..e -> Option a', { F: F; Option: TOption }>;
 }
 
 export interface GetOrParams<F extends Kind> extends Kind {
