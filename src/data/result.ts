@@ -7,6 +7,7 @@ import * as tFlip from '@typeclass/flip';
 import * as tApplicative from '@typeclass/applicative';
 import * as tMonad from '@typeclass/monad';
 import * as tBiFlatMap from '@typeclass/biflatmap';
+import * as tFoldable from '@typeclass/foldable';
 import { pipe } from '../pipe';
 
 export interface Err<E> {
@@ -56,6 +57,10 @@ export const BiFlatMap: tBiFlatMap.BiFlapMap<TResult> = {
 
 export const Functor: tfunctor.Functor<TResult> = {
   map: tbifunctor.mapLeft(Bifunctor),
+};
+
+export const Foldable: tFoldable.Foldable<TResult> = {
+  reduce: (f, b) => fa => (isOk(fa) ? f(b, fa.ok) : b),
 };
 
 export const Applicative: tApplicative.Applicative<TResult> = {
@@ -161,6 +166,23 @@ export const orElse = tBiFlatMap.orElse(BiFlatMap);
  * ```
  */
 export const map = Functor.map;
+
+/**
+ * reduce :: `(b a -> b) b -> Result<a, e> -> b`
+ *
+ * reduce :: `<A, B>(f: (b: B, a: A) => B, b: B) => <E>(fa: Result<A, E>) => B`
+ *
+ * @param f `(b a -> b) b`
+ * @param b `b`
+ * @returns `Result<a, e> -> b`
+ *
+ * @example
+ * ```ts
+ * pipe(ok(0), reduce((b, a) => b + a, 0)) // 0
+ * pipe(err("error"), reduce((b, a) => b + a, 0)) // 0
+ * ```
+ */
+export const reduce = Foldable.reduce;
 
 /**
  * flap :: `a -> Result<(a -> b), e> -> Result<b, e>`

@@ -5,6 +5,7 @@ import * as tTo from '@typeclass/to';
 import * as tZero from '@typeclass/zero';
 import * as tApplicative from '@typeclass/applicative';
 import * as tMonad from '@typeclass/monad';
+import * as tFoldable from '@typeclass/foldable';
 import { pipe } from '../pipe';
 
 export interface None {
@@ -43,6 +44,10 @@ export const To: tTo.To<TOption> = {
 
 export const Functor: tfunctor.Functor<TOption> = {
   map: f => fa => (isSome(fa) ? some(f(fa.value)) : none),
+};
+
+export const Foldable: tFoldable.Foldable<TOption> = {
+  reduce: (f, b) => fa => (isSome(fa) ? f(b, fa.value) : b),
 };
 
 export const Applicative: tApplicative.Applicative<TOption> = {
@@ -233,3 +238,20 @@ export const flatMap = Monad.flatMap;
  * ```
  */
 export const flatten = tMonad.flatten(Monad);
+
+/**
+ * reduce :: `(b a -> b) b -> Option<a> -> b`
+ *
+ * reduce :: `<B>(f: (b: B, a: A) => B, b: B) => (fa: Option<A>) => B`
+ *
+ * @param f `(b a -> b) b`
+ * @param b `b`
+ * @returns `Option<a> -> b`
+ *
+ * @example
+ * ```ts
+ * pipe(some(1), reduce((b, a) => b + a, 0)) // 1
+ * pipe(none, reduce((b, a) => b + a, 0)) // 0
+ * ```
+ */
+export const reduce = Foldable.reduce;

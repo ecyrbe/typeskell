@@ -4,6 +4,7 @@ import { type Of as tOf } from '@typeclass/of';
 import * as tApplicative from '@typeclass/applicative';
 import * as tMonad from '@typeclass/monad';
 import * as tCoMonad from '@typeclass/comonad';
+import * as tFoldable from '@typeclass/foldable';
 
 export type NonEmptyArray<A> = [A, ...A[]];
 
@@ -19,6 +20,15 @@ export const Of: tOf<TNonEmptyArray> = {
 
 export const Functor: tFunctor.Functor<TNonEmptyArray> = {
   map: f => fa => fa.map(f) as NonEmptyArray<ReturnType<typeof f>>,
+};
+
+export const Foldable: tFoldable.Foldable<TNonEmptyArray> = {
+  reduce: (f, b) => fa => fa.reduce(f, b),
+};
+
+export const NonEmptyFoldable: tFoldable.NonEmptyFoldable<TNonEmptyArray> = {
+  ...Foldable,
+  fold: f => fa => fa.reduce(f),
 };
 
 export const Applicative: tApplicative.Applicative<TNonEmptyArray> = {
@@ -42,6 +52,10 @@ export const CoMonad: tCoMonad.CoMonad<TNonEmptyArray> = {
 export const of = Of.of;
 
 export const map = Functor.map;
+
+export const reduce = Foldable.reduce;
+
+export const fold = NonEmptyFoldable.fold;
 
 export const ap = Applicative.ap;
 

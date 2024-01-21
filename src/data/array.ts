@@ -5,6 +5,7 @@ import * as tTo from '@typeclass/to';
 import * as tZero from '@typeclass/zero';
 import * as tApplicative from '@typeclass/applicative';
 import * as tMonad from '@typeclass/monad';
+import * as tFoldable from '@typeclass/foldable';
 
 export type TArray = Kind.Array;
 
@@ -22,6 +23,10 @@ export const To: tTo.To<TArray> = {
 
 export const Functor: tfunctor.Functor<TArray> = {
   map: f => fa => fa.map(f),
+};
+
+export const Foldable: tFoldable.Foldable<TArray> = {
+  reduce: (f, b) => fa => fa.reduce(f, b),
 };
 
 export const Applicative: tApplicative.Applicative<TArray> = {
@@ -186,3 +191,19 @@ export const flatMap = Monad.flatMap;
  * ```
  */
 export const flatten = tMonad.flatten(Monad);
+
+/**
+ * reduce :: `(b a -> b) b -> a[] -> b`
+ *
+ * reduce :: `<A, B>(f: (b: B, a: A) => B, b: B) => (fa: A[]) => B`
+ *
+ * @param f `(b a -> b)`
+ * @param b `b`
+ * @returns `a[] -> b`
+ *
+ * @example
+ * ```ts
+ * pipe([1,2,3], reduce((b, a) => b + a, 0)) // 6
+ * ```
+ */
+export const reduce = Foldable.reduce;
