@@ -1,9 +1,11 @@
 import type { Kind } from '@kinds';
 import type { Functor } from '@typeclass/functor';
 import type { Of } from '@typeclass/of';
-import { TypeSkell } from '@typeskell';
-import { TPair } from '@data/pair';
-import { liftA2 as liftA2Impl, product as productImpl } from './applicative.impl';
+import type { TypeSkell } from '@typeskell';
+import type { TPair } from '@data/pair';
+import type { TNonEmptyArray } from '@data/non-empty-array';
+import type { TIterable } from '@data/iterable';
+import { liftA2 as liftA2Impl, product as productImpl, productMany as productManyImpl } from './applicative.impl';
 /**
  * Applicative is a typeclass that provides a way to apply a function in a context to a value in a context.
  *
@@ -30,3 +32,10 @@ export const liftA2: <F extends Kind>(
 export const product: <F extends Kind>(
   applicative: Applicative<F>,
 ) => TypeSkell<'(F a ..x) -> (F b ..y) -> F (Pair a b) ..xy', { F: F; Pair: TPair }> = productImpl as any;
+
+export const productMany: <F extends Kind>(
+  applicative: Applicative<F>,
+) => TypeSkell<
+  'F a ..x -> Iterable (F a ..x) -> F (NonEmptyArray a) ..x',
+  { F: F; Iterable: TIterable; NonEmptyArray: TNonEmptyArray }
+> = productManyImpl as any;

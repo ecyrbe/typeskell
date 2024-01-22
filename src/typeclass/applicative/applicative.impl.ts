@@ -1,7 +1,8 @@
 import type { Kind, $ } from '@kinds';
-import { pipe } from '../../pipe';
+import type { NonEmptyArray } from '@data/non-empty-array';
+import type { Applicative } from './applicative';
 import { pair } from '@data/pair';
-import { Applicative } from './applicative';
+import { pipe } from '../../pipe';
 
 export const liftA2 =
   (applicative: Applicative<Kind.F>) =>
@@ -21,3 +22,20 @@ export const product =
   <A>(fa: $<Kind.F, [A]>) =>
   <B>(fb: $<Kind.F, [B]>) =>
     pipe(fb, pipe(fa, liftA2(applicative)(pair)));
+
+export const productMany =
+  (applicative: Applicative<Kind.F>) =>
+  <A>(fa: $<Kind.F, [A]>) =>
+  (faa: Iterable<$<Kind.F, [A]>>) => {
+    let result = pipe(
+      fa,
+      applicative.map((a): NonEmptyArray<A> => [a]),
+    );
+    for (const a of faa) {
+      result = pipe(
+        pipe(a, product(applicative)(result)),
+        applicative.map(arr => [...arr[0], arr[1]]),
+      );
+    }
+    return result;
+  };
