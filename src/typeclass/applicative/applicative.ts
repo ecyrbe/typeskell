@@ -6,6 +6,8 @@ import type { TPair } from '@data/pair';
 import type { TNonEmptyArray } from '@data/non-empty-array';
 import type { TIterable } from '@data/iterable';
 import { liftA2 as liftA2Impl, product as productImpl, productMany as productManyImpl } from './applicative.impl';
+import { Expect, Equal } from 'type-testing';
+
 /**
  * Applicative is a typeclass that provides a way to apply a function in a context to a value in a context.
  *
@@ -39,3 +41,9 @@ export const productMany: <F extends Kind>(
   'F a ..x -> Iterable (F a ..x) -> F (NonEmptyArray a) ..x',
   { F: F; Iterable: TIterable; NonEmptyArray: TNonEmptyArray }
 > = productManyImpl as any;
+
+type TestCases = [
+  Expect<Equal<typeof liftA2<Kind.F>, typeof liftA2Impl>>,
+  Expect<Equal<typeof product<Kind.F>, typeof productImpl>>,
+  Expect<Equal<typeof productMany<Kind.F>, typeof productManyImpl>>,
+];
