@@ -1,7 +1,8 @@
-import { Kind, $ } from '@kinds';
+import { Kind } from '@kinds';
 import { Functor } from '@typeclass/functor';
 import { TypeSkell } from '@typeskell';
-import { identity } from '@utils/functions';
+import { duplicate as duplicateImpl } from './comonad.impl';
+import { Expect, Equal } from 'type-testing';
 
 /**
  * CoMonad is a typeclass that defines two operations, extract and extend.
@@ -18,9 +19,7 @@ export interface CoMonad<F extends Kind> extends Functor<F> {
   extend: TypeSkell<'(F a ..e -> b) -> F a ..e -> F b ..e', { F: F }>;
 }
 
-const duplicateImpl: (coMonad: CoMonad<Kind.F>) => <A>(fa: $<Kind.F, [A]>) => $<Kind.F, [$<Kind.F, [A]>]> = (
-  coMonad: CoMonad<Kind.F>,
-) => coMonad.extend(identity);
-
 export const duplicate: <F extends Kind>(coMonad: CoMonad<F>) => TypeSkell<'F a ..e -> F (F a ..e) ..e', { F: F }> =
   duplicateImpl as any;
+
+type TestCases = [Expect<Equal<typeof duplicate<Kind.F>, typeof duplicateImpl>>];
