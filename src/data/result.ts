@@ -1,4 +1,5 @@
-import { Kind, InvariantParam, CovariantParam } from '@kinds';
+import type { Kind, InvariantParam, CovariantParam, $ } from '@kinds';
+import type { Expect, Equal } from 'type-testing';
 import * as tfunctor from '@typeclass/functor';
 import * as tbifunctor from '@typeclass/bifunctor';
 import * as tOf from '@typeclass/of';
@@ -8,7 +9,8 @@ import * as tApplicative from '@typeclass/applicative';
 import * as tMonad from '@typeclass/monad';
 import * as tBiFlatMap from '@typeclass/biflatmap';
 import * as tFoldable from '@typeclass/foldable';
-import { Option, some, none } from './option';
+import * as tTraversable from '@typeclass/traversable';
+import { some, none } from './option';
 import { pipe } from '../pipe';
 
 export interface Err<E> {
@@ -79,6 +81,20 @@ export const Monad: tMonad.Monad<TResult> = {
   ...Applicative,
   flatMap: f => fa => (isOk(fa) ? f(fa.ok) : fa),
 };
+
+const traverseImpl =
+  (applicative: tApplicative.Applicative<Kind.F>) =>
+  <A, B>(f: (a: A) => $<Kind.F, [B]>) =>
+  <E>(fa: Result<A, E>): $<Kind.F, [Result<B, E>]> =>
+    isErr(fa) ? applicative.of(fa) : pipe(f(fa.ok), applicative.map(ok));
+
+export const Traversable: tTraversable.Traversable<TResult> = {
+  ...Functor,
+  traverse: traverseImpl as any,
+};
+
+type TraverseTestCases = [Expect<Equal<typeof traverseImpl, typeof Traversable.traverse<Kind.F>>>];
+
 /**
  * of :: `a -> Result<a, never>`
  *
@@ -371,3 +387,39 @@ export const flatten = tMonad.flatten(Monad);
  * ```
  */
 export const biFlapMap = BiFlatMap.biFlapMap;
+
+/**
+ * traverse :: `Applicative f => (a -> f b) -> Result<a, e> -> f Result<b, e>`
+ *
+ * traverse :: `<F extends Kind>(applicative: Applicative<F>) => <A, B>(f: (a: A) => $<F, [B]>) => <E>(fa: Result<A, E>) => $<F, [Result<B, E>]>
+ *
+ * @param applicative `Applicative<F>`
+ * @returns `(a -> f b) -> Result<a, e> -> f Result<b, e>`
+ *
+ * @example
+ * ```ts
+ * const traverseOption = traverse(O.Applicative);
+ * pipe(ok(0), traverseOption(x => some(x + 1))) // some(ok(1))
+ * pipe(err("error"), traverseOption(x => some(x + 1))) // some(err("error"))
+ * pipe(ok(0), traverseOption(x => none)) // none
+ * ```
+ */
+export const traverse: tTraversable.Traversable<TResult>['traverse'] = Traversable.traverse;
+
+/**
+ * sequence :: `Applicative f => Result<f a, e> -> f Result<a, e>`
+ *
+ * sequence :: `<F extends Kind>(applicative: Applicative<F>) => <A, E>(fa: Result<$<F, [A]>, E>) => $<F, [Result<A, E>]>
+ *
+ * @param applicative `Applicative<F>`
+ * @returns `Result<f a, e> -> f Result<a, e>`
+ *
+ * @example
+ * ```ts
+ * const sequenceOption = sequence(O.Applicative);
+ * pipe(ok(some(0)), sequenceOption) // some(ok(0))
+ * pipe(ok(none), sequenceOption) // none
+ * pipe(err("error"), sequenceOption) // some(err("error"))
+ * ```
+ */
+export const sequence: ReturnType<typeof tTraversable.sequence<TResult>> = tTraversable.sequence(Traversable);
