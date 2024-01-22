@@ -355,6 +355,11 @@ export const ap = Applicative.ap;
 export const flatMap = Monad.flatMap;
 
 /**
+ * alias of {@link flatMap}
+ */
+export const chain = flatMap;
+
+/**
  * flatten :: `Result<Result<a, e1>, e2> -> Result<a, e1 | e2>`
  *
  * flatten :: `<A, E1, E2>(ffa: Result<Result<A, E1>, E2>) => Result<A, E1 | E2>`
