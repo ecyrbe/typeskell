@@ -90,6 +90,7 @@ const traverseImpl =
 
 export const Traversable: tTraversable.Traversable<TResult> = {
   ...Functor,
+  ...Foldable,
   traverse: traverseImpl as any,
 };
 
