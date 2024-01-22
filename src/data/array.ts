@@ -28,7 +28,7 @@ export const To: tTo.To<TArray> = {
 
 export const OptionalTo: tTo.OptionalTo<TArray> = {
   ...To,
-  get: fa => (fa.length === 0 ? none : some(fa[0])),
+  get: fa => (fa.length === 0 ? none() : some(fa[0])),
 };
 
 export const Functor: tfunctor.Functor<TArray> = {

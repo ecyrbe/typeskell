@@ -8,5 +8,5 @@ export const filter: (
 ) => <A>(f: (a: A) => boolean) => (fa: $<Kind.F, [A]>) => $<Kind.F, [A]> = filterable => f => fa =>
   pipe(
     fa,
-    filterable.filterMap(a => (f(a) ? some(a) : none)),
+    filterable.filterMap(a => (f(a) ? some(a) : none())),
   );

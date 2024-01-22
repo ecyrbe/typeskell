@@ -20,7 +20,7 @@ export interface Some<A> {
 
 export type Option<A> = None | Some<A>;
 
-export const none: Option<never> = { _tag: 'None' };
+export const none = <A = never>(): Option<A> => ({ _tag: 'None' });
 export const some = <A>(a: A): Option<A> => ({ _tag: 'Some', value: a });
 
 export const isNone = <A>(option: Option<A>): option is None => option._tag === 'None';
@@ -32,7 +32,7 @@ export interface TOption extends Kind<[InvariantParam]> {
 }
 
 export const Zero: tZero.Zero<TOption> = {
-  zero: () => none,
+  zero: () => none(),
 };
 
 export const Of: tOf.Of<TOption> = {
@@ -44,7 +44,7 @@ export const To: tTo.To<TOption> = {
 };
 
 export const Functor: tfunctor.Functor<TOption> = {
-  map: f => fa => (isSome(fa) ? some(f(fa.value)) : none),
+  map: f => fa => (isSome(fa) ? some(f(fa.value)) : none()),
 };
 
 export const Foldable: tFoldable.Foldable<TOption> = {
@@ -54,18 +54,18 @@ export const Foldable: tFoldable.Foldable<TOption> = {
 export const Filterable: tFilterable.Filterable<TOption> = {
   ...Zero,
   ...Functor,
-  filterMap: f => fa => (isSome(fa) ? f(fa.value) : none),
+  filterMap: f => fa => (isSome(fa) ? f(fa.value) : none()),
 };
 
 export const Applicative: tApplicative.Applicative<TOption> = {
   ...Of,
   ...Functor,
-  ap: fa => fab => (isSome(fab) ? pipe(fa, Functor.map(fab.value)) : none),
+  ap: fa => fab => (isSome(fab) ? pipe(fa, Functor.map(fab.value)) : none()),
 };
 
 export const Monad: tMonad.Monad<TOption> = {
   ...Applicative,
-  flatMap: f => fa => (isSome(fa) ? f(fa.value) : none),
+  flatMap: f => fa => (isSome(fa) ? f(fa.value) : none()),
 };
 
 /**

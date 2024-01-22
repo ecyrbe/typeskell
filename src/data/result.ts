@@ -10,7 +10,7 @@ import * as tMonad from '@typeclass/monad';
 import * as tBiFlatMap from '@typeclass/biflatmap';
 import * as tFoldable from '@typeclass/foldable';
 import * as tTraversable from '@typeclass/traversable';
-import { some, none } from './option';
+import * as O from './option';
 import { pipe } from '../pipe';
 
 export interface Err<E> {
@@ -46,7 +46,7 @@ export const To: tTo.To<TResult> = {
 
 export const OptionalTo: tTo.OptionalTo<TResult> = {
   ...To,
-  get: fa => (isOk(fa) ? some(fa.ok) : none),
+  get: fa => (isOk(fa) ? O.some(fa.ok) : O.none()),
 };
 
 export const Flip: tFlip.Flip<TResult> = {
@@ -190,6 +190,11 @@ export const get = OptionalTo.get;
  * ```
  */
 export const toOption = get;
+
+export const fromOption =
+  <A, E>(f: () => E) =>
+  (option: O.Option<A>): Result<A, E> =>
+    O.isNone(option) ? err(f()) : ok(option.value);
 
 /**
  * orElse :: `(e1 -> Result<a, e2>) -> Result<a, e1> -> Result<a, e2>`
