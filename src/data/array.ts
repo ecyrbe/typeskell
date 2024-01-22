@@ -7,7 +7,10 @@ import * as tApplicative from '@typeclass/applicative';
 import * as tMonad from '@typeclass/monad';
 import * as tFoldable from '@typeclass/foldable';
 import * as tFilterable from '@typeclass/filterable';
+import * as tTraversable from '@typeclass/traversable';
 import { Option, isSome, none, some } from './option';
+import { pipe } from '../pipe';
+import { identity } from '@utils/functions';
 
 export type TArray = Kind.Array;
 
@@ -199,6 +202,52 @@ export const doubleMap = tfunctor.mapCompose(Functor, Functor);
  * pipe(of(x=>x+1), ap([1,2,3])) // [2,3,4]
  */
 export const ap = Applicative.ap;
+
+/**
+ * liftA2 :: `(a b -> c) -> a[] -> b[] -> c[]`
+ *
+ * liftA2 :: `<A, B, C>(f: (a: A, b: B) => C) => (fa: A[]) => (fb: B[]) => C[]`
+ *
+ * @param f `(a b -> c)`
+ * @returns `a[] -> b[] -> c[]`
+ *
+ * @example
+ * ```ts
+ * pipe([1,2,3],pipe([1,2,3],liftA2((a, b) => a + b))) // [2,3,4,3,4,5,4,5,6]
+ * pipe([1,2,3],pipe([1,2,3],liftA2((a,b)=> [a,b]))) // [[1,1],[1,2],[1,3],[2,1],[2,2],[2,3],[3,1],[3,2],[3,3]]
+ * ```
+ */
+export const liftA2 = tApplicative.liftA2(Applicative);
+
+/**
+ * product :: `a[] -> b[] -> [a, b][]`
+ *
+ * product :: `<A, B>(fa: A[]) => (fb: B[]) => [A, B][]`
+ *
+ * @param fa `a[]`
+ * @returns `b[] -> [a, b][]`
+ *
+ * @example
+ * ```ts
+ * pipe([1,2,3], product([1,2,3])) // [[1,1],[1,2],[1,3],[2,1],[2,2],[2,3],[3,1],[3,2],[3,3]]
+ * ```
+ */
+export const product = tApplicative.product(Applicative);
+
+/**
+ * productMany :: `a[] -> a[][] -> a[][]`
+ *
+ * productMany :: `<A>(fa: A[]) => (faa: A[][]) => A[][]`
+ *
+ * @param fa `a[]`
+ * @returns `a[][] -> a[][]`
+ *
+ * @example
+ * ```ts
+ * pipe([1,2,3], productMany([[1,2,3],[4,5,6]])) // [[1,1,2,3],[1,4,5,6],[2,1,2,3],[2,4,5,6],[3,1,2,3],[3,4,5,6]]
+ * ```
+ */
+export const productMany = tApplicative.productMany(Applicative);
 
 /**
  * flatMap :: `(a -> b[]) -> a[] -> b[]`
