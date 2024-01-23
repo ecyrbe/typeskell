@@ -34,4 +34,26 @@ describe('Array', () => {
       expect(result).toEqual(O.none());
     });
   });
+  describe('semialign', () => {
+    it('should zithWith', () => {
+      const result = pipe(
+        [1, 2, 3],
+        pipe(
+          [4, 5, 6],
+          A.zipWith((a, b) => a + b),
+        ),
+      );
+      expectTypeOf(result).toEqualTypeOf<number[]>();
+      expect(result).toEqual([5, 7, 9]);
+    });
+    it('should zip', () => {
+      const result = pipe([4, 5, 6], A.zip([1, 2, 3]));
+      expectTypeOf(result).toEqualTypeOf<[number, number][]>();
+      expect(result).toEqual([
+        [1, 4],
+        [2, 5],
+        [3, 6],
+      ]);
+    });
+  });
 });

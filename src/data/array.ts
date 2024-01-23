@@ -4,6 +4,7 @@ import { type Of as tOf } from '@typeclass/of';
 import * as tTo from '@typeclass/to';
 import * as tZero from '@typeclass/zero';
 import * as tApplicative from '@typeclass/applicative';
+import * as tSemiAlign from '@typeclass/semialign';
 import * as tMonad from '@typeclass/monad';
 import * as tFoldable from '@typeclass/foldable';
 import * as tFilterable from '@typeclass/filterable';
@@ -58,6 +59,17 @@ export const Applicative: tApplicative.Applicative<TArray> = {
   ...Of,
   ...Functor,
   ap: fa => fab => fab.flatMap(f => fa.map(f)),
+};
+
+export const SemiAlign: tSemiAlign.SemiAlign<TArray> = {
+  zipWith: f => fa => fb => {
+    const result: ReturnType<typeof f>[] = [];
+    const minLength = Math.min(fa.length, fb.length);
+    for (let i = 0; i < minLength; i++) {
+      result.push(f(fa[i], fb[i]));
+    }
+    return result;
+  },
 };
 
 export const Monad: tMonad.Monad<TArray> = {
@@ -282,6 +294,36 @@ export const product = tApplicative.product(Applicative);
  * ```
  */
 export const productMany = tApplicative.productMany(Applicative);
+
+/**
+ * zipWith :: `(a b -> c) -> a[] -> b[] -> c[]`
+ *
+ * zipWith :: `<A, B, C>(f: (a: A, b: B) => C) => (fa: A[]) => (fb: B[]) => C[]`
+ *
+ * @param f `(a b -> c)`
+ * @returns `a[] -> b[] -> c[]`
+ *
+ * @example
+ * ```ts
+ * pipe([1,2,3], pipe([1,2,3], zipWith((a, b) => a + b))) // [2,4,6]
+ * ```
+ */
+export const zipWith = SemiAlign.zipWith;
+
+/**
+ * zip :: `a[] -> b[] -> [a, b][]`
+ *
+ * zip :: `<A, B>(fa: A[]) => (fb: B[]) => [A, B][]`
+ *
+ * @param fa `a[]`
+ * @returns `b[] -> [a, b][]`
+ *
+ * @example
+ * ```ts
+ * pipe([4,5,6], zip([1,2,3])) // [[1,4],[2,5],[3,6]]
+ * ```
+ */
+export const zip = tSemiAlign.zip(SemiAlign);
 
 /**
  * flatMap :: `(a -> b[]) -> a[] -> b[]`
