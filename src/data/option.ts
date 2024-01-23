@@ -19,6 +19,7 @@ export interface Some<A> {
 }
 
 export type Option<A> = None | Some<A>;
+export type OptionOf<O> = Exclude<O, None> extends Some<infer A> ? A : never;
 
 export const none = <A = never>(): Option<A> => ({ _tag: 'None' });
 export const some = <A>(a: A): Option<A> => ({ _tag: 'Some', value: a });

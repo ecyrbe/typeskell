@@ -9,7 +9,7 @@ import * as tFoldable from '@typeclass/foldable';
 import * as tFilterable from '@typeclass/filterable';
 import * as tTraversable from '@typeclass/traversable';
 import * as tGroups from '@typeclass/groups';
-import { Option, isSome, none, some } from './option';
+import { OptionOf, isSome, none, some } from './option';
 import { pipe } from '../pipe';
 
 export type TArray = Kind.Array;
@@ -43,7 +43,7 @@ export const Filterable: tFilterable.Filterable<TArray> = {
   ...Zero,
   ...Functor,
   filterMap: f => fa => {
-    const result: (ReturnType<typeof f> extends Option<infer A> ? A : never)[] = [];
+    const result: OptionOf<ReturnType<typeof f>>[] = [];
     for (const a of fa) {
       const b = f(a);
       if (isSome(b)) {
