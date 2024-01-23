@@ -28,6 +28,10 @@ export namespace SemiGroup {
     };
 }
 
+export interface SemiGroupKind<F extends Kind> {
+  semigroup: <A>() => SemiGroup<$<F, [A]>>;
+}
+
 /**
  * Commutative SemiGroup is a SemiGroup with commutativity.
  *
@@ -85,4 +89,8 @@ export namespace Group {
       const right = G.concat(G.invert(a), a);
       return left === right && left === G.identity;
     };
+}
+
+export interface GroupKind<F extends Kind> extends MonoidKind<F> {
+  group: <A>() => Group<$<F, [A]>>;
 }
