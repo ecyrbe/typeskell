@@ -8,9 +8,9 @@ import * as tMonad from '@typeclass/monad';
 import * as tFoldable from '@typeclass/foldable';
 import * as tFilterable from '@typeclass/filterable';
 import * as tTraversable from '@typeclass/traversable';
+import * as tGroups from '@typeclass/groups';
 import { Option, isSome, none, some } from './option';
 import { pipe } from '../pipe';
-import { identity } from '@utils/functions';
 
 export type TArray = Kind.Array;
 
@@ -89,6 +89,14 @@ export const Traversable: tTraversable.Traversable<TArray> = {
   ...Functor,
   ...Foldable,
   traverse: traverseImpl as any,
+};
+
+export const MonoidKind: tGroups.MonoidKind<TArray> = {
+  ...Zero,
+  monoid: () => ({
+    concat: (a, b) => a.concat(b),
+    identity: zero(),
+  }),
 };
 
 /**
@@ -354,3 +362,8 @@ export const filter = (f => fa => fa.filter(f)) as tFilterable.FilterSignature<T
 export const traverse: tTraversable.Traversable<TArray>['traverse'] = Traversable.traverse;
 
 export const sequence: ReturnType<typeof tTraversable.sequence<TArray>> = tTraversable.sequence(Traversable);
+
+export const concat =
+  <A>(a: A[]) =>
+  (b: A[]) =>
+    MonoidKind.monoid<A>().concat(a, b);

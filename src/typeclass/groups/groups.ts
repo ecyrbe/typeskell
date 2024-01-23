@@ -1,3 +1,6 @@
+import { Kind, $ } from '@kinds';
+import { Zero } from '@typeclass/zero';
+
 /**
  * A Magma is a set `A` with a binary operation `concat` that is closed on `A`.
  *
@@ -59,6 +62,10 @@ export namespace Monoid {
       const right = G.concat(G.identity, a);
       return left === right && left === a;
     };
+}
+
+export interface MonoidKind<F extends Kind> extends Zero<F> {
+  monoid: <A>() => Monoid<$<F, [A]>>;
 }
 
 /**
