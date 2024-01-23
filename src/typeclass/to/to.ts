@@ -21,6 +21,9 @@ export interface To<F extends Kind> {
    *
    * to :: `<B,...E>(f: (...args: E)=> B) => <A>(fa: $<F, [A,...E]>) => A | B`
    *
+   * At the moment typeskell don't support spreading outside a type constructor
+   * So we have to use a workaround with a custom `ToParams` and `ToResult`
+   *
    * @param f `f (e -> a)`
    * @returns `F a -> a`
    *
@@ -30,14 +33,6 @@ export interface To<F extends Kind> {
 
 export interface OptionalTo<F extends Kind> extends To<F> {
   get: TypeSkell<'F a ..e -> Option a', { F: F; Option: TOption }>;
-}
-
-export interface GetOrParams<F extends Kind> extends Kind {
-  return: this['rawArgs'] extends unknown[] ? [fa: $<F, this['rawArgs']>] : never;
-}
-
-export interface GetOrResult<B> extends Kind {
-  return: this['arg0'] | B;
 }
 
 const _getOr =
@@ -54,7 +49,7 @@ const _getOr =
  * @param b `b`
  * @returns `F a -> a | b`
  */
-export const getOr: <F extends Kind>(to: To<F>) => <B>(b: B) => GenericFn<F['arity'], GetOrParams<F>, GetOrResult<B>> =
+export const getOr: <F extends Kind>(to: To<F>) => TypeSkell<'b -> F a ..e -> Or a b', { F: F; Or: Kind.Or }> =
   _getOr as any;
 
 /**

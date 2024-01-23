@@ -88,8 +88,16 @@ export namespace Kind {
     return: globalThis.Record<this['arg0'], this['arg1']>;
   }
 
+  export interface Iterable extends Kind.unary {
+    return: globalThis.Iterable<this['arg0']>;
+  }
+
   export interface Promise extends Kind.unary {
     return: globalThis.Promise<this['arg0']>;
+  }
+
+  export interface Or extends Kind.binary {
+    return: this['arg0'] | this['arg1'];
   }
 
   export interface Basic<T> extends Kind.nullary {
