@@ -4,6 +4,27 @@ import * as A from '@data/array';
 import { pipe } from '../../pipe';
 
 describe('Applicative', () => {
+  it('should liftA2', () => {
+    const result = pipe(
+      [4, 5, 6],
+      pipe(
+        [1, 2, 3],
+        A.liftA2((a, b) => [a, b]),
+      ),
+    );
+    expectTypeOf(result).toEqualTypeOf<number[][]>();
+    expect(result).toEqual([
+      [1, 4],
+      [1, 5],
+      [1, 6],
+      [2, 4],
+      [2, 5],
+      [2, 6],
+      [3, 4],
+      [3, 5],
+      [3, 6],
+    ]);
+  });
   it('should product many', () => {
     const result = pipe(
       [
