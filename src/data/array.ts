@@ -1,4 +1,4 @@
-import { Kind } from '@kinds';
+import { Kind, $ } from '@kinds';
 import * as tfunctor from '@typeclass/functor';
 import { type Of as tOf } from '@typeclass/of';
 import * as tTo from '@typeclass/to';
@@ -63,6 +63,32 @@ export const Applicative: tApplicative.Applicative<TArray> = {
 export const Monad: tMonad.Monad<TArray> = {
   ...Applicative,
   flatMap: f => fa => fa.flatMap(f),
+};
+
+const traverseImpl =
+  (applicative: tApplicative.Applicative<Kind.F>) =>
+  <A, B>(f: (a: A) => $<Kind.F, [B]>) =>
+  (fa: A[]) => {
+    return pipe(
+      fa,
+      reduce(
+        (acc, x) =>
+          pipe(
+            acc,
+            pipe(
+              f(x),
+              tApplicative.liftA2(applicative)((a, b) => (b.push(a), b)),
+            ),
+          ),
+        applicative.of<B[]>([]),
+      ),
+    );
+  };
+
+export const Traversable: tTraversable.Traversable<TArray> = {
+  ...Functor,
+  ...Foldable,
+  traverse: traverseImpl as any,
 };
 
 /**
@@ -324,3 +350,7 @@ export const filterMap = Filterable.filterMap;
  * ```
  */
 export const filter = (f => fa => fa.filter(f)) as tFilterable.FilterSignature<TArray>;
+
+export const traverse: tTraversable.Traversable<TArray>['traverse'] = Traversable.traverse;
+
+export const sequence: ReturnType<typeof tTraversable.sequence<TArray>> = tTraversable.sequence(Traversable);
