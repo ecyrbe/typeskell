@@ -4,7 +4,6 @@ import type { Of } from '@typeclass/of';
 import type { TypeSkell } from '@typeskell';
 import type { TPair } from '@data/pair';
 import type { TNonEmptyArray } from '@data/non-empty-array';
-import type { TIterable } from '@data/iterable';
 import { liftA2 as liftA2Impl, product as productImpl, productMany as productManyImpl } from './applicative.impl';
 import { Expect, Equal } from 'type-testing';
 
@@ -48,7 +47,7 @@ export const productMany: <F extends Kind>(
   applicative: Applicative<F>,
 ) => TypeSkell<
   'F a ..x -> Iterable (F a ..x) -> F (NonEmptyArray a) ..x',
-  { F: F; Iterable: TIterable; NonEmptyArray: TNonEmptyArray }
+  { F: F; Iterable: Kind.Iterable; NonEmptyArray: TNonEmptyArray }
 > = productManyImpl as any;
 
 type TestCases = [
