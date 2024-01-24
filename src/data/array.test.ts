@@ -2,6 +2,8 @@ import { describe, it, expect, expectTypeOf } from 'vitest';
 import * as A from '@data/array';
 import * as O from '@data/option';
 import { pipe } from '../pipe';
+import { functorLaws } from '@typeclass/functor/functor.laws';
+import * as fc from 'fast-check';
 
 describe('Array', () => {
   describe('traverse', () => {
@@ -54,6 +56,27 @@ describe('Array', () => {
         [2, 5],
         [3, 6],
       ]);
+    });
+  });
+
+  describe('functor', () => {
+    it('should obey functor identity law', () => {
+      const law = functorLaws(A.Functor).identity;
+      fc.assert(
+        fc.property(fc.array(fc.anything()), a => {
+          expect(law.left(a)).toEqual(law.right(a));
+        }),
+      );
+    });
+    it('should obey functor composition law', () => {
+      const law = functorLaws(A.Functor).composition;
+      fc.assert(
+        fc.property(fc.array(fc.anything()), a => {
+          const f = <A>(x: A) => ({ x });
+          const g = <A>(x: { x: A }) => ({ y: x.x });
+          expect(law.left(f, g)(a)).toEqual(law.right(f, g)(a));
+        }),
+      );
     });
   });
 });
