@@ -77,25 +77,24 @@ export const Monad: tMonad.Monad<TArray> = {
   flatMap: f => fa => fa.flatMap(f),
 };
 
-const traverseImpl =
-  (applicative: tApplicative.Applicative<Kind.F>) =>
-  <A, B>(f: (a: A) => $<Kind.F, [B]>) =>
-  (fa: A[]) => {
-    return pipe(
-      fa,
-      reduce(
-        (acc, x) =>
+const traverseImpl: (
+  applicative: tApplicative.Applicative<Kind.F>,
+) => tTraversable.Traversable.$traverse<TArray, Kind.F> = applicative => f => fa => {
+  return pipe(
+    fa,
+    reduce(
+      (acc, x) =>
+        pipe(
+          acc,
           pipe(
-            acc,
-            pipe(
-              f(x),
-              tApplicative.liftA2(applicative)((a, b) => (b.push(a), b)),
-            ),
+            f(x),
+            tApplicative.liftA2(applicative)((a, b) => (b.push(a), b)),
           ),
-        applicative.of<B[]>([]),
-      ),
-    );
-  };
+        ),
+      applicative.of<ReturnType<typeof f>['Args'][0][]>([]),
+    ),
+  );
+};
 
 export const Traversable: tTraversable.Traversable<TArray> = {
   ...Functor,

@@ -82,11 +82,10 @@ export const Monad: tMonad.Monad<TResult> = {
   flatMap: f => fa => (isOk(fa) ? f(fa.ok) : fa),
 };
 
-const traverseImpl =
-  (applicative: tApplicative.Applicative<Kind.F>) =>
-  <A, B>(f: (a: A) => $<Kind.F, [B]>) =>
-  <E>(fa: Result<A, E>): $<Kind.F, [Result<B, E>]> =>
-    isErr(fa) ? applicative.of(fa) : pipe(f(fa.ok), applicative.map(ok));
+const traverseImpl: (
+  applicative: tApplicative.Applicative<Kind.F>,
+) => tTraversable.Traversable.$traverse<TResult, Kind.F> = applicative => f => fa =>
+  isErr(fa) ? applicative.of(err(fa.err)) : pipe(f(fa.ok), applicative.map(ok));
 
 export const Traversable: tTraversable.Traversable<TResult> = {
   ...Functor,
