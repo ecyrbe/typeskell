@@ -3,6 +3,16 @@ import type { Kind } from '@kinds';
 import { as as asImpl, flap as flapImpl, mapCompose as mapComposeImpl } from './functor.impl';
 import { TypeSkell } from '@typeskell';
 
+export namespace Functor {
+  export type $map<F extends Kind> = TypeSkell<'(a -> b) -> F a ..e -> F b ..e', { F: F }>;
+  export type $mapCompose<F extends Kind, G extends Kind> = TypeSkell<
+    '(a -> b) -> F (G a ..x) ..y -> F (G b ..x) ..y',
+    { F: F; G: G }
+  >;
+  export type $flap<F extends Kind> = TypeSkell<'a -> F (a -> b) ..x -> F b ..x', { F: F }>;
+  export type $as<F extends Kind> = TypeSkell<'b -> F a ..x -> F b ..x', { F: F }>;
+}
+
 /**
  * Functor is a typeclass that defines a single operation, map.
  *
@@ -17,7 +27,7 @@ export interface Functor<F extends Kind> {
    * @param f `a -> b`
    * @returns `F a -> F b`
    */
-  map: TypeSkell<'(a -> b) -> F a ..e -> F b ..e', { F: F }>;
+  map: Functor.$map<F>;
 }
 
 /**
@@ -30,7 +40,7 @@ export interface Functor<F extends Kind> {
 export const mapCompose: <F extends Kind, G extends Kind>(
   FunctorF: Functor<F>,
   FunctorG: Functor<G>,
-) => TypeSkell<'(a -> b) -> F (G a ..x) ..y -> F (G b ..x) ..y', { F: F; G: G }> = mapComposeImpl as any;
+) => Functor.$mapCompose<F, G> = mapComposeImpl as any;
 
 /**
  * flap :: `Functor F -> a -> F (a -> b) -> F b`
@@ -38,8 +48,7 @@ export const mapCompose: <F extends Kind, G extends Kind>(
  * @param functor `Functor<F>`
  * @returns `a -> F (a -> b) -> F b`
  */
-export const flap: <F extends Kind>(functor: Functor<F>) => TypeSkell<'a -> F (a -> b) ..x -> F b ..x', { F: F }> =
-  flapImpl as any;
+export const flap: <F extends Kind>(functor: Functor<F>) => Functor.$flap<F> = flapImpl as any;
 
 /**
  * as :: `Functor F -> b -> F a -> F b`
@@ -47,8 +56,7 @@ export const flap: <F extends Kind>(functor: Functor<F>) => TypeSkell<'a -> F (a
  * @param functor `Functor<F>`
  * @returns `b -> F a -> F b`
  */
-export const as: <F extends Kind>(functor: Functor<F>) => TypeSkell<'b -> F a ..x -> F b ..x', { F: F }> =
-  asImpl as any;
+export const as: <F extends Kind>(functor: Functor<F>) => Functor.$as<F> = asImpl as any;
 
 /**
  * TYPE TESTS to check impl and interface are in sync

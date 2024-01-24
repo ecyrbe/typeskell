@@ -1,6 +1,9 @@
 import type { Kind } from '@kinds';
 import type { TypeSkell } from '@typeskell';
 
+export namespace Zero {
+  export type $zero<F extends Kind> = TypeSkell<' -> F a ..e', { F: F }>;
+}
 export interface Zero<F extends Kind> {
   /**
    * zero :: `() -> F a`
@@ -9,5 +12,5 @@ export interface Zero<F extends Kind> {
    *
    * @returns `F a`
    */
-  zero: TypeSkell<' -> F a ..e', { F: F }>;
+  zero: Zero.$zero<F>;
 }

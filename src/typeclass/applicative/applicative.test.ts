@@ -25,6 +25,31 @@ describe('Applicative', () => {
       [3, 6],
     ]);
   });
+
+  it('should zipLeft', () => {
+    const result = pipe(
+      [4, 5, 6],
+      pipe(
+        [1, 2, 3],
+        A.liftA2((a, b) => a),
+      ),
+    );
+    expectTypeOf(result).toEqualTypeOf<number[]>();
+    expect(result).toEqual([1, 1, 1, 2, 2, 2, 3, 3, 3]);
+  });
+
+  it('should zipRight', () => {
+    const result = pipe(
+      [4, 5, 6],
+      pipe(
+        [1, 2, 3],
+        A.liftA2((a, b) => b),
+      ),
+    );
+    expectTypeOf(result).toEqualTypeOf<number[]>();
+    expect(result).toEqual([4, 5, 6, 4, 5, 6, 4, 5, 6]);
+  });
+
   it('should product many', () => {
     const result = pipe(
       [
@@ -33,7 +58,7 @@ describe('Applicative', () => {
       ],
       A.productMany([1, 2, 3]),
     );
-    expectTypeOf(result).toEqualTypeOf<NonEmptyArray<number>[]>();
+    expectTypeOf(result).toEqualTypeOf<number[][]>();
     expect(result).toEqual([
       [1, 1, 4],
       [1, 1, 5],

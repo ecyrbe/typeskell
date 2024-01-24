@@ -3,13 +3,12 @@ import type { Kind, $ } from '@kinds';
 import { GenericFn } from '@utils/functions';
 import { TOption } from '@data/option';
 import { TypeSkell } from '@typeskell';
+import { ToParams, ToResult } from './to.types';
+import { OptionalTo } from '@data/array';
 
-export interface ToParams extends Kind {
-  return: this['rawArgs'] extends [infer B, ...infer Args] ? [f: (...args: Args) => B] : never;
-}
-
-export interface ToResult<F extends Kind> extends Kind {
-  return: this['rawArgs'] extends [infer B, ...infer Args] ? <A>(fa: $<F, [A, ...Args]>) => A | B : never;
+export namespace To {
+  export type $getOrElse<F extends Kind> = GenericFn<F['arity'], ToParams, ToResult<F>>;
+  export type $getOr<F extends Kind> = TypeSkell<'b -> F a ..e -> Or a b', { F: F; Or: Kind.Or }>;
 }
 
 /**
@@ -28,17 +27,10 @@ export interface To<F extends Kind> {
    * @returns `F a -> a`
    *
    */
-  getOrElse: GenericFn<F['arity'], ToParams, ToResult<F>>;
+  getOrElse: To.$getOrElse<F>;
 }
 
-export interface OptionalTo<F extends Kind> extends To<F> {
-  get: TypeSkell<'F a ..e -> Option a', { F: F; Option: TOption }>;
-}
-
-const _getOr =
-  (to: To<Kind.F>) =>
-  <B>(b: B) =>
-    to.getOrElse(() => b);
+const getOrImpl: (to: To<Kind.F>) => To.$getOr<Kind.F> = to => b => to.getOrElse(() => b);
 
 /**
  * getOr :: `To F -> b -> F a -> a | b`
@@ -49,10 +41,17 @@ const _getOr =
  * @param b `b`
  * @returns `F a -> a | b`
  */
-export const getOr: <F extends Kind>(to: To<F>) => TypeSkell<'b -> F a ..e -> Or a b', { F: F; Or: Kind.Or }> =
-  _getOr as any;
+export const getOr: <F extends Kind>(to: To<F>) => To.$getOr<F> = getOrImpl as any;
+
+export namespace OptionalTo {
+  export type $get<F extends Kind> = TypeSkell<'F a ..e -> Option a', { F: F; Option: TOption }>;
+}
+
+export interface OptionalTo<F extends Kind> extends To<F> {
+  get: OptionalTo.$get<F>;
+}
 
 /**
  * TYPE TESTS to check impl and interface are in sync
  */
-type TestCases = [Expect<Equal<typeof getOr<Kind.F>, typeof _getOr>>];
+type TestCases = [Expect<Equal<typeof getOr<Kind.F>, typeof getOrImpl>>];

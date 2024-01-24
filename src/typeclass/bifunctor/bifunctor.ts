@@ -1,7 +1,12 @@
 import { Equal, Expect } from 'type-testing';
 import type { Kind } from '@kinds';
-import { identity } from '@utils/functions';
 import { TypeSkell } from '@typeskell';
+import { mapLeft as mapLeftImpl, mapRight as mapRightImpl } from './bifunctor.impl';
+export namespace BiFunctor {
+  export type $bimap<F extends Kind> = TypeSkell<'(a -> b) (c -> d) -> F a c ..e -> F b d ..e', { F: F }>;
+  export type $mapLeft<F extends Kind> = TypeSkell<'(a -> b) -> F a c ..e -> F b c ..e', { F: F }>;
+  export type $mapRight<F extends Kind> = TypeSkell<'(a -> b) -> F c a ..e -> F c b ..e', { F: F }>;
+}
 
 /**
  * BiFunctor is a typeclass that defines a single operation, bimap.
@@ -18,48 +23,24 @@ import { TypeSkell } from '@typeskell';
 export interface BiFunctor<F extends Kind> {
   /**
    * bimap :: `(a -> b) (c -> d) -> F a c -> F b d`
-   *
-   * @param f `a -> b`
-   * @param g `c -> d`
-   * @returns `F a c -> F b d`
    */
-  bimap: TypeSkell<'(a -> b) (c -> d) -> F a c ..e -> F b d ..e', { F: F }>;
+  bimap: BiFunctor.$bimap<F>;
 }
-
-const _mapLeft =
-  (bifunctor: BiFunctor<Kind.F2>) =>
-  <A, B>(f: (a: A) => B) =>
-    bifunctor.bimap(f, identity);
 
 /**
  * mapLeft :: `BiFunctor F -> (a -> b) -> F a c -> F b c`
- *
- * @param bifunctor `BiFunctor<F>`
- * @returns `(a -> b) -> F a c -> F b c`
  */
-export const mapLeft: <F extends Kind>(
-  bifunctor: BiFunctor<F>,
-) => TypeSkell<'(a -> b) -> F a c ..e -> F b c ..e', { F: F }> = _mapLeft as any;
-
-const _mapRight =
-  (bifunctor: BiFunctor<Kind.F2>) =>
-  <A, B>(f: (a: A) => B) =>
-    bifunctor.bimap(identity, f);
+export const mapLeft: <F extends Kind>(bifunctor: BiFunctor<F>) => BiFunctor.$mapLeft<F> = mapLeftImpl as any;
 
 /**
  * mapRight :: `BiFunctor F  -> (a -> b) -> F c a -> F c b`
- *
- * @param bifunctor `BiFunctor<F>`
- * @returns `(a -> b) -> F c a -> F c b`
  */
-export const mapRight: <F extends Kind>(
-  bifunctor: BiFunctor<F>,
-) => TypeSkell<'(a -> b) -> F c a ..e -> F c b ..e', { F: F }> = _mapRight as any;
+export const mapRight: <F extends Kind>(bifunctor: BiFunctor<F>) => BiFunctor.$mapRight<F> = mapRightImpl as any;
 
 /**
  * TYPE TESTS to check impl and interface are in sync
  */
 type TestCases = [
-  Expect<Equal<typeof mapLeft<Kind.F2>, typeof _mapLeft>>,
-  Expect<Equal<typeof mapRight<Kind.F2>, typeof _mapRight>>,
+  Expect<Equal<typeof mapLeft<Kind.F2>, typeof mapLeftImpl>>,
+  Expect<Equal<typeof mapRight<Kind.F2>, typeof mapRightImpl>>,
 ];

@@ -399,7 +399,7 @@ export const filterMap = Filterable.filterMap;
  * pipe([1,2,3], filter(x => x > 1)) // [2,3]
  * ```
  */
-export const filter = (f => fa => fa.filter(f)) as tFilterable.FilterSignature<TArray>;
+export const filter = (f => fa => fa.filter(f)) as tFilterable.Filterable.$filter<TArray>;
 
 export const traverse: tTraversable.Traversable<TArray>['traverse'] = Traversable.traverse;
 

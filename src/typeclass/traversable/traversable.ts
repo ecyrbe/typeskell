@@ -5,6 +5,17 @@ import type { TypeSkell } from '@typeskell';
 import { sequence as sequenceImpl } from './traversable.impl';
 import { Foldable } from '@typeclass/foldable';
 
+export namespace Traversable {
+  export type $traverse<T extends Kind, F extends Kind> = TypeSkell<
+    '(a -> F b ..x) -> T a ..y -> F (T b ..y) ..x',
+    { F: F; T: T }
+  >;
+  export type $sequence<T extends Kind, F extends Kind> = TypeSkell<
+    'T (F a ..x) ..y -> F (T a ..y) ..x',
+    { F: F; T: T }
+  >;
+}
+
 /**
  * Traversable is a typeclass that provides a way to traverse a data structure with an effect.
  *
@@ -20,9 +31,7 @@ export interface Traversable<T extends Kind> extends Functor<T>, Foldable<T> {
    * @param F `Applicative F`
    * @returns `(a -> F b) -> T a -> F (T b)`
    */
-  traverse: <F extends Kind>(
-    F: Applicative<F>,
-  ) => TypeSkell<'(a -> F b ..x) -> T a ..y -> F (T b ..y) ..x', { F: F; T: T }>;
+  traverse: <F extends Kind>(F: Applicative<F>) => Traversable.$traverse<T, F>;
 }
 
 /**
@@ -33,5 +42,4 @@ export interface Traversable<T extends Kind> extends Functor<T>, Foldable<T> {
  */
 export const sequence: <T extends Kind>(
   traversable: Traversable<T>,
-) => <F extends Kind>(F: Applicative<F>) => TypeSkell<'T (F a ..x) ..y -> F (T a ..y) ..x', { F: F; T: T }> =
-  sequenceImpl as any;
+) => <F extends Kind>(F: Applicative<F>) => Traversable.$sequence<T, F> = sequenceImpl as any;
