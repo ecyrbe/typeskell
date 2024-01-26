@@ -400,9 +400,13 @@ export const filterMap = Filterable.filterMap;
  */
 export const filter = (f => fa => fa.filter(f)) as tFilterable.Filterable.$filter<TArray>;
 
-export const traverse: tTraversable.Traversable<TArray>['traverse'] = Traversable.traverse;
+export const traverse: <F extends Kind>(
+  F: tApplicative.Applicative<F>,
+) => tTraversable.Traversable.$traverse<TArray, F> = Traversable.traverse;
 
-export const sequence: ReturnType<typeof tTraversable.sequence<TArray>> = tTraversable.sequence(Traversable);
+export const sequence: <F extends Kind>(
+  F: tApplicative.Applicative<F>,
+) => tTraversable.Traversable.$sequence<TArray, F> = tTraversable.sequence(Traversable);
 
 export const concat =
   <A>(a: A[]) =>

@@ -414,7 +414,9 @@ export const biFlapMap = BiFlatMap.biFlapMap;
  * pipe(ok(0), traverseOption(x => none)) // none
  * ```
  */
-export const traverse: tTraversable.Traversable<TResult>['traverse'] = Traversable.traverse;
+export const traverse: <F extends Kind>(
+  F: tApplicative.Applicative<F>,
+) => tTraversable.Traversable.$traverse<TResult, F> = Traversable.traverse;
 
 /**
  * sequence :: `Applicative f => Result<f a, e> -> f Result<a, e>`
@@ -432,4 +434,6 @@ export const traverse: tTraversable.Traversable<TResult>['traverse'] = Traversab
  * pipe(err("error"), sequenceOption) // some(err("error"))
  * ```
  */
-export const sequence: ReturnType<typeof tTraversable.sequence<TResult>> = tTraversable.sequence(Traversable);
+export const sequence: <F extends Kind>(
+  F: tApplicative.Applicative<F>,
+) => tTraversable.Traversable.$sequence<TResult, F> = tTraversable.sequence(Traversable);

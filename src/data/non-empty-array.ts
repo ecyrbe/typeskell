@@ -26,7 +26,7 @@ export const Foldable: tFoldable.Foldable<TNonEmptyArray> = {
   reduce: (f, b) => fa => fa.reduce(f, b),
 };
 
-export const NonEmptyFoldable: tFoldable.NonEmptyFoldable<TNonEmptyArray> = {
+export const NonEmptyFoldable: tFoldable.Foldable1<TNonEmptyArray> = {
   ...Foldable,
   fold: f => fa => fa.reduce(f),
 };
