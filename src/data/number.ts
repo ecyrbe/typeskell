@@ -1,11 +1,13 @@
 import * as groups from '@typeclass/groups';
 
-export const SemiGroupMax: groups.SemiGroup<number> = {
+export const MonoidMax: groups.Monoid<number> = {
   concat: (a, b) => Math.max(a, b),
+  identity: -Infinity,
 };
 
-export const SemiGroupMin: groups.SemiGroup<number> = {
+export const MonoidMin: groups.Monoid<number> = {
   concat: (a, b) => Math.min(a, b),
+  identity: Infinity,
 };
 
 export const GroupSum: groups.Group<number> = {
