@@ -28,6 +28,17 @@ export const isNone = <A>(option: Option<A>): option is None => option._tag === 
 
 export const isSome = <A>(option: Option<A>): option is Some<A> => option._tag === 'Some';
 
+export const fromNullable = <A>(a: A | null | undefined): Option<A> => (a == null ? none() : some(a));
+
+export const fromIterable = <A>(iterable: Iterable<A>): Option<A> => {
+  const iterator = iterable[Symbol.iterator]();
+  const next = iterator.next();
+  return next.done ? none() : some(next.value);
+};
+
+export const toNullable = <A>(option: Option<A>): A | null => (isNone(option) ? null : option.value);
+
+export const toUndefined = <A>(option: Option<A>): A | undefined => (isNone(option) ? undefined : option.value);
 export interface TOption extends Kind<[InvariantParam]> {
   return: Option<this['arg0']>;
 }
