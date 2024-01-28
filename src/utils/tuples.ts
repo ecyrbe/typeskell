@@ -1,8 +1,16 @@
 import { Kind, $ } from '@kinds';
 
-export type Tuple<T, N extends number, $acc extends unknown[] = []> = $acc['length'] extends N
-  ? $acc
-  : Tuple<T, N, [...$acc, T]>;
+export type Tuple<T, N extends number, $acc extends unknown[] = []> = number extends N
+  ? T[]
+  : $acc['length'] extends N
+    ? $acc
+    : Tuple<T, N, [...$acc, T]>;
+
+export type ReadonlyTuple<T, N extends number, $acc extends readonly unknown[] = readonly []> = number extends N
+  ? readonly T[]
+  : $acc['length'] extends N
+    ? $acc
+    : ReadonlyTuple<T, N, readonly [...$acc, T]>;
 
 export type StringToTuple<T extends string, $acc extends unknown[] = []> = T extends `${infer A}${infer B}`
   ? StringToTuple<B, [...$acc, A]>
