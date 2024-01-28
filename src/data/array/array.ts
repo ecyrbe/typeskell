@@ -10,8 +10,9 @@ import * as tFoldable from '@typeclass/foldable';
 import * as tFilterable from '@typeclass/filterable';
 import * as tTraversable from '@typeclass/traversable';
 import * as tGroups from '@typeclass/groups';
-import { OptionOf, isSome, none, some } from './option';
-import { pipe } from '../pipe';
+import { GroupProduct, GroupSum, MonoidMax, MonoidMin } from '@data/number';
+import * as O from '../option';
+import { pipe } from '../../pipe';
 
 export type TArray = Kind.Array;
 
@@ -23,13 +24,15 @@ export const Of: tOf<TArray> = {
   of: a => [a],
 };
 
+export const from = <A>(fa: Iterable<A>) => [...fa];
+
 export const To: tTo.To<TArray> = {
   getOrElse: f => fa => (fa.length === 0 ? f() : fa[0]),
 };
 
 export const OptionalTo: tTo.OptionalTo<TArray> = {
   ...To,
-  get: fa => (fa.length === 0 ? none() : some(fa[0])),
+  get: fa => (fa.length === 0 ? O.none() : O.some(fa[0])),
 };
 
 export const Functor: tfunctor.Functor<TArray> = {
@@ -44,10 +47,10 @@ export const Filterable: tFilterable.Filterable<TArray> = {
   ...Zero,
   ...Functor,
   filterMap: f => fa => {
-    const result: OptionOf<ReturnType<typeof f>>[] = [];
+    const result: O.OptionOf<ReturnType<typeof f>>[] = [];
     for (const a of fa) {
       const b = f(a);
-      if (isSome(b)) {
+      if (O.isSome(b)) {
         result.push(b.value);
       }
     }
@@ -277,7 +280,7 @@ export const liftA2 = tApplicative.liftA2(Applicative);
  * pipe([1,2,3], product([1,2,3])) // [[1,1],[1,2],[1,3],[2,1],[2,2],[2,3],[3,1],[3,2],[3,3]]
  * ```
  */
-export const product = tApplicative.product(Applicative);
+export const aproduct = tApplicative.product(Applicative);
 
 /**
  * productMany :: `a[] -> a[][] -> a[][]`
@@ -370,6 +373,40 @@ export const flatten = tMonad.flatten(Monad);
  */
 export const reduce = Foldable.reduce;
 
+export const reduceRight =
+  <A, B>(f: (acc: B, item: A) => B, init: B) =>
+  (fa: A[]) => {
+    let acc = init;
+    for (let i = fa.length - 1; i >= 0; i--) {
+      acc = f(acc, fa[i]);
+    }
+    return acc;
+  };
+
+export const scan =
+  <A, B>(f: (b: B, a: A) => B, init: B) =>
+  (fa: A[]) => {
+    const scan: B[] = [];
+    let sum = init;
+    for (const item of fa) {
+      sum = f(sum, item);
+      scan.push(sum);
+    }
+    return scan;
+  };
+
+export const scanRight =
+  <A, B>(f: (b: B, a: A) => B, init: B) =>
+  (fa: A[]) => {
+    const scan: B[] = [];
+    let sum = init;
+    for (let i = fa.length - 1; i >= 0; i--) {
+      sum = f(sum, fa[i]);
+      scan.push(sum);
+    }
+    return scan;
+  };
+
 /**
  * filterMap :: `(a -> Option<b>) -> a[] -> b[]`
  *
@@ -409,6 +446,153 @@ export const sequence: <F extends Kind>(
 ) => tTraversable.Traversable.$sequence<TArray, F> = tTraversable.sequence(Traversable);
 
 export const concat =
-  <A>(a: A[]) =>
-  (b: A[]) =>
+  <A>(b: A[]) =>
+  (a: A[]) =>
     MonoidKind.monoid<A>().concat(a, b);
+
+export const concatMany = <A>(...faa: A[][]) => {
+  const monoid = MonoidKind.monoid<A>();
+  return faa.reduce((acc, fa) => monoid.concat(acc, fa), monoid.identity);
+};
+
+export const append = <A>(a: A) => concat(of(a));
+
+export const prepend =
+  <A>(a: A) =>
+  (fa: A[]) =>
+    pipe(of(a), concat(fa));
+
+export const pluck = <A, K extends keyof A>(k: K) => map((a: A) => a[k]);
+
+export const takeWhile =
+  <A>(f: (a: A) => boolean) =>
+  (fa: A[]) => {
+    const result: A[] = [];
+    for (const a of fa) {
+      if (!f(a)) return result;
+      result.push(a);
+    }
+    return result;
+  };
+
+export const take =
+  (count: number) =>
+  <A>(fa: A[]) => {
+    const result: A[] = [];
+    for (const a of fa) {
+      if (result.length >= count) return result;
+      result.push(a);
+    }
+    return result;
+  };
+
+export const dropWhile =
+  <A>(f: (a: A) => boolean) =>
+  (fa: A[]) => {
+    const result: A[] = [];
+    for (const a of fa) {
+      if (f(a)) continue;
+      result.push(a);
+    }
+    return result;
+  };
+
+export const drop =
+  (count: number) =>
+  <A>(fa: A[]) =>
+    fa.slice(count);
+
+export const head = <A>(fa: A[]): O.Option<A> => (fa.length === 0 ? O.none() : O.some(fa[0]));
+
+export const tail = drop(1);
+
+export const last = <A>(fa: A[]) => (fa.length === 0 ? O.none() : O.some(fa[fa.length - 1]));
+
+export const enumerate = <A>(fa: A[]) => fa.map((a, i) => [a, i] as [A, number]);
+
+export const unique = <A>(fa: A[]) => [...new Set(fa)];
+
+export const duplicate = flatMap(<A>(a: A) => [a, a]);
+
+export const reverse = <A>(fa: A[]) => [...fa].reverse();
+
+export const some =
+  <A>(f: (a: A) => boolean) =>
+  (fa: A[]) =>
+    fa.some(f);
+
+export const every =
+  <A>(f: (a: A) => boolean) =>
+  (fa: A[]) =>
+    fa.every(f);
+
+export const find =
+  <A>(f: (a: A) => boolean) =>
+  (fa: A[]): O.Option<A> => {
+    const result = fa.find(f);
+    if (result === undefined) return O.none();
+    return O.some(result);
+  };
+
+export const findIndex =
+  <A>(f: (a: A) => boolean) =>
+  (fa: A[]): O.Option<number> => {
+    const result = fa.findIndex(f);
+    if (result === -1) return O.none();
+    return O.some(result);
+  };
+
+export const findLast =
+  <A>(f: (a: A) => boolean) =>
+  (fa: A[]): O.Option<A> => {
+    for (let i = fa.length - 1; i >= 0; i--) {
+      const a = fa[i];
+      if (f(a)) return O.some(a);
+    }
+    return O.none();
+  };
+
+export const findLastIndex =
+  <A>(f: (a: A) => boolean) =>
+  (fa: A[]): O.Option<number> => {
+    for (let i = fa.length - 1; i >= 0; i--) {
+      if (f(fa[i])) return O.some(i);
+    }
+    return O.none();
+  };
+
+export const includes =
+  <A>(a: A) =>
+  (fa: A[]) =>
+    fa.includes(a);
+
+export const isEmpty = <A>(fa: A[]) => fa.length === 0;
+
+export const count = <A>(fa: A[]) => fa.length;
+
+export const length = count;
+
+export const fold = <A>(monoid: tGroups.Monoid<A>) => reduce(monoid.concat, monoid.identity);
+
+export const sum = fold(GroupSum);
+
+export const product = fold(GroupProduct);
+
+export const max = fold(MonoidMax);
+
+export const min = fold(MonoidMin);
+
+export const alternateFold = <A>(group: tGroups.Group<A>) => {
+  let sum = group.identity;
+  let index = 0;
+  return (fa: A[]) => {
+    for (const item of fa) {
+      sum = index++ % 2 === 0 ? group.concat(sum, item) : group.concat(sum, group.invert(item));
+    }
+    return sum;
+  };
+};
+
+export const alternateSum = alternateFold(GroupSum);
+
+export const alternateProduct = alternateFold(GroupProduct);

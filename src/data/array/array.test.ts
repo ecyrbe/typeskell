@@ -1,7 +1,7 @@
 import { describe, it, expect, expectTypeOf } from 'vitest';
 import * as A from '@data/array';
 import * as O from '@data/option';
-import { pipe } from '../pipe';
+import { pipe } from '../../pipe';
 import { functorLaws } from '@typeclass/functor/functor.laws';
 import * as fc from 'fast-check';
 

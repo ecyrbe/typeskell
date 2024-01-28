@@ -11,5 +11,5 @@ export interface Foldable<F extends Kind> {
 }
 
 export interface Foldable1<F extends Kind> extends Foldable<F> {
-  fold: Foldable.$fold<F>;
+  fold1: Foldable.$fold<F>;
 }

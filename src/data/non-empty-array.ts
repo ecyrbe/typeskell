@@ -28,7 +28,7 @@ export const Foldable: tFoldable.Foldable<TNonEmptyArray> = {
 
 export const NonEmptyFoldable: tFoldable.Foldable1<TNonEmptyArray> = {
   ...Foldable,
-  fold: f => fa => fa.reduce(f),
+  fold1: f => fa => fa.reduce(f),
 };
 
 export const Applicative: tApplicative.Applicative<TNonEmptyArray> = {
@@ -55,7 +55,7 @@ export const map = Functor.map;
 
 export const reduce = Foldable.reduce;
 
-export const fold = NonEmptyFoldable.fold;
+export const fold1 = NonEmptyFoldable.fold1;
 
 export const ap = Applicative.ap;
 

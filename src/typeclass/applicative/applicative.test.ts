@@ -1,5 +1,4 @@
 import { describe, it, expect, expectTypeOf } from 'vitest';
-import type { NonEmptyArray } from '@data/non-empty-array';
 import * as A from '@data/array';
 import { pipe } from '../../pipe';
 
