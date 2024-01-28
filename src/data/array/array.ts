@@ -445,6 +445,14 @@ export const sequence: <F extends Kind>(
   F: tApplicative.Applicative<F>,
 ) => tTraversable.Traversable.$sequence<TArray, F> = tTraversable.sequence(Traversable);
 
+export const range = (start: number, end: number, step = 1) => {
+  const result: number[] = [];
+  for (let i = start; i < end; i += step) {
+    result.push(i);
+  }
+  return result;
+};
+
 export const concat =
   <A>(b: A[]) =>
   (a: A[]) =>
@@ -506,7 +514,9 @@ export const head = <A>(fa: A[]): O.Option<A> => (fa.length === 0 ? O.none() : O
 
 export const tail = drop(1);
 
-export const last = <A>(fa: A[]) => (fa.length === 0 ? O.none() : O.some(fa[fa.length - 1]));
+export const list: <A>(fa: A[]) => [A, A[]] = fa => [fa[0], tail(fa)];
+
+export const last = <A>(fa: A[]): O.Option<A> => (fa.length === 0 ? O.none() : O.some(fa[fa.length - 1]));
 
 export const enumerate = <A>(fa: A[]) => fa.map((a, i) => [a, i] as [A, number]);
 
