@@ -39,6 +39,41 @@ export const fromIterable = <A>(iterable: Iterable<A>): Option<A> => {
 export const toNullable = <A>(option: Option<A>): A | null => (isNone(option) ? null : option.value);
 
 export const toUndefined = <A>(option: Option<A>): A | undefined => (isNone(option) ? undefined : option.value);
+
+export const Do: Option<{}> = some({});
+
+type BindOption<Name extends string, A, B> = Option<{ [K in Name | keyof A]: K extends keyof A ? A[K] : B }>;
+
+export const bind =
+  <Name extends string, A, B>(name: Exclude<Name, keyof A>, f: (a: A) => Option<B>) =>
+  (fa: Option<A>): BindOption<Name, A, B> =>
+    pipe(
+      fa,
+      flatMap(a =>
+        pipe(
+          f(a),
+          map(b => ({ ...a, [name]: b }) as any),
+        ),
+      ),
+    );
+
+export const bindTo =
+  <Name extends string>(name: Name) =>
+  <A>(fa: Option<A>): BindOption<Name, {}, A> =>
+    pipe(
+      fa,
+      map(a => ({ [name]: a }) as any),
+    );
+
+const let_ =
+  <Name extends string, A, B>(name: Exclude<Name, keyof A>, f: (a: A) => B) =>
+  (fa: Option<A>): BindOption<Name, A, B> =>
+    pipe(
+      fa,
+      map(a => ({ ...a, [name]: f(a) }) as any),
+    );
+
+export { let_ as let };
 export interface TOption extends Kind<[InvariantParam]> {
   return: Option<this['arg0']>;
 }
