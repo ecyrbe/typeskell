@@ -84,6 +84,12 @@ export const drop = (count: number) =>
     }
   };
 
+export const list = <A>(fa: Generator<A>) => {
+  const head = fa.next();
+  if (head.done) throw new Error('Cannot list an empty generator');
+  return [head.value, fa] as [A, Generator<A>];
+};
+
 export const concat = <A>(fb: Generator<A>) =>
   function* (fa: Generator<A>) {
     yield* fa;
