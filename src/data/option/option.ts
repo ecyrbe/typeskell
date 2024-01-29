@@ -8,6 +8,7 @@ import * as tMonad from '@typeclass/monad';
 import * as tFoldable from '@typeclass/foldable';
 import * as tFilterable from '@typeclass/filterable';
 import * as tSemiAlternative from '@typeclass/semialternative';
+import * as tAlternative from '@typeclass/alternative';
 import { pipe } from '../../pipe';
 
 export interface None {
@@ -80,6 +81,12 @@ export const Applicative: tApplicative.Applicative<TOption> = {
   ...Of,
   ...Functor,
   ap: fa => fab => (isSome(fab) ? pipe(fa, Functor.map(fab.value)) : none()),
+};
+
+export const Alternative: tAlternative.Alternative<TOption> = {
+  ...Zero,
+  ...Applicative,
+  ...SemiAlternative,
 };
 
 export const Monad: tMonad.Monad<TOption> = {
