@@ -45,6 +45,19 @@ export namespace Kind {
     return: this['arg0'][];
   }
 
+  /**
+   * Special Kind for do notation
+   */
+  export interface Do extends Kind.ternary {
+    return: this['arg0'] extends string
+      ? { [K in this['arg0'] | keyof this['arg1']]: K extends keyof this['arg1'] ? this['arg1'][K] : this['arg2'] }
+      : never;
+  }
+
+  export interface DoName extends Kind.binary {
+    return: this['arg0'] extends string ? Exclude<this['arg0'], keyof this['arg1']> : never;
+  }
+
   // we are in the matrix
   // simulate generics with higher kinded types
   type $<F, Args> = {

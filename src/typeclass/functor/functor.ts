@@ -1,6 +1,6 @@
 import { Expect, Equal } from 'type-testing';
 import type { Kind } from '@kinds';
-import { as as asImpl, flap as flapImpl, mapCompose as mapComposeImpl } from './functor.impl';
+import { $as, $flap, $mapCompose, $let } from './functor.impl';
 import { TypeSkell } from '@typeskell';
 
 export namespace Functor {
@@ -11,8 +11,14 @@ export namespace Functor {
   >;
   export type $flap<F extends Kind> = TypeSkell<'a -> F (a -> b) ..x -> F b ..x', { F: F }>;
   export type $as<F extends Kind> = TypeSkell<'b -> F a ..x -> F b ..x', { F: F }>;
+  export type $let<F extends Kind> = TypeSkell<
+    '(DoName n a) (a -> b) -> F a ..e -> F (Do n a b) ..e',
+    { DoName: Kind.DoName; Do: Kind.Do; F: F }
+  >;
 }
 
+// <Name extends string, A, B>(name: Exclude<Name, keyof A>, f: (a: A) => B) =>
+//   (fa: Array<A>): BindArray<Name, A, B>
 /**
  * Functor is a typeclass that defines a single operation, map.
  *
@@ -40,7 +46,7 @@ export interface Functor<F extends Kind> {
 export const mapCompose: <F extends Kind, G extends Kind>(
   FunctorF: Functor<F>,
   FunctorG: Functor<G>,
-) => Functor.$mapCompose<F, G> = mapComposeImpl as any;
+) => Functor.$mapCompose<F, G> = $mapCompose as any;
 
 /**
  * flap :: `Functor F -> a -> F (a -> b) -> F b`
@@ -48,7 +54,7 @@ export const mapCompose: <F extends Kind, G extends Kind>(
  * @param functor `Functor<F>`
  * @returns `a -> F (a -> b) -> F b`
  */
-export const flap: <F extends Kind>(functor: Functor<F>) => Functor.$flap<F> = flapImpl as any;
+export const flap: <F extends Kind>(functor: Functor<F>) => Functor.$flap<F> = $flap as any;
 
 /**
  * as :: `Functor F -> b -> F a -> F b`
@@ -56,13 +62,17 @@ export const flap: <F extends Kind>(functor: Functor<F>) => Functor.$flap<F> = f
  * @param functor `Functor<F>`
  * @returns `b -> F a -> F b`
  */
-export const as: <F extends Kind>(functor: Functor<F>) => Functor.$as<F> = asImpl as any;
+export const as: <F extends Kind>(functor: Functor<F>) => Functor.$as<F> = $as as any;
+
+const $$let: <F extends Kind>(functor: Functor<F>) => Functor.$let<F> = $let as any;
+
+export { $$let as let };
 
 /**
  * TYPE TESTS to check impl and interface are in sync
  */
 type TestCases = [
-  Expect<Equal<typeof mapCompose<Kind.F, Kind.G>, typeof mapComposeImpl>>,
-  Expect<Equal<typeof flap<Kind.F>, typeof flapImpl>>,
-  Expect<Equal<typeof as<Kind.F>, typeof asImpl>>,
+  Expect<Equal<typeof mapCompose<Kind.F, Kind.G>, typeof $mapCompose>>,
+  Expect<Equal<typeof flap<Kind.F>, typeof $flap>>,
+  Expect<Equal<typeof as<Kind.F>, typeof $as>>,
 ];
