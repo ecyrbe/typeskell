@@ -10,8 +10,8 @@ import * as tMonad from '@typeclass/monad';
 import * as tBiFlatMap from '@typeclass/biflatmap';
 import * as tFoldable from '@typeclass/foldable';
 import * as tTraversable from '@typeclass/traversable';
-import * as O from './option';
-import { pipe } from '../pipe';
+import * as O from '../option';
+import { pipe } from '../../pipe';
 
 export interface Err<E> {
   readonly _tag: 'Err';
