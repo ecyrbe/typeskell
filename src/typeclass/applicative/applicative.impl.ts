@@ -1,5 +1,4 @@
-import type { Kind, $ } from '@kinds';
-import type { NonEmptyArray } from '@data/non-empty-array';
+import type { Kind } from '@kinds';
 import type { Applicative } from './applicative';
 import { pair } from '@data/pair';
 import { pipe } from '../../pipe';
