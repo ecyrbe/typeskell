@@ -7,6 +7,7 @@ import * as tApplicative from '@typeclass/applicative';
 import * as tMonad from '@typeclass/monad';
 import * as tFoldable from '@typeclass/foldable';
 import * as tFilterable from '@typeclass/filterable';
+import * as tSemiAlternative from '@typeclass/semialternative';
 import { pipe } from '../../pipe';
 
 export interface None {
@@ -58,6 +59,11 @@ export const To: tTo.To<TOption> = {
 
 export const Functor: tfunctor.Functor<TOption> = {
   map: f => fa => (isSome(fa) ? some(f(fa.value)) : none()),
+};
+
+export const SemiAlternative: tSemiAlternative.SemiAlternative<TOption> = {
+  ...Functor,
+  or: fb => fa => (isSome(fa) ? fa : fb),
 };
 
 export const Foldable: tFoldable.Foldable<TOption> = {
@@ -143,6 +149,24 @@ export const getOrElse = To.getOrElse;
  * ```
  */
 export const getOr = tTo.getOr(To);
+
+/**
+ * or :: `Option<a> -> Option<a> -> Option<a>`
+ *
+ * or :: `<A>(fb: Option<A>) => (fa: Option<A>) => Option<A>`
+ *
+ * @param fb `Option<a>`
+ * @returns `Option<a> -> Option<a>`
+ *
+ * @example
+ * ```ts
+ * pipe(some(1), or(some(2))) // some(1)
+ * pipe(some(1), or(none)) // some(1)
+ * pipe(none, or(some(2))) // some(2)
+ * pipe(none, or(none)) // none
+ * ```
+ */
+export const or = SemiAlternative.or;
 
 /**
  * map :: `(a -> b) -> Option<a> -> Option<b>`

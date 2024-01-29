@@ -10,6 +10,7 @@ import * as tMonad from '@typeclass/monad';
 import * as tBiFlatMap from '@typeclass/biflatmap';
 import * as tFoldable from '@typeclass/foldable';
 import * as tTraversable from '@typeclass/traversable';
+import * as tSemiAlternative from '@typeclass/semialternative';
 import * as O from '../option';
 import { pipe } from '../../pipe';
 
@@ -65,6 +66,11 @@ export const BiFlatMap: tBiFlatMap.BiFlapMap<TResult> = {
 
 export const Functor: tfunctor.Functor<TResult> = {
   map: tbifunctor.mapLeft(Bifunctor),
+};
+
+export const SemiAlternative: tSemiAlternative.SemiAlternative<TResult> = {
+  ...Functor,
+  or: fb => fa => (isOk(fa) ? fa : fb),
 };
 
 export const Foldable: tFoldable.Foldable<TResult> = {
@@ -211,6 +217,23 @@ export const fromOption =
  * ```
  */
 export const orElse = tBiFlatMap.orElse(BiFlatMap);
+
+/**
+ *  or :: `Result<a, e1> -> Result<a, e2> -> Result<a, e1>`
+ *
+ * or :: `<A, E1>(fb: Result<A, E1>) => <E2>(fa: Result<A, E2>) => Result<A, E1>`
+ *
+ * @param fb `Result<a, e1>`
+ * @returns `Result<a, e2> -> Result<a, e1>`
+ *
+ * @example
+ * ```ts
+ * pipe(ok(0), or(ok(1))) // ok(0)
+ * pipe(err("error"), or(ok(1))) // ok(1)
+ * pipe(err("error"), or(err("error!"))) // err("error!")
+ * ```
+ */
+export const or = SemiAlternative.or;
 
 /**
  * map :: `(a -> b) -> Result<a, e> -> Result<b, e>`
