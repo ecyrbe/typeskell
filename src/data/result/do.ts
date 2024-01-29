@@ -1,4 +1,4 @@
-import { Functor, Monad, Result } from './result';
+import { Functor, Monad } from './result';
 import * as tFunctor from '@typeclass/functor';
 import * as tMonad from '@typeclass/monad';
 
