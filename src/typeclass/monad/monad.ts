@@ -8,7 +8,7 @@ export namespace Monad {
   export type $flatMap<M extends Kind> = TypeSkell<'(a -> M b ..x) -> M a ..y -> M b ..xy', { M: M }>;
   export type $flatten<M extends Kind> = TypeSkell<'M (M a ..x) ..y -> M a ..xy', { M: M }>;
   export type $bind<F extends Kind> = TypeSkell<
-    '(DoName n a) (a -> F b ..e) -> F a ..e -> F (Do n a b) ..e',
+    '(DoName n a) (a -> F b ..x) -> F a ..y -> F (Do n a b) ..xy',
     { DoName: Kind.DoName; Do: Kind.Do; F: F }
   >;
 }
