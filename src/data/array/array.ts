@@ -1,4 +1,4 @@
-import { Kind, $ } from '@kinds';
+import { Kind } from '@kinds';
 import * as tfunctor from '@typeclass/functor';
 import { type Of as tOf } from '@typeclass/of';
 import * as tTo from '@typeclass/to';
@@ -10,6 +10,8 @@ import * as tFoldable from '@typeclass/foldable';
 import * as tFilterable from '@typeclass/filterable';
 import * as tTraversable from '@typeclass/traversable';
 import * as tGroups from '@typeclass/groups';
+import * as tSemiAlternative from '@typeclass/semialternative';
+import * as tAlternative from '@typeclass/alternative';
 import { GroupProduct, GroupSum, MonoidMax, MonoidMin } from '@data/number';
 import * as O from '../option';
 import { pipe } from '../../pipe';
@@ -105,12 +107,15 @@ export const Traversable: tTraversable.Traversable<TArray> = {
   traverse: traverseImpl as any,
 };
 
-export const MonoidKind: tGroups.MonoidKind<TArray> = {
+export const SemiAlternative: tSemiAlternative.SemiAlternative<TArray> = {
+  ...Functor,
+  or: fb => fa => fa.concat(fb),
+};
+
+export const Alternative: tAlternative.Alternative<TArray> = {
   ...Zero,
-  monoid: () => ({
-    concat: (a, b) => a.concat(b),
-    identity: zero(),
-  }),
+  ...Applicative,
+  ...SemiAlternative,
 };
 
 /**
@@ -453,14 +458,11 @@ export const range = (start: number, end: number, step = 1) => {
   return result;
 };
 
-export const concat =
-  <A>(b: A[]) =>
-  (a: A[]) =>
-    MonoidKind.monoid<A>().concat(a, b);
+export const or = SemiAlternative.or;
+export const concat = or;
 
 export const concatMany = <A>(...faa: A[][]) => {
-  const monoid = MonoidKind.monoid<A>();
-  return faa.reduce((acc, fa) => monoid.concat(acc, fa), monoid.identity);
+  return faa.reduce((acc, fa) => acc.concat(fa), zero());
 };
 
 export const append = <A>(a: A) => concat(of(a));
