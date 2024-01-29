@@ -17,7 +17,7 @@ import * as tMonad from '@typeclass/monad';
  * )
  * ```
  */
-export const Do: Generator<{}> = Monad.of({});
+export const Do = Monad.of({});
 
 /**
  * bind an option to a name

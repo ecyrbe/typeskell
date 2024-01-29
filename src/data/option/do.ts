@@ -1,7 +1,6 @@
-import { Option, some, map, Functor, Monad } from './option';
+import { Functor, Monad } from './option';
 import * as tFunctor from '@typeclass/functor';
 import * as tMonad from '@typeclass/monad';
-import { pipe } from '../../pipe';
 
 /**
  * Do notation for Option
@@ -18,7 +17,7 @@ import { pipe } from '../../pipe';
  * )
  * ```
  */
-export const Do: Option<{}> = some({});
+export const Do = Monad.of({});
 
 /**
  * bind an option to a name

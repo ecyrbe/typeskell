@@ -1,4 +1,4 @@
-import { of, Monad, Functor } from './array';
+import { Monad, Functor } from './array';
 import * as tFunctor from '@typeclass/functor';
 import * as tMonad from '@typeclass/monad';
 
@@ -11,13 +11,13 @@ import * as tMonad from '@typeclass/monad';
  * ```ts
  * pipe(
  *  Do,
- *  bind('a', () => some(1)),
- *  bind('b', ({ a }) => some(a + 1)),
+ *  bind('a', () => of(1)),
+ *  bind('b', ({ a }) => of(a + 1)),
  *  map(({ a, b }) => a + b),
  * )
  * ```
  */
-export const Do: Array<{}> = of({});
+export const Do = Monad.of({});
 
 /**
  * bind an option to a name
@@ -29,8 +29,8 @@ export const Do: Array<{}> = of({});
  * ```ts
  * pipe(
  *  Do,
- *  bind('a', () => some(1)),
- *  bind('b', ({ a }) => some(a + 1)),
+ *  bind('a', () => of(1)),
+ *  bind('b', ({ a }) => of(a + 1)),
  *  map(({ a, b }) => a + b),
  * )
  * ```
