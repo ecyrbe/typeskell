@@ -14,7 +14,7 @@ import * as tSemiAlternative from '@typeclass/semialternative';
 import * as tAlternative from '@typeclass/alternative';
 import { GroupProduct, GroupSum, MonoidMax, MonoidMin } from '@data/number';
 import * as O from '../option';
-import { pipe } from '../../pipe';
+import { pipe } from '@utils/pipe';
 
 export type TArray = Kind.Array;
 

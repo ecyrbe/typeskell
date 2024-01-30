@@ -1,7 +1,7 @@
 import type { Kind } from '@kinds';
 import type { Applicative } from './applicative';
 import { pair } from '@data/pair';
-import { pipe } from '../../pipe';
+import { pipe } from '@utils/pipe';
 
 export const liftA2: (applicative: Applicative<Kind.F>) => Applicative.$liftA2<Kind.F> = applicative => f => fa => fb =>
   pipe(

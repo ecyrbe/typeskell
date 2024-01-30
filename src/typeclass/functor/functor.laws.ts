@@ -1,7 +1,7 @@
-import { Kind, $ } from '@kinds';
+import { Kind } from '@kinds';
 import { Functor } from './functor';
 import { identity } from '@utils/functions';
-import { flow } from '../../pipe';
+import { flow } from '@utils/pipe';
 import { TypeSkell } from '@typeskell';
 
 namespace functorLaws {

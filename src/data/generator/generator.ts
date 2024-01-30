@@ -13,7 +13,7 @@ import * as tGroups from '@typeclass/groups';
 import { OptionOf, isSome, none, some } from '../option';
 import { map, flatMap, filterMap, zipWith } from './operators';
 import { reduce } from './reducers';
-import { pipe } from '../../pipe';
+import { pipe } from '@utils/pipe';
 
 export interface TGenerator extends Kind.unary {
   return: Generator<this['arg0']>;

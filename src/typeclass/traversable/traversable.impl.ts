@@ -1,7 +1,6 @@
-import type { Kind, $ } from '@kinds';
+import type { Kind } from '@kinds';
 import type { Applicative } from '@typeclass/applicative';
 import { identity } from '@utils/functions';
-import { pipe } from '../../pipe';
 import type { Traversable } from './traversable';
 
 export const sequence: (

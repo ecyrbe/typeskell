@@ -12,7 +12,7 @@ import * as tFoldable from '@typeclass/foldable';
 import * as tTraversable from '@typeclass/traversable';
 import * as tSemiAlternative from '@typeclass/semialternative';
 import * as O from '../option';
-import { pipe } from '../../pipe';
+import { pipe } from '@utils/pipe';
 
 export interface Err<E> {
   readonly _tag: 'Err';

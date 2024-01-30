@@ -1,6 +1,6 @@
 import { describe, it, expect, expectTypeOf } from 'vitest';
 import * as A from '@data/array';
-import { pipe } from '../../pipe';
+import { pipe } from '@utils/pipe';
 
 describe('Applicative', () => {
   it('should liftA2', () => {

@@ -1,4 +1,4 @@
-import { pipe } from '../pipe';
+import { pipe } from '@utils/pipe';
 import { describe, expect, it } from 'vitest';
 import { duplicate, isNonEmptyArray, map, extract, extend, NonEmptyArray } from './non-empty-array';
 

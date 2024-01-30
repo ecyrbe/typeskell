@@ -9,7 +9,7 @@ import * as tFoldable from '@typeclass/foldable';
 import * as tFilterable from '@typeclass/filterable';
 import * as tSemiAlternative from '@typeclass/semialternative';
 import * as tAlternative from '@typeclass/alternative';
-import { pipe } from '../../pipe';
+import { pipe } from '@utils/pipe';
 
 export interface None {
   readonly _tag: 'None';

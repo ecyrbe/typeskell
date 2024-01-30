@@ -1,6 +1,6 @@
 import * as A from '@data/array';
 import * as O from '@data/option';
-import { pipe } from '../../pipe';
+import { pipe } from '@utils/pipe';
 import { Group, Monoid } from '@typeclass/groups';
 import { GroupProduct, GroupSum, MonoidMin, MonoidMax } from '@data/number';
 
