@@ -3,6 +3,7 @@ import * as A from '@data/array';
 import * as O from '@data/option';
 import { pipe } from '@utils/pipe';
 import { functorLaws } from '@typeclass/functor/functor.laws';
+import { applicativeLaws } from '@typeclass/applicative/applicative.laws';
 import * as fc from 'fast-check';
 
 describe('Array', () => {
@@ -75,6 +76,49 @@ describe('Array', () => {
           const f = <A>(x: A) => ({ x });
           const g = <A>(x: { x: A }) => ({ y: x.x });
           expect(law.left(f, g)(a)).toEqual(law.right(f, g)(a));
+        }),
+      );
+    });
+  });
+
+  describe('applicative', () => {
+    it('should obey applicative identity law', () => {
+      const law = applicativeLaws(A.Applicative).identity;
+      fc.assert(
+        fc.property(fc.array(fc.nat()), a => {
+          expect(law.left(a)).toEqual(law.right(a));
+        }),
+      );
+    });
+    it('should obey applicative homomorphism law', () => {
+      const law = applicativeLaws(A.Applicative).homomorphism;
+      const f = (x: number) => ({ x });
+      fc.assert(
+        fc.property(fc.nat(), x => {
+          expect(law.left(f, x)).toEqual(law.right(f, x));
+        }),
+      );
+    });
+    it('should obey applicative interchange law', () => {
+      const law = applicativeLaws(A.Applicative).interchange;
+      const u = [(x: number) => ({ x }), (x: number) => ({ x: x + 1 }), (x: number) => ({ x: x + 2 })];
+      fc.assert(
+        fc.property(fc.nat(), y => {
+          expect(law.left(u, y)).toEqual(law.right(u, y));
+        }),
+      );
+    });
+    it('should obey applicative composition law', () => {
+      const law = applicativeLaws(A.Applicative).composition;
+      const u = [
+        (x: { x: number }) => ({ x: x.x }),
+        (x: { x: number }) => ({ x: x.x + 1 }),
+        (x: { x: number }) => ({ x: x.x + 2 }),
+      ];
+      const v = [(x: number) => ({ x }), (x: number) => ({ x: x + 1 }), (x: number) => ({ x: x + 2 })];
+      fc.assert(
+        fc.property(fc.array(fc.nat()), w => {
+          expect(law.left(u, v, w)).toEqual(law.right(u, v, w));
         }),
       );
     });
