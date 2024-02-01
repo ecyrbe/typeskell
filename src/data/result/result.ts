@@ -25,13 +25,15 @@ export interface Ok<A> {
 }
 
 export type Result<A, E> = Ok<A> | Err<E>;
+export type OkOf<R> = Exclude<R, Err<unknown>> extends Ok<infer A> ? A : never;
+export type ErrOf<R> = Exclude<R, Ok<unknown>> extends Err<infer E> ? E : never;
 
 export const err = <E, A = never>(e: E): Result<A, E> => ({ _tag: 'Err', err: e });
 export const ok = <A, E = never>(a: A): Result<A, E> => ({ _tag: 'Ok', ok: a });
 
-export const isErr = <E>(result: Result<unknown, E>): result is Err<E> => result._tag === 'Err';
+export const isErr = <A, E>(result: Result<A, E>): result is Err<E> => result._tag === 'Err';
 
-export const isOk = <A>(result: Result<A, unknown>): result is Ok<A> => result._tag === 'Ok';
+export const isOk = <A, E>(result: Result<A, E>): result is Ok<A> => result._tag === 'Ok';
 
 export interface TResult extends Kind<[InvariantParam, CovariantParam]> {
   return: Result<this['arg0'], this['arg1']>;
@@ -58,10 +60,10 @@ export const Bifunctor: tbifunctor.BiFunctor<TResult> = {
   bimap: (f, g) => fa => (isOk(fa) ? ok(f(fa.ok)) : err(g(fa.err))),
 };
 
-export const BiFlatMap: tBiFlatMap.BiFlapMap<TResult> = {
+export const BiFlatMap: tBiFlatMap.BiFlatMap<TResult> = {
   ...Of,
   ...Bifunctor,
-  biFlapMap: (f, g) => fa => (isOk(fa) ? f(fa.ok) : g(fa.err)),
+  biFlatMap: (f, g) => fa => (isOk(fa) ? f(fa.ok) : g(fa.err)),
 };
 
 export const Functor: tfunctor.Functor<TResult> = {
@@ -419,7 +421,7 @@ export const flatten = tMonad.flatten(Monad);
  * pipe(err("error"), biFlapMap(x => ok(x + 1), x => err("error!"))) // err("error!")
  * ```
  */
-export const biFlapMap = BiFlatMap.biFlapMap;
+export const biFlatMap = BiFlatMap.biFlatMap;
 
 /**
  * traverse :: `Applicative f => (a -> f b) -> Result<a, e> -> f Result<b, e>`

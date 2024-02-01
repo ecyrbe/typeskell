@@ -1,5 +1,5 @@
 import type { Kind, $ } from '@kinds';
-import type { BiFlapMap } from './biflatmap';
+import type { BiFlatMap } from './biflatmap';
 
-export const orElse: (biflatmap: BiFlapMap<Kind.F2>) => BiFlapMap.$orElse<Kind.F2> = biflatmap => f =>
-  biflatmap.biFlapMap(biflatmap.of, f);
+export const orElse: (biflatmap: BiFlatMap<Kind.F2>) => BiFlatMap.$orElse<Kind.F2> = biflatmap => f =>
+  biflatmap.biFlatMap(biflatmap.of, f);

@@ -1,5 +1,5 @@
 import { describe, it, expect, expectTypeOf } from 'vitest';
-import { Result, biFlapMap, orElse, ok, err } from '@data/result';
+import { Result, biFlatMap, orElse, ok, err } from '@data/result';
 import { pipe } from '@utils/pipe';
 
 describe('BiFlatMap', () => {
