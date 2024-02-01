@@ -120,6 +120,8 @@ export const flatten = tMonad.flatten(Monad);
 
 export const biFlatMap = BiFlatMap.biFlatMap;
 
+export const orElse = tBiFlatMap.orElse(BiFlatMap);
+
 export const reduce = Foldable.reduce;
 
 export const or = SemiAlternative.or;
