@@ -3,8 +3,8 @@ import * as tFunctor from '@typeclass/functor';
 import * as tMonad from '@typeclass/monad';
 
 /**
- * Do notation for IO
- * it allows you to chain multiple IO computations together
+ * Do notation for IOResult
+ * it allows you to chain multiple IOResult computations together
  *
  * @example
  * ```ts
@@ -19,10 +19,10 @@ import * as tMonad from '@typeclass/monad';
 export const Do = Monad.of({});
 
 /**
- * bind an IO to a name
- * @param name name of the IO
- * @param f function that returns a IO
- * @returns IO with the name binded
+ * bind an IOResult to a name
+ * @param name name of the IOResult
+ * @param f function that returns a IOResult
+ * @returns IOResult with the name binded
  *
  * @example
  * ```ts

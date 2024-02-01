@@ -3,8 +3,8 @@ import * as tFunctor from '@typeclass/functor';
 import * as tMonad from '@typeclass/monad';
 
 /**
- * Do notation for Option
- * it allows you to chain multiple Option computations together
+ * Do notation for Generator
+ * it allows you to chain multiple Generator computations together
  * and not worry about the None case
  *
  * @example
@@ -20,10 +20,10 @@ import * as tMonad from '@typeclass/monad';
 export const Do = Monad.of({});
 
 /**
- * bind an option to a name
- * @param name name of the option
- * @param f function that returns an option
- * @returns Option with the name binded
+ * bind an Generator to a name
+ * @param name name of the Generator
+ * @param f function that returns an Generator
+ * @returns Generator with the name binded
  *
  * @example
  * ```ts
