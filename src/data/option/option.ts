@@ -1,4 +1,3 @@
-import { Kind, InvariantParam } from '@kinds';
 import * as tfunctor from '@typeclass/functor';
 import * as tOf from '@typeclass/of';
 import * as tTo from '@typeclass/to';
@@ -10,26 +9,7 @@ import * as tFilterable from '@typeclass/filterable';
 import * as tSemiAlternative from '@typeclass/semialternative';
 import * as tAlternative from '@typeclass/alternative';
 import { pipe } from '@utils/pipe';
-
-export interface None<A> {
-  readonly _tag: 'None';
-  readonly value?: A; // for type inference so we don't loose the type of A
-}
-
-export interface Some<A> {
-  readonly _tag: 'Some';
-  readonly value: A;
-}
-
-export type Option<A> = None<A> | Some<A>;
-export type OptionParamOf<O> = O extends Option<infer A> ? A : never;
-export type OptionOf<O> = O extends Some<infer A>
-  ? Option<A>
-  : O extends None<infer A>
-    ? Option<A>
-    : O extends Option<infer A>
-      ? Option<A>
-      : never;
+import { Option, None, Some, TOption } from './option.types';
 
 export const none = <A = never>(): Option<A> => ({ _tag: 'None' });
 export const some = <A>(a: A): Option<A> => ({ _tag: 'Some', value: a });
@@ -49,10 +29,6 @@ export const fromIterable = <A>(iterable: Iterable<A>): Option<A> => {
 export const toNullable = <A>(option: Option<A>): A | null => (isNone(option) ? null : option.value);
 
 export const toUndefined = <A>(option: Option<A>): A | undefined => (isNone(option) ? undefined : option.value);
-
-export interface TOption extends Kind<[InvariantParam]> {
-  return: Option<this['arg0']>;
-}
 
 export const Zero: tZero.Zero<TOption> = {
   zero: () => none(),
