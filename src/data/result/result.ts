@@ -208,9 +208,19 @@ export const get = OptionalTo.get;
 export const toOption = get;
 
 export const fromOption =
-  <A, E>(f: () => E) =>
+  <A, E>(onErr: () => E) =>
   (option: O.Option<A>): Result<A, E> =>
-    O.isNone(option) ? err(f()) : ok(option.value);
+    O.isNone(option) ? err(onErr()) : ok(option.value);
+
+export const fromNullable =
+  <A, E>(onErr: () => E) =>
+  (a: A | null | undefined): Result<A, E> =>
+    a == null ? err(onErr()) : ok(a);
+
+export const fromPredicate =
+  <A, E>(predicate: (a: A) => boolean, onErr: (a: A) => E) =>
+  (a: A): Result<A, E> =>
+    predicate(a) ? ok(a) : err(onErr(a));
 
 /**
  * orElse :: `(e1 -> Result<a, e2>) -> Result<a, e1> -> Result<a, e2>`

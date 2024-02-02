@@ -20,6 +20,11 @@ export const isSome = <A>(option: Option<A>): option is Some<A> => option._tag =
 
 export const fromNullable = <A>(a: A | null | undefined): Option<A> => (a == null ? none() : some(a));
 
+export const fromPredicate =
+  <A>(predicate: (a: A) => boolean) =>
+  (a: A): Option<A> =>
+    predicate(a) ? some(a) : none();
+
 export const fromIterable = <A>(iterable: Iterable<A>): Option<A> => {
   const iterator = iterable[Symbol.iterator]();
   const next = iterator.next();
