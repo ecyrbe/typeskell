@@ -326,3 +326,5 @@ export const filterMap = Filterable.filterMap;
 export const filter = tFilterable.filter(Filterable);
 
 export const compact = tFilterable.compact(Filterable);
+
+export const pluck = <A, K extends keyof A>(k: K) => map((a: A) => a[k]);

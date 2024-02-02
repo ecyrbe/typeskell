@@ -99,3 +99,5 @@ export const chain = flatMap;
 export const flatten = tMonad.flatten(Monad);
 
 export const or = SemiAlternative.or;
+
+export const pluck = <A, K extends keyof A>(k: K) => map((a: A) => a[k]);

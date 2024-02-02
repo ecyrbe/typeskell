@@ -66,3 +66,5 @@ export const extract = CoMonad.extract;
 export const extend = CoMonad.extend;
 
 export const duplicate = tCoMonad.duplicate(CoMonad);
+
+export const pluck = <A, K extends keyof A>(k: K) => map((a: A) => a[k]);

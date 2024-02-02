@@ -105,3 +105,5 @@ export const compact = tFilterable.compact(Filterable);
 export const reduce = Foldable.reduce;
 
 export const or = SemiAlternative.or;
+
+export const pluck = <A, K extends keyof A>(k: K) => map((a: A) => a[k]);

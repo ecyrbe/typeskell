@@ -133,3 +133,5 @@ export const traverse: <F extends Kind>(
 export const sequence: <F extends Kind>(
   F: tApplicative.Applicative<F>,
 ) => tTraversable.Traversable.$sequence<TIOResult, F> = tTraversable.sequence(Traversable) as any;
+
+export const pluck = <A, K extends keyof A>(k: K) => map((a: A) => a[k]);
