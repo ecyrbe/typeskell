@@ -2,12 +2,14 @@ import { Kind } from '@kinds';
 import * as O from '@data/option';
 import * as I from '@data/io';
 import * as tfunctor from '@typeclass/functor';
+import * as tZero from '@typeclass/zero';
 import * as tOf from '@typeclass/of';
 import * as tTo from '@typeclass/to';
 import * as tApplicative from '@typeclass/applicative';
 import * as tMonad from '@typeclass/monad';
 import * as tFoldable from '@typeclass/foldable';
 import * as tSemiAlternative from '@typeclass/semialternative';
+import * as tFilterable from '@typeclass/filterable';
 import { pipe } from '@utils/pipe';
 
 export interface IOOption<A> extends I.IO<O.Option<A>> {}
@@ -19,6 +21,10 @@ export interface TIOOption extends Kind.unary {
 export const none: <A = unknown>() => IOOption<A> = () => I.of(O.none());
 
 export const some: <A>(a: A) => IOOption<A> = a => I.of(O.some(a));
+
+export const Zero: tZero.Zero<TIOOption> = {
+  zero: none,
+};
 
 export const Of: tOf.Of<TIOOption> = {
   of: some,
@@ -49,6 +55,12 @@ export const Monad: tMonad.Monad<TIOOption> = {
 
 export const Foldable: tFoldable.Foldable<TIOOption> = {
   reduce: (f, b) => fa => pipe(fa(), O.reduce(f, b)),
+};
+
+export const Filterable: tFilterable.Filterable<TIOOption> = {
+  ...Functor,
+  ...Zero,
+  filterMap: f => fa => pipe(fa, I.map(O.filterMap(f))),
 };
 
 export const SemiAlternative: tSemiAlternative.SemiAlternative<TIOOption> = {
@@ -83,6 +95,12 @@ export const flatMap = Monad.flatMap;
 export const chain = flatMap;
 
 export const flatten = tMonad.flatten(Monad);
+
+export const filterMap = Filterable.filterMap;
+
+export const filter = tFilterable.filter(Filterable);
+
+export const compact = tFilterable.compact(Filterable);
 
 export const reduce = Foldable.reduce;
 

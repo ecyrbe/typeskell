@@ -89,3 +89,5 @@ export function* concatMany<T>(...faa: Generator<T>[]) {
     yield* fa;
   }
 }
+
+export const conpact = tFilterable.compact(Filterable);
