@@ -1,9 +1,9 @@
 import type { Expect, Equal } from 'type-testing';
 import type { Kind } from '@kinds';
-import { GenericFn } from '@utils/functions';
-import { TOption } from '@data/option';
-import { TypeSkell } from '@typeskell';
-import { ToParams, ToResult } from './to.types';
+import type { GenericFn } from '@utils/functions';
+import type { TOption } from '@data/option/option.types';
+import type { TypeSkell } from '@typeskell';
+import type { ToParams, ToResult } from './to.types';
 
 export namespace To {
   export type $getOrElse<F extends Kind> = GenericFn<F['arity'], ToParams, ToResult<F>>;

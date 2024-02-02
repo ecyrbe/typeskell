@@ -1,15 +1,16 @@
-import { Kind } from '@kinds';
-import { Functor } from '@typeclass/functor';
-import { TypeSkell } from '@typeskell';
-import { TOption } from '@data/option';
+import type { Kind } from '@kinds';
+import type { Functor } from '@typeclass/functor';
+import type { Zero } from '@typeclass/zero';
+import type { TypeSkell } from '@typeskell';
+import type { TOption } from '@data/option/option.types';
 import { $filter, $compact } from './filterable.impl';
-import { Zero } from '@typeclass/zero';
 
 export namespace Filterable {
   export type $filterMap<F extends Kind> = TypeSkell<
     '(a -> Option b) -> F a ..e -> F b ..e',
     { F: F; Option: TOption }
   >;
+
   export type $filter<F extends Kind> = TypeSkell<'(a -> boolean) -> F a ..e -> F a ..e', { F: F }>;
 
   export type $compact<F extends Kind> = TypeSkell<'F (Option a) ..e -> F a ..e', { F: F; Option: TOption }>;
