@@ -14,26 +14,35 @@ import * as tSemiAlternative from '@typeclass/semialternative';
 import * as O from '../option';
 import { pipe } from '@utils/pipe';
 
-export interface Err<E> {
+export interface Err<A, E> {
   readonly _tag: 'Err';
+  readonly ok?: A; // for type inference so we don't loose the type of A
   readonly err: E;
 }
 
-export interface Ok<A> {
+export interface Ok<A, E> {
   readonly _tag: 'Ok';
   readonly ok: A;
+  readonly err?: E; // for type inference so we don't loose the type of E
 }
 
-export type Result<A, E> = Ok<A> | Err<E>;
-export type OkOf<R> = Exclude<R, Err<unknown>> extends Ok<infer A> ? A : never;
-export type ErrOf<R> = Exclude<R, Ok<unknown>> extends Err<infer E> ? E : never;
+export type Result<A, E> = Ok<A, E> | Err<A, E>;
+export type OkOf<R> = R extends Ok<infer A, unknown> ? A : never;
+export type ErrOf<R> = R extends Err<unknown, infer E> ? E : never;
+export type ResultOf<R> = R extends Ok<infer A, infer E>
+  ? Result<A, E>
+  : R extends Err<infer A, infer E>
+    ? Result<A, E>
+    : R extends Result<infer A, infer E>
+      ? Result<A, E>
+      : never;
 
 export const err = <E, A = never>(e: E): Result<A, E> => ({ _tag: 'Err', err: e });
 export const ok = <A, E = never>(a: A): Result<A, E> => ({ _tag: 'Ok', ok: a });
 
-export const isErr = <A, E>(result: Result<A, E>): result is Err<E> => result._tag === 'Err';
+export const isErr = <A, E>(result: Result<A, E>): result is Err<A, E> => result._tag === 'Err';
 
-export const isOk = <A, E>(result: Result<A, E>): result is Ok<A> => result._tag === 'Ok';
+export const isOk = <A, E>(result: Result<A, E>): result is Ok<A, E> => result._tag === 'Ok';
 
 export interface TResult extends Kind<[InvariantParam, CovariantParam]> {
   return: Result<this['arg0'], this['arg1']>;
@@ -72,7 +81,7 @@ export const Functor: tfunctor.Functor<TResult> = {
 
 export const SemiAlternative: tSemiAlternative.SemiAlternative<TResult> = {
   ...Functor,
-  or: fb => fa => (isOk(fa) ? fa : fb),
+  or: fb => fa => (isOk(fa) ? ok(fa.ok) : fb),
 };
 
 export const Foldable: tFoldable.Foldable<TResult> = {
@@ -82,12 +91,12 @@ export const Foldable: tFoldable.Foldable<TResult> = {
 export const Applicative: tApplicative.Applicative<TResult> = {
   ...Of,
   ...Functor,
-  ap: fa => fab => (isOk(fab) ? pipe(fa, Functor.map(fab.ok)) : fab),
+  ap: fa => fab => (isOk(fab) ? pipe(fa, Functor.map(fab.ok)) : err(fab.err)),
 };
 
 export const Monad: tMonad.Monad<TResult> = {
   ...Applicative,
-  flatMap: f => fa => (isOk(fa) ? f(fa.ok) : fa),
+  flatMap: f => fa => (isOk(fa) ? f(fa.ok) : err(fa.err)),
 };
 
 const traverseImpl: (

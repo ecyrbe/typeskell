@@ -2,7 +2,7 @@ import { Kind } from '@kinds';
 import { Functor } from '@typeclass/functor';
 import { TypeSkell } from '@typeskell';
 import { TOption } from '@data/option';
-import { filter as filterImpl } from './filterable.impl';
+import { $filter, $compact } from './filterable.impl';
 import { Zero } from '@typeclass/zero';
 
 export namespace Filterable {
@@ -11,6 +11,8 @@ export namespace Filterable {
     { F: F; Option: TOption }
   >;
   export type $filter<F extends Kind> = TypeSkell<'(a -> boolean) -> F a ..e -> F a ..e', { F: F }>;
+
+  export type $compact<F extends Kind> = TypeSkell<'F (Option a) ..e -> F a ..e', { F: F; Option: TOption }>;
 }
 
 /**
@@ -26,4 +28,6 @@ export interface Filterable<F extends Kind> extends Functor<F>, Zero<F> {
   filterMap: Filterable.$filterMap<F>;
 }
 
-export const filter: <F extends Kind>(filterable: Filterable<F>) => Filterable.$filter<F> = filterImpl as any;
+export const filter: <F extends Kind>(filterable: Filterable<F>) => Filterable.$filter<F> = $filter as any;
+
+export const compact: <F extends Kind>(filterable: Filterable<F>) => Filterable.$compact<F> = $compact as any;

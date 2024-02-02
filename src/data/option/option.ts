@@ -11,8 +11,9 @@ import * as tSemiAlternative from '@typeclass/semialternative';
 import * as tAlternative from '@typeclass/alternative';
 import { pipe } from '@utils/pipe';
 
-export interface None {
+export interface None<A> {
   readonly _tag: 'None';
+  readonly value?: A; // for type inference so we don't loose the type of A
 }
 
 export interface Some<A> {
@@ -20,13 +21,20 @@ export interface Some<A> {
   readonly value: A;
 }
 
-export type Option<A> = None | Some<A>;
-export type OptionOf<O> = Exclude<O, None> extends Some<infer A> ? A : never;
+export type Option<A> = None<A> | Some<A>;
+export type OptionParamOf<O> = O extends Option<infer A> ? A : never;
+export type OptionOf<O> = O extends Some<infer A>
+  ? Option<A>
+  : O extends None<infer A>
+    ? Option<A>
+    : O extends Option<infer A>
+      ? Option<A>
+      : never;
 
 export const none = <A = never>(): Option<A> => ({ _tag: 'None' });
 export const some = <A>(a: A): Option<A> => ({ _tag: 'Some', value: a });
 
-export const isNone = <A>(option: Option<A>): option is None => option._tag === 'None';
+export const isNone = <A>(option: Option<A>): option is None<A> => option._tag === 'None';
 
 export const isSome = <A>(option: Option<A>): option is Some<A> => option._tag === 'Some';
 
@@ -340,3 +348,5 @@ export const filterMap = Filterable.filterMap;
  * ```
  */
 export const filter = tFilterable.filter(Filterable);
+
+export const compact = tFilterable.compact(Filterable);

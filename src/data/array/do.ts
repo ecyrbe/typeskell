@@ -1,4 +1,4 @@
-import { Monad, Functor } from './array';
+import { Monad, Functor } from './array.typeclass';
 import * as tFunctor from '@typeclass/functor';
 import * as tMonad from '@typeclass/monad';
 

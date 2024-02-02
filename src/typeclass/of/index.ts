@@ -1,1 +1,1 @@
-export * from './of';
+export type * from './of';
