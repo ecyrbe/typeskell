@@ -13,7 +13,7 @@ import type * as tAlternative from '@typeclass/alternative';
 import * as tApplicative from '@typeclass/applicative';
 import * as O from '@data/option';
 import { pipe } from '@utils/pipe';
-import type { TArray } from './array';
+import type { TArray } from './array.types';
 
 export const Zero: tZero.Zero<TArray> = {
   zero: () => [],

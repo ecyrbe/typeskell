@@ -1,4 +1,4 @@
-export type * from './array';
+export type * from './array.types';
 export * from './array.typeclass';
-export * from './array.impl';
+export * from './array';
 export * from './do';
