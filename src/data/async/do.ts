@@ -1,4 +1,4 @@
-import { Functor, Monad } from './promise';
+import { Functor, Monad } from './async';
 import * as tFunctor from '@typeclass/functor';
 import * as tMonad from '@typeclass/monad';
 

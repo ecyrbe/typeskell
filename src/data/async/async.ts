@@ -5,18 +5,18 @@ import * as tApplicative from '@typeclass/applicative';
 import * as tMonad from '@typeclass/monad';
 import * as tSemiAlternative from '@typeclass/semialternative';
 import * as tAlternative from '@typeclass/alternative';
-import { TPromise } from './promise.types';
+import { TAsync } from './async.types';
 import { pipe } from '@utils/pipe';
 
-export const Of: tOf.Of<TPromise> = {
+export const Of: tOf.Of<TAsync> = {
   of: Promise.resolve,
 };
 
-export const Zero: tZero.Zero<TPromise> = {
+export const Zero: tZero.Zero<TAsync> = {
   zero: () => Promise.reject('Zero Promise'),
 };
 
-export const Functor: tfunctor.Functor<TPromise> = {
+export const Functor: tfunctor.Functor<TAsync> = {
   /**
    * Promise then is not compatible with functor laws, so we need to wrap the result in a Promise so we workaround thenable objects
    * @param f
@@ -25,23 +25,23 @@ export const Functor: tfunctor.Functor<TPromise> = {
   map: f => fa => fa.then(a => of(f(a))),
 };
 
-export const Applicative: tApplicative.Applicative<TPromise> = {
+export const Applicative: tApplicative.Applicative<TAsync> = {
   ...Of,
   ...Functor,
   ap: fa => flatMap(f => pipe(fa, map(f))),
 };
 
-export const Monad: tMonad.Monad<TPromise> = {
+export const Monad: tMonad.Monad<TAsync> = {
   ...Applicative,
   flatMap: Functor.map,
 };
 
-export const SemiAlternative: tSemiAlternative.SemiAlternative<TPromise> = {
+export const SemiAlternative: tSemiAlternative.SemiAlternative<TAsync> = {
   ...Functor,
   orElse: fb => fa => fa.catch(() => fb()),
 };
 
-export const Alternative: tAlternative.Alternative<TPromise> = {
+export const Alternative: tAlternative.Alternative<TAsync> = {
   ...Zero,
   ...Applicative,
   ...SemiAlternative,
