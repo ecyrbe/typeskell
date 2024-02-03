@@ -50,7 +50,7 @@ export const Applicative: tApplicative.Applicative<TIO> = {
 
 export const Monad: tMonad.Monad<TIO> = {
   ...Applicative,
-  flatMap: f => fa => () => f(fa())(),
+  flatMap: f => io => () => f(io())(),
 };
 
 export const SemiAlternative: tSemiAlternative.SemiAlternative<TIO> = {

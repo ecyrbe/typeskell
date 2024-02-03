@@ -31,7 +31,7 @@ export const Of: tOf.Of<TIOResult> = {
 };
 
 export const BiFunctor: tbifunctor.BiFunctor<TIOResult> = {
-  bimap: (f, g) => io => pipe(io, I.map(R.bimap(f, g))),
+  bimap: (f, g) => I.map(R.bimap(f, g)),
 };
 
 export const Functor: tfunctor.Functor<TIOResult> = {
@@ -43,7 +43,7 @@ export const To: tTo.To<TIOResult> = {
 };
 
 export const Flip: tFlip.Flip<TIOResult> = {
-  flip: io => pipe(io, I.map(R.flip)),
+  flip: I.map(R.flip),
 };
 
 export const Applicative: tApplicative.Applicative<TIOResult> = {
@@ -54,20 +54,17 @@ export const Applicative: tApplicative.Applicative<TIOResult> = {
 
 export const Monad: tMonad.Monad<TIOResult> = {
   ...Applicative,
-  flatMap: f => fa => pipe(fa, I.map(R.flatMap(a => runIO(f(a))))),
+  flatMap: f => I.map(R.flatMap(a => runIO(f(a)))),
 };
 
 export const BiFlatMap: tBiFlatMap.BiFlatMap<TIOResult> = {
   ...Of,
   ...BiFunctor,
-  biFlatMap: (f, g) => fa =>
-    pipe(
-      fa,
-      I.map(
-        R.biFlatMap(
-          a => runIO(f(a)),
-          e => runIO(g(e)),
-        ),
+  biFlatMap: (f, g) =>
+    I.map(
+      R.biFlatMap(
+        a => runIO(f(a)),
+        e => runIO(g(e)),
       ),
     ),
 };
