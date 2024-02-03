@@ -71,4 +71,12 @@ export const productMany = tApplicative.productMany(Applicative);
 
 export const flatMap = Monad.flatMap;
 
+export const andThen = flatMap;
+
+export const chain = flatMap;
+
 export const flatten = tMonad.flatten(Monad);
+
+export const orElse = SemiAlternative.orElse;
+
+export const or = tSemiAlternative.or(SemiAlternative);

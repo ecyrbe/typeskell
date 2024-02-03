@@ -281,6 +281,16 @@ export const ap = Applicative.ap;
 export const flatMap = Monad.flatMap;
 
 /**
+ * alias for {@link flatMap}
+ */
+export const andThen = flatMap;
+
+/**
+ * alias for {@link flatMap}
+ */
+export const chain = flatMap;
+
+/**
  * flatten :: `Option<Option<a>> -> Option<a>`
  *
  * flatten :: `<A>(ffa: Option<Option<A>>) => Option<A>`

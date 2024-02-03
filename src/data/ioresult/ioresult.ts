@@ -120,6 +120,8 @@ export const productMany = tApplicative.productMany(Applicative);
 
 export const flatMap = Monad.flatMap;
 
+export const andThen = flatMap;
+
 export const chain = flatMap;
 
 export const flatten = tMonad.flatten(Monad);
