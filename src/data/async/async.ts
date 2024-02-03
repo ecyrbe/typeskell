@@ -5,7 +5,7 @@ import * as tApplicative from '@typeclass/applicative';
 import * as tMonad from '@typeclass/monad';
 import * as tSemiAlternative from '@typeclass/semialternative';
 import * as tAlternative from '@typeclass/alternative';
-import { TAsync } from './async.types';
+import { TAsync, Async } from './async.types';
 import { pipe } from '@utils/pipe';
 
 export const Of: tOf.Of<TAsync> = {
@@ -16,13 +16,13 @@ export const Zero: tZero.Zero<TAsync> = {
   zero: () => Promise.reject('Zero Promise'),
 };
 
+const $catch =
+  <A>(f: (e: unknown) => Async<A>) =>
+  (fa: Async<A>) =>
+    fa.catch(f);
+
 export const Functor: tfunctor.Functor<TAsync> = {
-  /**
-   * Promise then is not compatible with functor laws, so we need to wrap the result in a Promise so we workaround thenable objects
-   * @param f
-   * @returns
-   */
-  map: f => fa => fa.then(a => of(f(a))),
+  map: f => async fa => f(await fa),
 };
 
 export const Applicative: tApplicative.Applicative<TAsync> = {
@@ -78,5 +78,7 @@ export const chain = flatMap;
 export const flatten = tMonad.flatten(Monad);
 
 export const orElse = SemiAlternative.orElse;
+
+export { $catch as catch };
 
 export const or = tSemiAlternative.or(SemiAlternative);
