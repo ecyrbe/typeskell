@@ -53,7 +53,7 @@ export const Functor: tfunctor.Functor<TOption> = {
 
 export const SemiAlternative: tSemiAlternative.SemiAlternative<TOption> = {
   ...Functor,
-  or: fb => fa => (isSome(fa) ? fa : fb),
+  orElse: fb => fa => (isSome(fa) ? fa : fb()),
 };
 
 export const Foldable: tFoldable.Foldable<TOption> = {
@@ -147,6 +147,24 @@ export const getOrElse = To.getOrElse;
 export const getOr = tTo.getOr(To);
 
 /**
+ * orElse :: `(() -> Option<a>) -> Option<a> -> Option<a>`
+ *
+ * orElse :: `<A>(fb: () => Option<A>) => (fa: Option<A>) => Option<A>`
+ *
+ * @param fb `() -> Option<a>`
+ * @returns `Option<a> -> Option<a>`
+ *
+ * @example
+ * ```ts
+ * pipe(some(1), orElse(() => some(2))) // some(1)
+ * pipe(some(1), orElse(() => none)) // some(1)
+ * pipe(none, orElse(() => some(2))) // some(2)
+ * pipe(none, orElse(() => none)) // none
+ * ```
+ */
+export const orElse = SemiAlternative.orElse;
+
+/**
  * or :: `Option<a> -> Option<a> -> Option<a>`
  *
  * or :: `<A>(fb: Option<A>) => (fa: Option<A>) => Option<A>`
@@ -162,7 +180,7 @@ export const getOr = tTo.getOr(To);
  * pipe(none, or(none)) // none
  * ```
  */
-export const or = SemiAlternative.or;
+export const or = tSemiAlternative.or(SemiAlternative);
 
 /**
  * map :: `(a -> b) -> Option<a> -> Option<b>`

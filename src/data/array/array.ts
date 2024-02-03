@@ -19,6 +19,7 @@ import * as tfunctor from '@typeclass/functor';
 import * as tTo from '@typeclass/to';
 import * as tApplicative from '@typeclass/applicative';
 import * as tSemiAlign from '@typeclass/semialign';
+import * as tSemiAlternative from '@typeclass/semialternative';
 import * as tMonad from '@typeclass/monad';
 import * as tFilterable from '@typeclass/filterable';
 import * as tTraversable from '@typeclass/traversable';
@@ -381,7 +382,10 @@ export const range = (start: number, end: number, step = 1) => {
   return result;
 };
 
-export const or = SemiAlternative.or;
+export const orElse = SemiAlternative.orElse;
+
+export const or = tSemiAlternative.or(SemiAlternative);
+
 export const concat = or;
 
 export const concatMany = <A>(...faa: A[][]) => {

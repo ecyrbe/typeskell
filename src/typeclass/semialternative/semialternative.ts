@@ -1,9 +1,11 @@
 import { Kind } from '@kinds';
 import { TypeSkell } from '@typeskell';
 import { Functor } from '@typeclass/functor';
+import { $or } from './semialternative.impl';
 
 export namespace SemiAlternative {
-  export type $or<F extends Kind> = TypeSkell<'F a ..y -> F a ..x -> F a ..y', { F: F }>;
+  export type $orElse<F extends Kind> = TypeSkell<'(-> F a ..y) -> F a ..x -> F a ..y', { F: F }>;
+  export type $or<F extends Kind> = TypeSkell<'F a ..x -> F a ..y -> F a ..xy', { F: F }>;
 }
 
 /**
@@ -16,5 +18,7 @@ export namespace SemiAlternative {
  *
  */
 export interface SemiAlternative<F extends Kind> extends Functor<F> {
-  or: SemiAlternative.$or<F>;
+  orElse: SemiAlternative.$orElse<F>;
 }
+
+export const or: <F extends Kind>(semiAlternative: SemiAlternative<F>) => SemiAlternative.$or<F> = $or as any;

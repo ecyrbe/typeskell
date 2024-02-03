@@ -22,6 +22,8 @@ export const none: <A = unknown>() => IOOption<A> = () => I.of(O.none());
 
 export const some: <A>(a: A) => IOOption<A> = a => I.of(O.some(a));
 
+export const runIO = <A>(io: IOOption<A>): O.Option<A> => io();
+
 export const Zero: tZero.Zero<TIOOption> = {
   zero: none,
 };
@@ -31,7 +33,7 @@ export const Of: tOf.Of<TIOOption> = {
 };
 
 export const Functor: tfunctor.Functor<TIOOption> = {
-  map: f => io => pipe(io, I.map(O.map(f))),
+  map: tfunctor.mapCompose(I.Functor, O.Functor),
 };
 
 export const To: tTo.To<TIOOption> = {
@@ -41,31 +43,27 @@ export const To: tTo.To<TIOOption> = {
 export const Applicative: tApplicative.Applicative<TIOOption> = {
   ...Of,
   ...Functor,
-  ap: fa => fab => pipe(fab, I.map(O.ap(fa()))),
+  ap: tApplicative.apCompose(I.Applicative, O.Applicative),
 };
 
 export const Monad: tMonad.Monad<TIOOption> = {
   ...Applicative,
-  flatMap: f => fa => {
-    const result = pipe(fa(), O.map(f));
-    if (O.isNone(result)) return none();
-    return result.value;
-  },
+  flatMap: f => io => pipe(io, I.map(O.flatMap(a => runIO(f(a))))),
 };
 
 export const Foldable: tFoldable.Foldable<TIOOption> = {
-  reduce: (f, b) => fa => pipe(fa(), O.reduce(f, b)),
+  reduce: (f, b) => io => pipe(io(), O.reduce(f, b)),
 };
 
 export const Filterable: tFilterable.Filterable<TIOOption> = {
   ...Functor,
   ...Zero,
-  filterMap: f => fa => pipe(fa, I.map(O.filterMap(f))),
+  filterMap: f => io => pipe(io, I.map(O.filterMap(f))),
 };
 
 export const SemiAlternative: tSemiAlternative.SemiAlternative<TIOOption> = {
   ...Functor,
-  or: fb => fa => pipe(fa, I.map(O.or(fb()))),
+  orElse: alt => io => () => pipe(io, I.map(O.orElse(alt())))(),
 };
 
 export const of = Of.of;
@@ -104,6 +102,8 @@ export const compact = tFilterable.compact(Filterable);
 
 export const reduce = Foldable.reduce;
 
-export const or = SemiAlternative.or;
+export const orElse = SemiAlternative.orElse;
+
+export const or = tSemiAlternative.or(SemiAlternative);
 
 export const pluck = <A, K extends keyof A>(k: K) => map((a: A) => a[k]);

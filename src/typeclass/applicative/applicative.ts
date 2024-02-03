@@ -4,11 +4,20 @@ import type { Of } from '@typeclass/of';
 import type { TypeSkell } from '@typeskell';
 import type { TPair } from '@data/pair';
 import type { TArray } from '@data/array';
-import { liftA2 as liftA2Impl, product as productImpl, productMany as productManyImpl } from './applicative.impl';
+import {
+  liftA2 as liftA2Impl,
+  product as productImpl,
+  productMany as productManyImpl,
+  apCompose as apComposeImpl,
+} from './applicative.impl';
 import { Expect, Equal } from 'type-testing';
 
 export namespace Applicative {
   export type $ap<F extends Kind> = TypeSkell<'F a ..x -> F (a -> b) ..y -> F b ..xy', { F: F }>;
+  export type $apCompose<F extends Kind, G extends Kind> = TypeSkell<
+    'F (G a ..x) ..y -> F (G (a -> b) ..u) ..v -> F (G b ..xu) ..yv',
+    { F: F; G: G }
+  >;
   export type $liftA2<F extends Kind> = TypeSkell<'(a b -> c) -> F a ..x -> F b ..y -> F c ..xy', { F: F }>;
   export type $product<F extends Kind> = TypeSkell<'F a ..x -> F b ..y -> F (Pair a b) ..xy', { F: F; Pair: TPair }>;
   export type $productMany<F extends Kind> = TypeSkell<
@@ -35,6 +44,11 @@ export interface Applicative<F extends Kind> extends Functor<F>, Of<F> {
    */
   ap: Applicative.$ap<F>;
 }
+
+export const apCompose: <F extends Kind, G extends Kind>(
+  applicative: Applicative<F>,
+  applicativeG: Applicative<G>,
+) => Applicative.$apCompose<F, G> = apComposeImpl as any;
 
 /**
  * liftA2 :: `Applicative F -> (a b -> c) -> F a -> F b -> F c`

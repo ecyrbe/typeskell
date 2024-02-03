@@ -13,7 +13,6 @@ import * as tFoldable from '@typeclass/foldable';
 import * as tTraversable from '@typeclass/traversable';
 import * as tSemiAlternative from '@typeclass/semialternative';
 import { pipe } from '@utils/pipe';
-import { identity } from '@utils/functions';
 
 export interface IOResult<A, E> extends I.IO<R.Result<A, E>> {}
 
@@ -25,6 +24,8 @@ export const err: <E, A = unknown>(e: E) => IOResult<A, E> = e => I.of(R.err(e))
 
 export const ok: <A, E = unknown>(a: A) => IOResult<A, E> = a => I.of(R.ok(a));
 
+export const runIO = <A, E>(io: IOResult<A, E>): R.Result<A, E> => io();
+
 export const Of: tOf.Of<TIOResult> = {
   of: ok,
 };
@@ -34,11 +35,11 @@ export const BiFunctor: tbifunctor.BiFunctor<TIOResult> = {
 };
 
 export const Functor: tfunctor.Functor<TIOResult> = {
-  map: f => io => pipe(io, I.map(R.map(f))),
+  map: tfunctor.mapCompose(I.Functor, R.Functor),
 };
 
 export const To: tTo.To<TIOResult> = {
-  getOrElse: f => io => pipe(io(), R.getOrElse(f)),
+  getOrElse: f => io => pipe(runIO(io), R.getOrElse(f)),
 };
 
 export const Flip: tFlip.Flip<TIOResult> = {
@@ -48,31 +49,36 @@ export const Flip: tFlip.Flip<TIOResult> = {
 export const Applicative: tApplicative.Applicative<TIOResult> = {
   ...Of,
   ...Functor,
-  ap: fa => fab => pipe(fab, I.map(R.ap(fa()))),
+  ap: tApplicative.apCompose(I.Applicative, R.Applicative),
 };
 
 export const Monad: tMonad.Monad<TIOResult> = {
   ...Applicative,
-  flatMap: f => fa => {
-    const result = pipe(fa(), R.map(f));
-    if (R.isErr(result)) return err(result.err);
-    return result.ok;
-  },
+  flatMap: f => fa => pipe(fa, I.map(R.flatMap(a => runIO(f(a))))),
 };
 
 export const BiFlatMap: tBiFlatMap.BiFlatMap<TIOResult> = {
   ...Of,
   ...BiFunctor,
-  biFlatMap: (f, g) => fa => pipe(fa(), R.bimap(f, g), R.getOrElse(identity)),
+  biFlatMap: (f, g) => fa =>
+    pipe(
+      fa,
+      I.map(
+        R.biFlatMap(
+          a => runIO(f(a)),
+          e => runIO(g(e)),
+        ),
+      ),
+    ),
 };
 
 export const Foldable: tFoldable.Foldable<TIOResult> = {
-  reduce: (f, b) => fa => pipe(fa(), R.reduce(f, b)),
+  reduce: (f, b) => io => pipe(runIO(io), R.reduce(f, b)),
 };
 
 export const SemiAlternative: tSemiAlternative.SemiAlternative<TIOResult> = {
   ...Functor,
-  or: fb => fa => pipe(fa, I.map(R.or(fb()))),
+  orElse: fb => fa => () => pipe(fa, I.map(R.orElse(fb())))(),
 };
 
 const $traverse: (
@@ -124,7 +130,9 @@ export const orElse = tBiFlatMap.orElse(BiFlatMap);
 
 export const reduce = Foldable.reduce;
 
-export const or = SemiAlternative.or;
+export const orElseAlt = SemiAlternative.orElse;
+
+export const or = tSemiAlternative.or(SemiAlternative);
 
 export const traverse: <F extends Kind>(
   F: tApplicative.Applicative<F>,

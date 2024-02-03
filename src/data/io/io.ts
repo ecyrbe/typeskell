@@ -12,6 +12,8 @@ export interface IO<A> {
   (): A;
 }
 
+const runIO = <A>(io: IO<A>): A => io();
+
 export interface TIO extends Kind.unary {
   return: IO<this['arg0']>;
 }
@@ -37,7 +39,7 @@ export const To: tTo.To<TIO> = {
 };
 
 export const Functor: tfunctor.Functor<TIO> = {
-  map: f => io => of(f(io())),
+  map: f => io => () => f(io()),
 };
 
 export const Applicative: tApplicative.Applicative<TIO> = {
@@ -48,16 +50,16 @@ export const Applicative: tApplicative.Applicative<TIO> = {
 
 export const Monad: tMonad.Monad<TIO> = {
   ...Applicative,
-  flatMap: f => fa => f(fa()),
+  flatMap: f => fa => () => f(fa())(),
 };
 
 export const SemiAlternative: tSemiAlternative.SemiAlternative<TIO> = {
   ...Functor,
-  or: fb => fa => () => {
+  orElse: fb => fa => () => {
     try {
       return fa();
     } catch {
-      return fb();
+      return runIO(fb());
     }
   },
 };
@@ -98,6 +100,8 @@ export const chain = flatMap;
 
 export const flatten = tMonad.flatten(Monad);
 
-export const or = SemiAlternative.or;
+export const orElse = SemiAlternative.orElse;
+
+export const or = tSemiAlternative.or(SemiAlternative);
 
 export const pluck = <A, K extends keyof A>(k: K) => map((a: A) => a[k]);

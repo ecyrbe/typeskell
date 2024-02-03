@@ -27,8 +27,8 @@ export interface Ok<A, E> {
 }
 
 export type Result<A, E> = Ok<A, E> | Err<A, E>;
-export type OkOf<R> = R extends Ok<infer A, unknown> ? A : never;
-export type ErrOf<R> = R extends Err<unknown, infer E> ? E : never;
+export type OkOf<R> = R extends Result<infer A, unknown> ? A : never;
+export type ErrOf<R> = R extends Result<unknown, infer E> ? E : never;
 export type ResultOf<R> = R extends Ok<infer A, infer E>
   ? Result<A, E>
   : R extends Err<infer A, infer E>
@@ -81,7 +81,7 @@ export const Functor: tfunctor.Functor<TResult> = {
 
 export const SemiAlternative: tSemiAlternative.SemiAlternative<TResult> = {
   ...Functor,
-  or: fb => fa => (isOk(fa) ? ok(fa.ok) : fb),
+  orElse: fb => fa => (isOk(fa) ? ok(fa.ok) : fb()),
 };
 
 export const Foldable: tFoldable.Foldable<TResult> = {
@@ -240,6 +240,25 @@ export const fromPredicate =
 export const orElse = tBiFlatMap.orElse(BiFlatMap);
 
 /**
+ * Alternative version of orElse
+ *
+ * orElseAlt :: `(() -> Result<a, e1>) -> Result<a, e2> -> Result<a, e1>`
+ *
+ * orElseAlt :: `<A, E1>(fb: () => Result<A, E1>) => <E2>(fa: Result<A, E2>) => Result<A, E1>`
+ *
+ * @param fb `() -> Result<a, e1>`
+ * @returns `Result<a, e2> -> Result<a, e1>`
+ *
+ * @example
+ * ```ts
+ * pipe(ok(0), orElseAlt(() => ok(1))) // ok(0)
+ * pipe(err("error"), orElseAlt(() => ok(1))) // ok(1)
+ * pipe(err("error"), orElseAlt(() => err("error!"))) // err("error!")
+ * ```
+ */
+export const orElseAlt = SemiAlternative.orElse;
+
+/**
  *  or :: `Result<a, e1> -> Result<a, e2> -> Result<a, e1>`
  *
  * or :: `<A, E1>(fb: Result<A, E1>) => <E2>(fa: Result<A, E2>) => Result<A, E1>`
@@ -254,7 +273,7 @@ export const orElse = tBiFlatMap.orElse(BiFlatMap);
  * pipe(err("error"), or(err("error!"))) // err("error!")
  * ```
  */
-export const or = SemiAlternative.or;
+export const or = tSemiAlternative.or(SemiAlternative);
 
 /**
  * map :: `(a -> b) -> Result<a, e> -> Result<b, e>`

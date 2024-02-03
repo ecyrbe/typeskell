@@ -102,7 +102,7 @@ export const Traversable: tTraversable.Traversable<TArray> = {
 
 export const SemiAlternative: tSemiAlternative.SemiAlternative<TArray> = {
   ...Functor,
-  or: fb => fa => fa.concat(fb),
+  orElse: fb => fa => fa.concat(fb()),
 };
 
 export const Alternative: tAlternative.Alternative<TArray> = {
