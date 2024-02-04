@@ -79,6 +79,50 @@ export const flatten = tMonad.flatten(Monad);
 
 export const orElse = SemiAlternative.orElse;
 
+export const or = tSemiAlternative.or(SemiAlternative);
+
 export { $catch as catch };
 
-export const or = tSemiAlternative.or(SemiAlternative);
+export const awaitAll: <A>(fa: Async<A>[]) => Async<Awaited<A>[]> = Promise.all;
+
+export const awaitAllSettled: <A>(fa: Async<A>[]) => Async<PromiseSettledResult<Awaited<A>>[]> = Promise.allSettled;
+
+export const awaitRace: <A>(fa: Async<A>[]) => Async<Awaited<A>> = Promise.race;
+
+export const awaitAny: <A>(fa: Async<A>[]) => Async<Awaited<A>> = Promise.any;
+
+export const delay =
+  <A>(ms: number) =>
+  (fa: Async<A>) =>
+    new Promise<A>(resolve => setTimeout(() => fa.then(resolve), ms)) as Async<A>;
+
+export const timeout =
+  <A>(ms: number) =>
+  (fa: Async<A>) =>
+    new Promise<A>((resolve, reject) => {
+      const id = setTimeout(() => {
+        clearTimeout(id);
+        reject(new Error('Timeout'));
+      }, ms);
+      fa.then(a => {
+        clearTimeout(id);
+        resolve(a);
+      });
+    }) as Async<A>;
+
+export const makeBarrier = (n: number) => {
+  const results: unknown[] = [];
+  let deferredResolve: (results: unknown[]) => void;
+  let deferred = new Promise<unknown[]>(resolve => {
+    deferredResolve = resolve;
+  });
+
+  return <A>(a: A): Async<A[]> => {
+    results.push(a);
+    if (results.length >= n) {
+      deferredResolve(results);
+      return deferred as Async<A[]>;
+    }
+    return deferred as Async<A[]>;
+  };
+};
