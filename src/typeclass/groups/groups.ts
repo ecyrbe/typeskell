@@ -18,6 +18,9 @@ export interface Magma<A> {
  * - Associativity: `(a.b).c = a.(b.c)`
  */
 export interface SemiGroup<A> extends Magma<A> {}
+
+export interface FreeSemiGroup<A, Identity = undefined> extends SemiGroup<A | Identity> {}
+
 export namespace SemiGroup {
   export const checkLaws =
     <A>(G: SemiGroup<A>) =>
@@ -57,6 +60,10 @@ export namespace CommutativeSemiGroup {
  */
 export interface Monoid<A> extends SemiGroup<A> {
   identity: A;
+}
+
+export interface FreeMonoid<A, Identity = undefined> extends FreeSemiGroup<A, Identity> {
+  identity: Identity;
 }
 export namespace Monoid {
   export const checkLaws =
