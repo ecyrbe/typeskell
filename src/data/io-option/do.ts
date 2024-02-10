@@ -1,4 +1,4 @@
-import { Functor, Monad } from './iooption';
+import { Functor, Monad } from './io-option';
 import * as tFunctor from '@typeclass/functor';
 import * as tMonad from '@typeclass/monad';
 
