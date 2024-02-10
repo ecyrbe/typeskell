@@ -95,8 +95,6 @@ export const getOrElse = To.getOrElse;
 
 export const getOr = tTo.getOr(To);
 
-export const bimap = BiFunctor.bimap;
-
 export const map = Functor.map;
 
 export const mapCompose = tfunctor.mapCompose(Functor, Functor);
@@ -104,6 +102,14 @@ export const mapCompose = tfunctor.mapCompose(Functor, Functor);
 export const flap = tfunctor.flap(Functor);
 
 export const as = tfunctor.as(Functor);
+
+export const bimap = BiFunctor.bimap;
+
+export const mapLeft = tbifunctor.mapLeft(BiFunctor);
+
+export const mapRight = tbifunctor.mapRight(BiFunctor);
+
+export const mapErr = mapRight;
 
 export const flip = Flip.flip;
 
@@ -129,7 +135,7 @@ export const orElse = tBiFlatMap.orElse(BiFlatMap);
 
 export const reduce = Foldable.reduce;
 
-export const orElseAlt = SemiAlternative.orElse;
+export const alt = SemiAlternative.orElse;
 
 export const or = tSemiAlternative.or(SemiAlternative);
 
