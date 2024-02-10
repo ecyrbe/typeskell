@@ -7,16 +7,9 @@ import * as tApplicative from '@typeclass/applicative';
 import * as tMonad from '@typeclass/monad';
 import * as tSemiAlternative from '@typeclass/semialternative';
 import * as tAlternative from '@typeclass/alternative';
-
-export interface IO<A> {
-  (): A;
-}
+import type { TIO, IO } from './io.types';
 
 const runIO = <A>(io: IO<A>): A => io();
-
-export interface TIO extends Kind.unary {
-  return: IO<this['arg0']>;
-}
 
 export const Zero: tZero.Zero<TIO> = {
   zero: () => () => {
