@@ -24,7 +24,8 @@ import * as tMonad from '@typeclass/monad';
 import * as tFilterable from '@typeclass/filterable';
 import * as tTraversable from '@typeclass/traversable';
 import * as tGroups from '@typeclass/groups';
-import { GroupProduct, GroupSum, MonoidMax, MonoidMin } from '@data/number';
+import * as N from '@data/number';
+import * as S from '@data/string';
 import { pipe } from '@utils/pipe';
 
 /**
@@ -513,13 +514,13 @@ export const length = count;
 
 export const fold = <A>(monoid: tGroups.Monoid<A>) => reduce(monoid.concat, monoid.identity);
 
-export const sum = fold(GroupSum);
+export const sum = fold(N.GroupSum);
 
-export const product = fold(GroupProduct);
+export const product = fold(N.GroupProduct);
 
-export const max = fold(MonoidMax);
+export const max = fold(N.MonoidMax);
 
-export const min = fold(MonoidMin);
+export const min = fold(N.MonoidMin);
 
 export const alternateFold = <A>(group: tGroups.Group<A>) => {
   let sum = group.identity;
@@ -532,6 +533,16 @@ export const alternateFold = <A>(group: tGroups.Group<A>) => {
   };
 };
 
-export const alternateSum = alternateFold(GroupSum);
+export const alternateSum = alternateFold(N.GroupSum);
 
-export const alternateProduct = alternateFold(GroupProduct);
+export const alternateProduct = alternateFold(N.GroupProduct);
+
+export const join = (separator: string) => (fa: string[]) => fa.join(separator);
+
+export const joinAll = fold(S.MonoidConcat);
+
+export const biggest = fold(S.MonoidMax);
+
+export const smallestNonEmpty = fold(S.MonoidMinNonEmpty);
+
+export const split = (separator: string) => (fa: string) => fa.split(separator);
