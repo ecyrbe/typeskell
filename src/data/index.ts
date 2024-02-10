@@ -2,7 +2,7 @@ export * as Array from './array';
 export * as NonEmptyArray from './non-empty-array';
 export * as Option from './option';
 export * as IO from './io';
-export * as IOResult from './ioresult';
+export * as IOResult from './io-result';
 export * as Pair from './pair';
 export * as Result from './result';
 export * as Boolean from './boolean';
