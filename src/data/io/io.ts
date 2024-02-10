@@ -9,7 +9,7 @@ import * as tSemiAlternative from '@typeclass/semialternative';
 import * as tAlternative from '@typeclass/alternative';
 import type { TIO, IO } from './io.types';
 
-const runIO = <A>(io: IO<A>): A => io();
+export const run = <A>(io: IO<A>): A => io();
 
 export const Zero: tZero.Zero<TIO> = {
   zero: () => () => {
@@ -32,27 +32,27 @@ export const To: tTo.To<TIO> = {
 };
 
 export const Functor: tfunctor.Functor<TIO> = {
-  map: f => io => () => f(io()),
+  map: f => io => () => f(run(io)),
 };
 
 export const Applicative: tApplicative.Applicative<TIO> = {
   ...Of,
   ...Functor,
-  ap: fa => fab => () => fab()(fa()),
+  ap: fa => fab => () => run(fab)(run(fa)),
 };
 
 export const Monad: tMonad.Monad<TIO> = {
   ...Applicative,
-  flatMap: f => io => () => f(io())(),
+  flatMap: f => io => () => run(f(run(io))),
 };
 
 export const SemiAlternative: tSemiAlternative.SemiAlternative<TIO> = {
   ...Functor,
   orElse: fb => fa => () => {
     try {
-      return fa();
+      return run(fa);
     } catch {
-      return runIO(fb());
+      return run(fb());
     }
   },
 };
