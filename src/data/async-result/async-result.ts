@@ -1,4 +1,3 @@
-import { Kind } from '@kinds';
 import * as R from '@data/result';
 import * as A from '@data/async';
 import * as tfunctor from '@typeclass/functor';
@@ -72,3 +71,47 @@ export const SemiAlternative: tSemiAlternative.SemiAlternative<TAsyncResult> = {
     }
   },
 };
+
+export const of = Of.of;
+
+export const map = Functor.map;
+
+export const mapCompose = tfunctor.mapCompose(Functor, Functor);
+
+export const flap = tfunctor.flap(Functor);
+
+export const as = tfunctor.as(Functor);
+
+export const bimap = BiFunctor.bimap;
+
+export const mapLeft = tbifunctor.mapLeft(BiFunctor);
+
+export const mapRight = tbifunctor.mapRight(BiFunctor);
+
+export const mapErr = mapRight;
+
+export const flip = Flip.flip;
+
+export const ap = Applicative.ap;
+
+export const liftA2 = tApplicative.liftA2(Applicative);
+
+export const product = tApplicative.product(Applicative);
+
+export const productMany = tApplicative.productMany(Applicative);
+
+export const flatMap = Monad.flatMap;
+
+export const chain = flatMap;
+
+export const andThen = flatMap;
+
+export const flatten = tMonad.flatten(Monad);
+
+export const biFlatMap = BiFlatMap.biFlatMap;
+
+export const orElse = tBiFlatMap.orElse(BiFlatMap);
+
+export const alt = SemiAlternative.orElse;
+
+export const or = tSemiAlternative.or(SemiAlternative);
