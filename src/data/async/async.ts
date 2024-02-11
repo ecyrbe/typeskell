@@ -16,11 +16,6 @@ export const Zero: tZero.Zero<TAsync> = {
   zero: () => Promise.reject('Zero Promise'),
 };
 
-const $catch =
-  <A>(f: (e: unknown) => Async<A>) =>
-  (fa: Async<A>) =>
-    fa.catch(f);
-
 export const Functor: tfunctor.Functor<TAsync> = {
   map: f => async fa => f(await fa),
 };
@@ -46,6 +41,17 @@ export const Alternative: tAlternative.Alternative<TAsync> = {
   ...Applicative,
   ...SemiAlternative,
 };
+
+const $try = <A>(f: () => A): Async<A> => new Promise<A>(resolve => resolve(f()));
+
+const $catch =
+  <A>(f: (e: unknown) => Async<A>) =>
+  (fa: Async<A>) =>
+    fa.catch(f);
+
+const $throw = <A, E>(f: () => E): Async<A> => new Promise<A>((_, reject) => reject(f()));
+
+export { $catch as catch, $try as try, $throw as throw };
 
 export const of = Of.of;
 
@@ -80,8 +86,6 @@ export const flatten = tMonad.flatten(Monad);
 export const orElse = SemiAlternative.orElse;
 
 export const or = tSemiAlternative.or(SemiAlternative);
-
-export { $catch as catch };
 
 export const awaitAll: <A>(fa: Async<A>[]) => Async<Awaited<A>[]> = Promise.all;
 
