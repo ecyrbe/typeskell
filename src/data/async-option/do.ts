@@ -3,8 +3,8 @@ import * as tFunctor from '@typeclass/functor';
 import * as tMonad from '@typeclass/monad';
 
 /**
- * Do notation for AsyncResult
- * it allows you to chain multiple AsyncResult computations together
+ * Do notation for AsyncOption
+ * it allows you to chain multiple AsyncOption computations together
  * and not worry about the None case
  *
  * @example
@@ -20,10 +20,10 @@ import * as tMonad from '@typeclass/monad';
 export const Do = Monad.of({});
 
 /**
- * bind an AsyncResult to a name
- * @param name name of the AsyncResult
- * @param f function that returns an AsyncResult
- * @returns AsyncResult with the name binded
+ * bind an AsyncOption to a name
+ * @param name name of the AsyncOption
+ * @param f function that returns an AsyncOption
+ * @returns AsyncOption with the name binded
  *
  * @example
  * ```ts
