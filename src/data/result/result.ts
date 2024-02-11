@@ -1,4 +1,4 @@
-import type { Kind, InvariantParam, CovariantParam, $ } from '@kinds';
+import type { Kind, InvariantParam, CovariantParam } from '@kinds';
 import type { Expect, Equal } from 'type-testing';
 import * as tfunctor from '@typeclass/functor';
 import * as tbifunctor from '@typeclass/bifunctor';
@@ -89,6 +89,11 @@ export const Traversable: tTraversable.Traversable<TResult> = {
 };
 
 type TraverseTestCases = [Expect<Equal<typeof traverseImpl, typeof Traversable.traverse<Kind.F>>>];
+
+export const match =
+  <A, B, C, E>(onOk: (a: A) => B, onErr: (e: E) => C) =>
+  (result: Result<A, E>): B | C =>
+    isOk(result) ? onOk(result.ok) : onErr(result.err);
 
 /**
  * of :: `a -> Result<a, never>`

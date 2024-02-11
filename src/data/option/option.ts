@@ -83,6 +83,11 @@ export const Monad: tMonad.Monad<TOption> = {
   flatMap: f => fa => (isSome(fa) ? f(fa.value) : none()),
 };
 
+export const match =
+  <A, B, C>(onSome: (a: A) => B, onNone: () => C) =>
+  (fa: Option<A>): B | C =>
+    isSome(fa) ? onSome(fa.value) : onNone();
+
 /**
  * produce an none Option of type a
  *
