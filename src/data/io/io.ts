@@ -8,6 +8,7 @@ import * as tMonad from '@typeclass/monad';
 import * as tSemiAlternative from '@typeclass/semialternative';
 import * as tAlternative from '@typeclass/alternative';
 import type { TIO, IO } from './io.types';
+import { identity } from '@utils/functions';
 
 export const run = <A>(io: IO<A>): A => io();
 
@@ -63,9 +64,11 @@ export const Alternative: tAlternative.Alternative<TIO> = {
   ...SemiAlternative,
 };
 
-export const zero = Zero.zero;
+export const fromIO: <A>(io: IO<A>) => IO<A> = identity;
 
 export const of = Of.of;
+
+export const zero = Zero.zero;
 
 export const getOrElse = To.getOrElse;
 

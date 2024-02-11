@@ -89,6 +89,8 @@ export const Traversable: tTraversable.Traversable<TIOResult> = {
   traverse: $traverse as any,
 };
 
+export const fromIO: <A, E = never>(io: I.IO<A>) => IOResult<A, E> = I.map(R.ok);
+
 export const of = Of.of;
 
 export const getOrElse = To.getOrElse;

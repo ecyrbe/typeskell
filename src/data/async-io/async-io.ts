@@ -5,7 +5,7 @@ import * as tApplicative from '@typeclass/applicative';
 import * as tMonad from '@typeclass/monad';
 import * as tSemiAlternative from '@typeclass/semialternative';
 import * as tAlternative from '@typeclass/alternative';
-import { TAsyncIO } from './async-io.types';
+import { AsyncIO, TAsyncIO } from './async-io.types';
 import * as I from '@data/io';
 import * as A from '@data/async';
 
@@ -42,6 +42,8 @@ export const Alternative: tAlternative.Alternative<TAsyncIO> = {
   ...Applicative,
   ...SemiAlternative,
 };
+
+export const fromIO: <A>(args_0: I.IO<A>) => AsyncIO<A> = I.map(A.of);
 
 export const of = Of.of;
 

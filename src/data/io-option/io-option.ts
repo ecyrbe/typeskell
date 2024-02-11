@@ -22,7 +22,7 @@ export const none: <A = unknown>() => IOOption<A> = () => I.of(O.none());
 
 export const some: <A>(a: A) => IOOption<A> = a => I.of(O.some(a));
 
-export const runIO = <A>(io: IOOption<A>): O.Option<A> => io();
+export const run = <A>(io: IOOption<A>): O.Option<A> => io();
 
 export const Zero: tZero.Zero<TIOOption> = {
   zero: none,
@@ -48,7 +48,7 @@ export const Applicative: tApplicative.Applicative<TIOOption> = {
 
 export const Monad: tMonad.Monad<TIOOption> = {
   ...Applicative,
-  flatMap: f => io => pipe(io, I.map(O.flatMap(a => runIO(f(a))))),
+  flatMap: f => io => pipe(io, I.map(O.flatMap(a => run(f(a))))),
 };
 
 export const Foldable: tFoldable.Foldable<TIOOption> = {
@@ -65,6 +65,8 @@ export const SemiAlternative: tSemiAlternative.SemiAlternative<TIOOption> = {
   ...Functor,
   orElse: alt => io => () => pipe(io, I.map(O.orElse(alt())))(),
 };
+
+export const fromIO: <A>(io: I.IO<A>) => IOOption<A> = I.map(O.some);
 
 export const of = Of.of;
 
