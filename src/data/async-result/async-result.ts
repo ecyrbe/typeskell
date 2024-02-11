@@ -37,39 +37,18 @@ export const Applicative: tApplicative.Applicative<TAsyncResult> = {
 
 export const Monad: tMonad.Monad<TAsyncResult> = {
   ...Applicative,
-  flatMap: f => async fa => {
-    const a = await fa;
-    if (R.isOk(a)) {
-      return f(a.ok);
-    } else {
-      return R.err(a.err);
-    }
-  },
+  flatMap: f => A.flatMap(R.match(f, err as any)),
 };
 
 export const BiFlatMap: tBiFlatMap.BiFlatMap<TAsyncResult> = {
   ...Of,
   ...BiFunctor,
-  biFlatMap: (f, g) => async fa => {
-    const a = await fa;
-    if (R.isOk(a)) {
-      return f(a.ok);
-    } else {
-      return g(a.err);
-    }
-  },
+  biFlatMap: (f, g) => A.flatMap(R.match(f, g)),
 };
 
 export const SemiAlternative: tSemiAlternative.SemiAlternative<TAsyncResult> = {
   ...Functor,
-  orElse: f => async fa => {
-    const a = await fa;
-    if (R.isOk(a)) {
-      return R.ok(a.ok);
-    } else {
-      return f();
-    }
-  },
+  orElse: f => A.flatMap(R.match(ok as any, f)),
 };
 
 export const of = Of.of;

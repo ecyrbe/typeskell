@@ -33,19 +33,12 @@ export const Applicative: tApplicative.Applicative<TAsyncOption> = {
 
 export const Monad: tMonad.Monad<TAsyncOption> = {
   ...Applicative,
-  flatMap: f => fa => pipe(fa, A.flatMap(O.match(f, () => none()))),
+  flatMap: f => A.flatMap(O.match(f, none as any)),
 };
 
 export const SemiAlternative: tSemiAlternative.SemiAlternative<TAsyncOption> = {
   ...Functor,
-  orElse: f => async fa => {
-    const a = await fa;
-    if (O.isSome(a)) {
-      return O.some(a.value);
-    } else {
-      return f();
-    }
-  },
+  orElse: f => A.flatMap(O.match(some, f)),
 };
 
 export const of = Of.of;
