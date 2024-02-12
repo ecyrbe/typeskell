@@ -5,10 +5,8 @@ import * as tOf from '@typeclass/of';
 import * as tZero from '@typeclass/zero';
 import * as tApplicative from '@typeclass/applicative';
 import * as tMonad from '@typeclass/monad';
-import * as tBiFlatMap from '@typeclass/biflatmap';
 import * as tSemiAlternative from '@typeclass/semialternative';
 import { AsyncOption, TAsyncOption } from './async-option.types';
-import { pipe } from '@utils/pipe';
 
 export const some = <A>(a: A): AsyncOption<A> => A.of(O.some(a));
 export const none = <A = unknown>(): AsyncOption<A> => A.of(O.none());
