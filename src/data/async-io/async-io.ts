@@ -43,7 +43,7 @@ export const Alternative: tAlternative.Alternative<TAsyncIO> = {
   ...SemiAlternative,
 };
 
-export const fromIO: <A>(args_0: I.IO<A>) => AsyncIO<A> = I.map(A.of);
+export const fromIO: <A>(io: I.IO<A>) => AsyncIO<A> = I.map(A.of);
 
 export const of = Of.of;
 
