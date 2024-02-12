@@ -4,6 +4,6 @@ import { Option } from '@data/option';
 
 export interface AsyncIOOption<A> extends AsyncIO<Option<A>> {}
 
-export interface TAsyncIOOption extends Kind {
+export interface TAsyncIOOption extends Kind.unary {
   return: AsyncIOOption<this['arg0']>;
 }
