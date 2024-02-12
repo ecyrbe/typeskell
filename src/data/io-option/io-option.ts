@@ -1,7 +1,7 @@
 import { Kind } from '@kinds';
 import * as O from '@data/option';
 import * as I from '@data/io';
-import * as tfunctor from '@typeclass/functor';
+import * as tFunctor from '@typeclass/functor';
 import * as tZero from '@typeclass/zero';
 import * as tOf from '@typeclass/of';
 import * as tTo from '@typeclass/to';
@@ -18,7 +18,7 @@ export interface TIOOption extends Kind.unary {
   return: IOOption<this['arg0']>;
 }
 
-export const none: <A = unknown>() => IOOption<A> = () => I.of(O.none());
+export const none: <A = never>() => IOOption<A> = () => I.of(O.none());
 
 export const some: <A>(a: A) => IOOption<A> = a => I.of(O.some(a));
 
@@ -32,8 +32,8 @@ export const Of: tOf.Of<TIOOption> = {
   of: some,
 };
 
-export const Functor: tfunctor.Functor<TIOOption> = {
-  map: tfunctor.mapCompose(I.Functor, O.Functor),
+export const Functor: tFunctor.Functor<TIOOption> = {
+  map: tFunctor.mapCompose(I.Functor, O.Functor),
 };
 
 export const To: tTo.To<TIOOption> = {
@@ -76,11 +76,11 @@ export const getOr = tTo.getOr(To);
 
 export const map = Functor.map;
 
-export const mapCompose = tfunctor.mapCompose(Functor, Functor);
+export const mapCompose = tFunctor.mapCompose(Functor, Functor);
 
-export const flap = tfunctor.flap(Functor);
+export const flap = tFunctor.flap(Functor);
 
-export const as = tfunctor.as(Functor);
+export const as = tFunctor.as(Functor);
 
 export const ap = Applicative.ap;
 

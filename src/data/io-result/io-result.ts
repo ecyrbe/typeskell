@@ -1,8 +1,8 @@
 import { Kind } from '@kinds';
 import * as R from '@data/result';
 import * as I from '@data/io';
-import * as tfunctor from '@typeclass/functor';
-import * as tbifunctor from '@typeclass/bifunctor';
+import * as tFunctor from '@typeclass/functor';
+import * as tBiFunctor from '@typeclass/bifunctor';
 import * as tOf from '@typeclass/of';
 import * as tTo from '@typeclass/to';
 import * as tFlip from '@typeclass/flip';
@@ -20,26 +20,26 @@ export interface TIOResult extends Kind.binary {
   return: IOResult<this['arg0'], this['arg1']>;
 }
 
-export const err: <E, A = unknown>(e: E) => IOResult<A, E> = e => I.of(R.err(e));
+export const err: <E, A = never>(e: E) => IOResult<A, E> = e => I.of(R.err(e));
 
-export const ok: <A, E = unknown>(a: A) => IOResult<A, E> = a => I.of(R.ok(a));
+export const ok: <A, E = never>(a: A) => IOResult<A, E> = a => I.of(R.ok(a));
 
-export const runIO = <A, E>(io: IOResult<A, E>): R.Result<A, E> => io();
+export const run = <A, E>(io: IOResult<A, E>): R.Result<A, E> => io();
 
 export const Of: tOf.Of<TIOResult> = {
   of: ok,
 };
 
-export const BiFunctor: tbifunctor.BiFunctor<TIOResult> = {
+export const BiFunctor: tBiFunctor.BiFunctor<TIOResult> = {
   bimap: (f, g) => I.map(R.bimap(f, g)),
 };
 
-export const Functor: tfunctor.Functor<TIOResult> = {
-  map: tfunctor.mapCompose(I.Functor, R.Functor),
+export const Functor: tFunctor.Functor<TIOResult> = {
+  map: tFunctor.mapCompose(I.Functor, R.Functor),
 };
 
 export const To: tTo.To<TIOResult> = {
-  getOrElse: f => io => pipe(runIO(io), R.getOrElse(f)),
+  getOrElse: f => io => pipe(run(io), R.getOrElse(f)),
 };
 
 export const Flip: tFlip.Flip<TIOResult> = {
@@ -54,7 +54,7 @@ export const Applicative: tApplicative.Applicative<TIOResult> = {
 
 export const Monad: tMonad.Monad<TIOResult> = {
   ...Applicative,
-  flatMap: f => I.map(R.flatMap(a => runIO(f(a)))),
+  flatMap: f => I.map(R.flatMap(a => run(f(a)))),
 };
 
 export const BiFlatMap: tBiFlatMap.BiFlatMap<TIOResult> = {
@@ -63,14 +63,14 @@ export const BiFlatMap: tBiFlatMap.BiFlatMap<TIOResult> = {
   biFlatMap: (f, g) =>
     I.map(
       R.biFlatMap(
-        a => runIO(f(a)),
-        e => runIO(g(e)),
+        a => run(f(a)),
+        e => run(g(e)),
       ),
     ),
 };
 
 export const Foldable: tFoldable.Foldable<TIOResult> = {
-  reduce: (f, b) => io => pipe(runIO(io), R.reduce(f, b)),
+  reduce: (f, b) => io => pipe(run(io), R.reduce(f, b)),
 };
 
 export const SemiAlternative: tSemiAlternative.SemiAlternative<TIOResult> = {
@@ -99,17 +99,17 @@ export const getOr = tTo.getOr(To);
 
 export const map = Functor.map;
 
-export const mapCompose = tfunctor.mapCompose(Functor, Functor);
+export const mapCompose = tFunctor.mapCompose(Functor, Functor);
 
-export const flap = tfunctor.flap(Functor);
+export const flap = tFunctor.flap(Functor);
 
-export const as = tfunctor.as(Functor);
+export const as = tFunctor.as(Functor);
 
 export const bimap = BiFunctor.bimap;
 
-export const mapLeft = tbifunctor.mapLeft(BiFunctor);
+export const mapLeft = tBiFunctor.mapLeft(BiFunctor);
 
-export const mapRight = tbifunctor.mapRight(BiFunctor);
+export const mapRight = tBiFunctor.mapRight(BiFunctor);
 
 export const mapErr = mapRight;
 
