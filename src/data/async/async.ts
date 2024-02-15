@@ -87,13 +87,13 @@ export const orElse = SemiAlternative.orElse;
 
 export const or = tSemiAlternative.or(SemiAlternative);
 
-export const awaitAll: <A>(fa: Async<A>[]) => Async<Awaited<A>[]> = Promise.all;
+export const all: <A>(fa: Async<A>[]) => Async<Awaited<A>[]> = Promise.all;
 
-export const awaitAllSettled: <A>(fa: Async<A>[]) => Async<PromiseSettledResult<Awaited<A>>[]> = Promise.allSettled;
+export const allSettled: <A>(fa: Async<A>[]) => Async<PromiseSettledResult<Awaited<A>>[]> = Promise.allSettled;
 
-export const awaitRace: <A>(fa: Async<A>[]) => Async<Awaited<A>> = Promise.race;
+export const race: <A>(fa: Async<A>[]) => Async<Awaited<A>> = Promise.race;
 
-export const awaitAny: <A>(fa: Async<A>[]) => Async<Awaited<A>> = Promise.any;
+export const any: <A>(fa: Async<A>[]) => Async<Awaited<A>> = Promise.any;
 
 export const delay =
   <A>(ms: number) =>
