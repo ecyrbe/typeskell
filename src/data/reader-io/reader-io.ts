@@ -1,6 +1,5 @@
-import { Kind } from '@kinds';
-import * as tFunctor from '@typeclass/functor';
 import * as tOf from '@typeclass/of';
+import * as tFunctor from '@typeclass/functor';
 import * as tApplicative from '@typeclass/applicative';
 import * as tMonad from '@typeclass/monad';
 import type { ReaderIO, TReaderIO } from './reader-io.types';
