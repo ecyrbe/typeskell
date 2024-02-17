@@ -52,6 +52,7 @@ export const SemiAlternative: tSemiAlternative.SemiAlternative<TAsyncIOResult> =
   ...Functor,
   orElse: f => AIO.flatMap(R.match(ok as any, f)),
 };
+
 export const fromIO: <A, E = never>(io: I.IO<A>) => AsyncIOResult<A, E> = I.map(a => A.of(R.ok(a)));
 
 export const of = Of.of;
