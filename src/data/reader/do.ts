@@ -1,7 +1,6 @@
-import { Functor, Monad, ask, map } from './reader';
+import { Functor, Monad } from './reader';
 import * as tFunctor from '@typeclass/functor';
 import * as tMonad from '@typeclass/monad';
-import { pipe } from '../..';
 
 /**
  * Do notation for Reader
