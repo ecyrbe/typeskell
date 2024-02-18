@@ -11,6 +11,7 @@ import * as tBiFlatMap from '@typeclass/biflatmap';
 import * as tFoldable from '@typeclass/foldable';
 import * as tTraversable from '@typeclass/traversable';
 import * as tSemiAlternative from '@typeclass/semialternative';
+import * as tSemiAlign from '@typeclass/semialign';
 import * as O from '../option';
 import { pipe } from '@utils/pipe';
 import { Result, Err, Ok } from './result.types';
@@ -89,6 +90,10 @@ export const Traversable: tTraversable.Traversable<TResult> = {
 };
 
 type TraverseTestCases = [Expect<Equal<typeof traverseImpl, typeof Traversable.traverse<Kind.F>>>];
+
+export const SemiAlign: tSemiAlign.SemiAlign<TResult> = {
+  zipWith: f => fa => fb => (isOk(fa) ? (isOk(fb) ? ok(f(fa.ok, fb.ok)) : err(fb.err)) : err(fa.err)),
+};
 
 export const match =
   <A, B, C, E>(onOk: (a: A) => B, onErr: (e: E) => C) =>
@@ -388,6 +393,12 @@ export const mapErr = tbifunctor.mapRight(Bifunctor);
  */
 export const ap = Applicative.ap;
 
+export const liftA2 = tApplicative.liftA2(Applicative);
+
+export const product = tApplicative.product(Applicative);
+
+export const productMany = tApplicative.productMany(Applicative);
+
 /**
  * flatMap :: `(a -> Result<b, e1>) -> Result<a, e2> -> Result<b, e1 | e2>`
  *
@@ -490,3 +501,7 @@ export const sequence: <F extends Kind>(
 ) => tTraversable.Traversable.$sequence<TResult, F> = tTraversable.sequence(Traversable);
 
 export const pluck = <A, K extends keyof A>(k: K) => map((a: A) => a[k]);
+
+export const zipWith = SemiAlign.zipWith;
+
+export const zip = tSemiAlign.zip(SemiAlign);
