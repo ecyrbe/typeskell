@@ -269,6 +269,12 @@ export const doubleMap = tfunctor.mapCompose(Functor, Functor);
  */
 export const ap = Applicative.ap;
 
+export const liftA2 = tApplicative.liftA2(Applicative);
+
+export const product = tApplicative.product(Applicative);
+
+export const productMany = tApplicative.productMany(Applicative);
+
 /**
  * flatMap :: `(a -> Option<b>) -> Option<a> -> Option<b>`
  *
