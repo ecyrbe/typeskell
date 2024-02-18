@@ -8,6 +8,7 @@ import * as tFoldable from '@typeclass/foldable';
 import * as tFilterable from '@typeclass/filterable';
 import * as tSemiAlternative from '@typeclass/semialternative';
 import * as tAlternative from '@typeclass/alternative';
+import * as tSemiAlign from '@typeclass/semialign';
 import { pipe } from '@utils/pipe';
 import { Option, None, Some, TOption } from './option.types';
 
@@ -81,6 +82,10 @@ export const Alternative: tAlternative.Alternative<TOption> = {
 export const Monad: tMonad.Monad<TOption> = {
   ...Applicative,
   flatMap: f => fa => (isSome(fa) ? f(fa.value) : none()),
+};
+
+export const SemiAlign: tSemiAlign.SemiAlign<TOption> = {
+  zipWith: f => fa => fb => (isSome(fa) && isSome(fb) ? some(f(fa.value, fb.value)) : none()),
 };
 
 export const match =
@@ -269,6 +274,22 @@ export const doubleMap = tfunctor.mapCompose(Functor, Functor);
  */
 export const ap = Applicative.ap;
 
+/**
+ * liftA2 :: `(a b -> c) -> Option<a> -> Option<b> -> Option<c>`
+ *
+ * liftA2 :: `<A, B, C>(f: (a: A, b: B) => C) => (fa: Option<A>) => (fb: Option<B>) => Option<C>`
+ *
+ * @param f `(a b -> c)`
+ * @returns `Option<a> -> Option<b> -> Option<c>`
+ *
+ * @example
+ * ```ts
+ * pipe(liftA2((a, b) => a + b)(some(1))(some(2))) // some(3)
+ * pipe(liftA2((a, b) => a + b)(some(1))(none())) // none()
+ * pipe(liftA2((a, b) => a + b)(none())(some(2))) // none()
+ * pipe(liftA2((a, b) => a + b)(none())(none())) // none()
+ * ```
+ */
 export const liftA2 = tApplicative.liftA2(Applicative);
 
 export const product = tApplicative.product(Applicative);
@@ -372,3 +393,7 @@ export const filter = tFilterable.filter(Filterable);
 export const compact = tFilterable.compact(Filterable);
 
 export const pluck = <A, K extends keyof A>(k: K) => map((a: A) => a[k]);
+
+export const zipWith = SemiAlign.zipWith;
+
+export const zip = tSemiAlign.zip(SemiAlign);
