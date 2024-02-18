@@ -7,7 +7,7 @@ import * as IO from '@data/io';
 import * as Reader from '@data/reader';
 import { pipe } from '@utils/pipe';
 
-export const ask: <Env>() => ReaderIO<Env, Env> = () => env => () => env;
+export const ask: <Env>() => ReaderIO<Env, Env> = () => env => IO.of(env);
 
 export const asks: <Env, A>(f: (env: Env) => A) => ReaderIO<A, Env> = f => env => () => f(env);
 
