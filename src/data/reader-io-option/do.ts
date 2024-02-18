@@ -3,8 +3,8 @@ import * as tFunctor from '@typeclass/functor';
 import * as tMonad from '@typeclass/monad';
 
 /**
- * Do notation for ReaderIO
- * it allows you to chain multiple ReaderIO computations together
+ * Do notation for ReaderIOOption
+ * it allows you to chain multiple ReaderIOOption computations together
  *
  * @example
  * ```ts
@@ -19,10 +19,10 @@ import * as tMonad from '@typeclass/monad';
 export const Do = Monad.of({});
 
 /**
- * bind an ReaderIO to a name
- * @param name name of the ReaderIO
- * @param f function that returns a ReaderIO
- * @returns ReaderIO with the name binded
+ * bind an ReaderIOOption to a name
+ * @param name name of the ReaderIOOption
+ * @param f function that returns a ReaderIOOption
+ * @returns ReaderIOOption with the name binded
  *
  * @example
  * ```ts
