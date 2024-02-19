@@ -195,16 +195,60 @@ export const get = OptionalTo.get;
  */
 export const toOption = get;
 
+/**
+ * fromOption :: `(() -> e ) -> Option<a> -> Result<a, e>`
+ *
+ * fromOption :: `<A, E>(onErr: () => E) => (option: O.Option<A>): Result<A, E>`
+ *
+ * @param onErr A function that returns an error of type `E`.
+ * @returns A function that takes an `Option<A>` and returns a `Result<A, E>`.
+ *
+ * @example
+ * ```ts
+ * pipe(some(0), fromOption(() => "error")) // ok(0)
+ * pipe(none(), fromOption(() => "error")) // err("error")
+ * ```
+ */
 export const fromOption =
   <A, E>(onErr: () => E) =>
   (option: O.Option<A>): Result<A, E> =>
     O.isNone(option) ? err(onErr()) : ok(option.value);
 
+/**
+ * fromNullable :: `(() -> e) -> a | null | undefined -> Result<a, e>`
+ *
+ * fromNullable :: `<A, E>(onErr: () => E) => (a: A | null | undefined) => Result<A, E>`
+ *
+ * @param onErr A function that returns an error of type `E`.
+ * @returns A function that takes a value of type `A | null | undefined` and returns a `Result<A, E>`.
+ *
+ * @example
+ * ```ts
+ * pipe(0, fromNullable(() => "error")) // ok(0)
+ * pipe(null, fromNullable(() => "error")) // err("error")
+ * pipe(undefined, fromNullable(() => "error")) // err("error")
+ * ```
+ */
 export const fromNullable =
   <A, E>(onErr: () => E) =>
   (a: A | null | undefined): Result<A, E> =>
     a == null ? err(onErr()) : ok(a);
 
+/**
+ * fromPredicate :: `(a -> boolean) (a -> e) -> a -> Result<a, e>`
+ *
+ * fromPredicate :: `<A, E>(predicate: (a: A) => boolean, onErr: (a: A) => E) => (a: A) => Result<A, E>`
+ *
+ * @param predicate A function that takes a value of type `A` and returns a boolean.
+ * @param onErr A function that takes a value of type `A` and returns an error of type `E`.
+ * @returns A function that takes a value of type `A` and returns a `Result<A, E>`.
+ *
+ * @example
+ * ```ts
+ * pipe(0, fromPredicate(x => x === 0, () => "error")) // ok(0)
+ * pipe(1, fromPredicate(x => x === 0, () => "error")) // err("error")
+ * ```
+ */
 export const fromPredicate =
   <A, E>(predicate: (a: A) => boolean, onErr: (a: A) => E) =>
   (a: A): Result<A, E> =>
