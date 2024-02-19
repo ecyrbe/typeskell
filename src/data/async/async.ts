@@ -13,7 +13,7 @@ export const Of: tOf.Of<TAsync> = {
 };
 
 export const Zero: tZero.Zero<TAsync> = {
-  zero: () => Promise.reject('Zero Promise'),
+  zero: () => Promise.reject(new Error('Zero Promise')),
 };
 
 export const Functor: tfunctor.Functor<TAsync> = {
