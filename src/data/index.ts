@@ -1,5 +1,5 @@
 export * as Array from './array';
-export * as NonEmptyArray from './non-empty-array';
+export * as ArrayFull from './arrayfull';
 export * as Option from './option';
 export * as IO from './io';
 export * as IOResult from './io-result';

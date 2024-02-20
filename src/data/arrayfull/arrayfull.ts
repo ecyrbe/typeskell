@@ -5,44 +5,39 @@ import * as tApplicative from '@typeclass/applicative';
 import * as tMonad from '@typeclass/monad';
 import * as tCoMonad from '@typeclass/comonad';
 import * as tFoldable from '@typeclass/foldable';
+import { ArrayFull, TArrayFull } from './arrayfull.types';
 
-export type NonEmptyArray<A> = [A, ...A[]];
+export const isArrayFull = <A>(arr: A[]): arr is ArrayFull<A> => arr.length > 0;
 
-export interface TNonEmptyArray extends Kind.unary {
-  return: NonEmptyArray<this['arg0']>;
-}
-
-export const isNonEmptyArray = <A>(arr: A[]): arr is NonEmptyArray<A> => arr.length > 0;
-
-export const Of: tOf<TNonEmptyArray> = {
+export const Of: tOf<TArrayFull> = {
   of: a => [a],
 };
 
-export const Functor: tFunctor.Functor<TNonEmptyArray> = {
-  map: f => fa => fa.map(f) as NonEmptyArray<ReturnType<typeof f>>,
+export const Functor: tFunctor.Functor<TArrayFull> = {
+  map: f => fa => fa.map(f) as ArrayFull<ReturnType<typeof f>>,
 };
 
-export const Foldable: tFoldable.Foldable<TNonEmptyArray> = {
+export const Foldable: tFoldable.Foldable<TArrayFull> = {
   reduce: (f, b) => fa => fa.reduce(f, b),
 };
 
-export const NonEmptyFoldable: tFoldable.Foldable1<TNonEmptyArray> = {
+export const NonEmptyFoldable: tFoldable.Foldable1<TArrayFull> = {
   ...Foldable,
   fold1: f => fa => fa.reduce(f),
 };
 
-export const Applicative: tApplicative.Applicative<TNonEmptyArray> = {
+export const Applicative: tApplicative.Applicative<TArrayFull> = {
   ...Of,
   ...Functor,
-  ap: fa => fab => fab.flatMap(f => fa.map(f)) as NonEmptyArray<ReturnType<(typeof fab)[0]>>,
+  ap: fa => fab => fab.flatMap(f => fa.map(f)) as ArrayFull<ReturnType<(typeof fab)[0]>>,
 };
 
-export const Monad: tMonad.Monad<TNonEmptyArray> = {
+export const Monad: tMonad.Monad<TArrayFull> = {
   ...Applicative,
   flatMap: f => fa => fa.flatMap(f) as ReturnType<typeof f>,
 };
 
-export const CoMonad: tCoMonad.CoMonad<TNonEmptyArray> = {
+export const CoMonad: tCoMonad.CoMonad<TArrayFull> = {
   ...Of,
   ...Functor,
   extract: fa => fa[0],
