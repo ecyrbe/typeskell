@@ -1,4 +1,7 @@
 import * as O from '@data/option';
+import * as IO from '@data/io';
+import * as A from '@data/async';
+import * as AO from '@data/async-option';
 import * as AIO from '@data/async-io';
 import * as tFunctor from '@typeclass/functor';
 import * as tOf from '@typeclass/of';
@@ -7,6 +10,7 @@ import * as tApplicative from '@typeclass/applicative';
 import * as tMonad from '@typeclass/monad';
 import * as tSemiAlternative from '@typeclass/semialternative';
 import { AsyncIOOption, TAsyncIOOption } from './async-io-option.types';
+import { flow, pipe } from '@utils/pipe';
 
 export const some = <A>(a: A): AsyncIOOption<A> => AIO.of(O.some(a));
 export const none = <A = unknown>(): AsyncIOOption<A> => AIO.of(O.none());
@@ -39,6 +43,14 @@ export const SemiAlternative: tSemiAlternative.SemiAlternative<TAsyncIOOption> =
   orElse: f => AIO.flatMap(O.match(some, f)),
 };
 
+export const fromIO: <A>(io: IO.IO<A>) => AsyncIOOption<A> = IO.map(AO.of);
+
+export const fromAsync: <A>(a: A.Async<A>) => AsyncIOOption<A> = a => () => pipe(a, A.map(O.of));
+
+export const fromAsyncOption: <A>(a: AO.AsyncOption<A>) => AsyncIOOption<A> = IO.of;
+
+export const fromAsyncIO: <A>(a: AIO.AsyncIO<A>) => AsyncIOOption<A> = AIO.map(O.of);
+
 export const of = Of.of;
 
 export const map = Functor.map;
@@ -48,6 +60,8 @@ export const mapCompose = tFunctor.mapCompose(Functor, Functor);
 export const flap = tFunctor.flap(Functor);
 
 export const as = tFunctor.as(Functor);
+
+export const tap = tFunctor.tap(Functor);
 
 export const ap = Applicative.ap;
 

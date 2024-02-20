@@ -1,5 +1,5 @@
 import { Kind } from '@kinds';
-import * as tfunctor from '@typeclass/functor';
+import * as tFunctor from '@typeclass/functor';
 import * as tOf from '@typeclass/of';
 import * as tApplicative from '@typeclass/applicative';
 import * as tMonad from '@typeclass/monad';
@@ -23,7 +23,7 @@ export const Of: tOf.Of<TReader> = {
   of: a => () => a,
 };
 
-export const Functor: tfunctor.Functor<TReader> = {
+export const Functor: tFunctor.Functor<TReader> = {
   map: f => fa => r => f(fa(r)),
 };
 
@@ -42,11 +42,13 @@ export const of = Of.of;
 
 export const map = Functor.map;
 
-export const mapCompose = tfunctor.mapCompose(Functor, Functor);
+export const mapCompose = tFunctor.mapCompose(Functor, Functor);
 
-export const flap = tfunctor.flap(Functor);
+export const flap = tFunctor.flap(Functor);
 
-export const as = tfunctor.as(Functor);
+export const as = tFunctor.as(Functor);
+
+export const tap = tFunctor.tap(Functor);
 
 export const ap = Applicative.ap;
 

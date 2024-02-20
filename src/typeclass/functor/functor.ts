@@ -1,6 +1,6 @@
 import { Expect, Equal } from 'type-testing';
 import type { Kind } from '@kinds';
-import { $as, $flap, $mapCompose, $let } from './functor.impl';
+import { $as, $flap, $mapCompose, $let, $tap } from './functor.impl';
 import { TypeSkell } from '@typeskell';
 
 export namespace Functor {
@@ -15,6 +15,7 @@ export namespace Functor {
     '(DoName n a) (a -> b) -> F a ..e -> F (Do n a b) ..e',
     { DoName: Kind.DoName; Do: Kind.Do; F: F }
   >;
+  export type $tap<F extends Kind> = TypeSkell<'(a -> empty) -> F a ..e -> F a ..e', { F: F }, ['empty'], [void]>;
 }
 
 // <Name extends string, A, B>(name: Exclude<Name, keyof A>, f: (a: A) => B) =>
@@ -63,6 +64,8 @@ export const flap: <F extends Kind>(functor: Functor<F>) => Functor.$flap<F> = $
  * @returns `b -> F a -> F b`
  */
 export const as: <F extends Kind>(functor: Functor<F>) => Functor.$as<F> = $as as any;
+
+export const tap: <F extends Kind>(functor: Functor<F>) => Functor.$tap<F> = $tap as any;
 
 const $$let: <F extends Kind>(functor: Functor<F>) => Functor.$let<F> = $let as any;
 

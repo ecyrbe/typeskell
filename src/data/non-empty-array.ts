@@ -53,6 +53,12 @@ export const of = Of.of;
 
 export const map = Functor.map;
 
+export const flap = tFunctor.flap(Functor);
+
+export const as = tFunctor.as(Functor);
+
+export const tap = tFunctor.tap(Functor);
+
 export const reduce = Foldable.reduce;
 
 export const fold1 = NonEmptyFoldable.fold1;

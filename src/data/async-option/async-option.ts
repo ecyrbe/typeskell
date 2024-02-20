@@ -1,6 +1,6 @@
 import * as O from '@data/option';
 import * as A from '@data/async';
-import * as tfunctor from '@typeclass/functor';
+import * as tFunctor from '@typeclass/functor';
 import * as tOf from '@typeclass/of';
 import * as tZero from '@typeclass/zero';
 import * as tApplicative from '@typeclass/applicative';
@@ -19,8 +19,8 @@ export const Zero: tZero.Zero<TAsyncOption> = {
   zero: none,
 };
 
-export const Functor: tfunctor.Functor<TAsyncOption> = {
-  map: tfunctor.mapCompose(A.Functor, O.Functor),
+export const Functor: tFunctor.Functor<TAsyncOption> = {
+  map: tFunctor.mapCompose(A.Functor, O.Functor),
 };
 
 export const Applicative: tApplicative.Applicative<TAsyncOption> = {
@@ -43,11 +43,13 @@ export const of = Of.of;
 
 export const map = Functor.map;
 
-export const mapCompose = tfunctor.mapCompose(Functor, Functor);
+export const mapCompose = tFunctor.mapCompose(Functor, Functor);
 
-export const flap = tfunctor.flap(Functor);
+export const flap = tFunctor.flap(Functor);
 
-export const as = tfunctor.as(Functor);
+export const as = tFunctor.as(Functor);
+
+export const tap = tFunctor.tap(Functor);
 
 export const ap = Applicative.ap;
 

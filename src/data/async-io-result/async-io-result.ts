@@ -1,7 +1,9 @@
 import * as A from '@data/async';
 import * as R from '@data/result';
+import * as IO from '@data/io';
 import * as AIO from '@data/async-io';
-import * as I from '@data/io';
+import * as AO from '@data/async-option';
+import * as AR from '@data/async-result';
 import * as tFunctor from '@typeclass/functor';
 import * as tOf from '@typeclass/of';
 import * as tApplicative from '@typeclass/applicative';
@@ -11,6 +13,7 @@ import * as tBiFunctor from '@typeclass/bifunctor';
 import * as tFlip from '@typeclass/flip';
 import * as tBiFlatMap from '@typeclass/biflatmap';
 import { AsyncIOResult, TAsyncIOResult } from './async-io-result.types';
+import { flow, pipe } from '@utils/pipe';
 
 export const ok = <A, E = never>(a: A): AsyncIOResult<A, E> => AIO.of(R.ok(a));
 export const err = <E, A = never>(e: E): AsyncIOResult<A, E> => AIO.of(R.err(e));
@@ -53,7 +56,17 @@ export const SemiAlternative: tSemiAlternative.SemiAlternative<TAsyncIOResult> =
   orElse: f => AIO.flatMap(R.match(ok as any, f)),
 };
 
-export const fromIO: <A, E = never>(io: I.IO<A>) => AsyncIOResult<A, E> = I.map(a => A.of(R.ok(a)));
+export const fromIO: <A, E = never>(io: IO.IO<A>) => AsyncIOResult<A, E> = IO.map(AR.ok);
+
+export const fromAsync: <A, E = never>(a: A.Async<A>) => AsyncIOResult<A, E> = a => () => pipe(a, A.map(R.of));
+
+export const fromAsyncOption: <A, E = never>(onErr: () => E) => (ao: AO.AsyncOption<A>) => AsyncIOResult<A, E> =
+  onErr => ao => () =>
+    pipe(ao, A.map(R.fromOption(onErr)));
+
+export const fromAsyncResult: <A, E>(a: AR.AsyncResult<A, E>) => AsyncIOResult<A, E> = a => () => a;
+
+export const fromAsyncIO: <A, E = never>(a: AIO.AsyncIO<A>) => AsyncIOResult<A, E> = AIO.map(R.of);
 
 export const of = Of.of;
 
@@ -64,6 +77,8 @@ export const mapCompose = tFunctor.mapCompose(Functor, Functor);
 export const flap = tFunctor.flap(Functor);
 
 export const as = tFunctor.as(Functor);
+
+export const tap = tFunctor.tap(Functor);
 
 export const bimap = BiFunctor.bimap;
 

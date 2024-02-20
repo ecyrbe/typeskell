@@ -1,6 +1,6 @@
 import * as R from '@data/result';
 import * as A from '@data/async';
-import * as tfunctor from '@typeclass/functor';
+import * as tFunctor from '@typeclass/functor';
 import * as tbifunctor from '@typeclass/bifunctor';
 import * as tOf from '@typeclass/of';
 import * as tFlip from '@typeclass/flip';
@@ -17,8 +17,8 @@ export const Of: tOf.Of<TAsyncResult> = {
   of: ok,
 };
 
-export const Functor: tfunctor.Functor<TAsyncResult> = {
-  map: tfunctor.mapCompose(A.Functor, R.Functor),
+export const Functor: tFunctor.Functor<TAsyncResult> = {
+  map: tFunctor.mapCompose(A.Functor, R.Functor),
 };
 
 export const BiFunctor: tbifunctor.BiFunctor<TAsyncResult> = {
@@ -55,11 +55,13 @@ export const of = Of.of;
 
 export const map = Functor.map;
 
-export const mapCompose = tfunctor.mapCompose(Functor, Functor);
+export const mapCompose = tFunctor.mapCompose(Functor, Functor);
 
-export const flap = tfunctor.flap(Functor);
+export const flap = tFunctor.flap(Functor);
 
-export const as = tfunctor.as(Functor);
+export const as = tFunctor.as(Functor);
+
+export const tap = tFunctor.tap(Functor);
 
 export const bimap = BiFunctor.bimap;
 

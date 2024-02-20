@@ -17,6 +17,7 @@ import * as AR from '@data/async-result';
 import * as AIO from '@data/async-io';
 import * as AIOO from '@data/async-io-option';
 import * as AIOR from '@data/async-io-result';
+import * as Reader from '@data/reader';
 import * as RIO from '@data/reader-io';
 import * as RIOO from '@data/reader-io-option';
 import * as RIOR from '@data/reader-io-result';
@@ -95,27 +96,24 @@ export const fromIOResult: <A, E, Env = unknown>(ior: IOR.IOResult<A, E>) => Eff
   ior => env => async () =>
     ior();
 
-export const fromAsync: <A, E = never, Env = unknown>(a: A.Async<A>) => Effect<A, E, Env> = a => env => () =>
-  pipe(a, A.map(R.ok));
+export const fromAsync: <A, E = never, Env = unknown>(a: A.Async<A>) => Effect<A, E, Env> = flow(A.map(R.ok), RIO.of);
 
 export const fromAsyncOption: <A, E = never, Env = unknown>(
   onErr: () => E,
-) => (ao: AO.AsyncOption<A>) => Effect<A, E, Env> = onErr => ao => env => () => pipe(ao, A.map(R.fromOption(onErr)));
+) => (ao: AO.AsyncOption<A>) => Effect<A, E, Env> = onErr => flow(A.map(R.fromOption(onErr)), RIO.of);
 
-export const fromAsyncResult: <A, E, Env = unknown>(ar: AR.AsyncResult<A, E>) => Effect<A, E, Env> = ar => env => () =>
-  ar;
+export const fromAsyncResult: <A, E, Env = unknown>(ar: AR.AsyncResult<A, E>) => Effect<A, E, Env> = RIO.of;
 
-export const fromAsyncIO: <A, E = never, Env = unknown>(io: AIO.AsyncIO<A>) => Effect<A, E, Env> = aio => env =>
-  pipe(aio, AIO.map(R.ok));
+export const fromAsyncIO: <A, E = never, Env = unknown>(io: AIO.AsyncIO<A>) => Effect<A, E, Env> = flow(
+  AIO.map(R.ok),
+  Reader.of,
+);
 
 export const fromAsyncIOOption: <A, E = never, Env = unknown>(
   onErr: () => E,
-) => (aioo: AIOO.AsyncIOOption<A>) => Effect<A, E, Env> = onErr => aioo => env =>
-  pipe(aioo, AIO.map(R.fromOption(onErr)));
+) => (aioo: AIOO.AsyncIOOption<A>) => Effect<A, E, Env> = onErr => flow(AIO.map(R.fromOption(onErr)), Reader.of);
 
-export const fromAsyncIOResult: <A, E, Env = unknown>(aior: AIOR.AsyncIOResult<A, E>) => Effect<A, E, Env> =
-  aior => env =>
-    aior;
+export const fromAsyncIOResult: <A, E, Env = unknown>(aior: AIOR.AsyncIOResult<A, E>) => Effect<A, E, Env> = Reader.of;
 
 /******************************
  * Context aware constructors *
@@ -146,20 +144,27 @@ export const fromAsyncReaderIOOption: <A, E = never, Env = unknown>(
   onErr: () => E,
 ) => (ioo: ARIOO.AsyncReaderIOOption<A, Env>) => Effect<A, E, Env> = onErr => ARIO.map(R.fromOption(onErr));
 
-const $catch: <A, E1, Env>(f: (e: unknown) => E1) => <E2>(fa: Effect<A, E2, Env>) => Effect<A, E1 | E2, Env> =
-  f => fa => env => async () => {
-    try {
-      return fa(env)();
-    } catch (e) {
-      return R.err(f(e));
-    }
-  };
-
-export { $catch as catch };
+export const tryCatch: <A, E1, Env>(
+  $catch: (e: unknown) => E1,
+) => <E2>(fa: Effect<A, E2, Env>) => Effect<A, E1 | E2, Env> = $catch => fa => env => async () => {
+  try {
+    return fa(env)();
+  } catch (e) {
+    return R.err($catch(e));
+  }
+};
 
 export const of = Of.of;
 
 export const map = Functor.map;
+
+export const mapCompose = tFunctor.mapCompose(Functor, Functor);
+
+export const flap = tFunctor.flap(Functor);
+
+export const as = tFunctor.as(Functor);
+
+export const tap = tFunctor.tap(Functor);
 
 export const bimap = BiFunctor.bimap;
 
@@ -168,12 +173,6 @@ export const mapLeft = tBiFunctor.mapLeft(BiFunctor);
 export const mapRight = tBiFunctor.mapRight(BiFunctor);
 
 export const mapErr = mapRight;
-
-export const mapCompose = tFunctor.mapCompose(Functor, Functor);
-
-export const flap = tFunctor.flap(Functor);
-
-export const as = tFunctor.as(Functor);
 
 export const ap = Applicative.ap;
 

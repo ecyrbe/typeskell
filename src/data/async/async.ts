@@ -1,4 +1,4 @@
-import * as tfunctor from '@typeclass/functor';
+import * as tFunctor from '@typeclass/functor';
 import * as tOf from '@typeclass/of';
 import * as tZero from '@typeclass/zero';
 import * as tApplicative from '@typeclass/applicative';
@@ -16,7 +16,7 @@ export const Zero: tZero.Zero<TAsync> = {
   zero: () => Promise.reject(new Error('Zero Promise')),
 };
 
-export const Functor: tfunctor.Functor<TAsync> = {
+export const Functor: tFunctor.Functor<TAsync> = {
   map: f => async fa => f(await fa),
 };
 
@@ -59,11 +59,13 @@ export const zero = Zero.zero;
 
 export const map = Functor.map;
 
-export const mapCompose = tfunctor.mapCompose(Functor, Functor);
+export const mapCompose = tFunctor.mapCompose(Functor, Functor);
 
-export const flap = tfunctor.flap(Functor);
+export const flap = tFunctor.flap(Functor);
 
-export const as = tfunctor.as(Functor);
+export const as = tFunctor.as(Functor);
+
+export const tap = tFunctor.tap(Functor);
 
 export const ap = Applicative.ap;
 

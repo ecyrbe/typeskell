@@ -273,6 +273,21 @@ export const flatMap = Monad.flatMap;
 export const flatten = tMonad.flatten(Monad);
 
 /**
+ * tap :: `(a -> void) -> a[] -> a[]`
+ *
+ * tap :: `<A>(f: (a: A) => void) => (fa: A[]) => A[]`
+ *
+ * @param f `(a -> void)`
+ * @returns `a[] -> a[]`
+ *
+ * @example
+ * ```ts
+ * pipe([1,2,3], tap(console.log)) // [1,2,3]
+ * ```
+ */
+export const tap = tfunctor.tap(Functor);
+
+/**
  * reduce :: `(b a -> b) b -> a[] -> b`
  *
  * reduce :: `<A, B>(f: (b: B, a: A) => B, b: B) => (fa: A[]) => B`

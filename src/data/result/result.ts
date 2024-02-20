@@ -1,6 +1,6 @@
 import type { Kind, InvariantParam, CovariantParam } from '@kinds';
 import type { Expect, Equal } from 'type-testing';
-import * as tfunctor from '@typeclass/functor';
+import * as tFunctor from '@typeclass/functor';
 import * as tbifunctor from '@typeclass/bifunctor';
 import * as tOf from '@typeclass/of';
 import * as tTo from '@typeclass/to';
@@ -54,7 +54,7 @@ export const BiFlatMap: tBiFlatMap.BiFlatMap<TResult> = {
   biFlatMap: (f, g) => fa => (isOk(fa) ? f(fa.ok) : g(fa.err)),
 };
 
-export const Functor: tfunctor.Functor<TResult> = {
+export const Functor: tFunctor.Functor<TResult> = {
   map: tbifunctor.mapLeft(Bifunctor),
 };
 
@@ -354,7 +354,7 @@ export const reduce = Foldable.reduce;
  * pipe(err("error"), flap(0)) // err("error")
  * ```
  */
-export const flap = tfunctor.flap(Functor);
+export const flap = tFunctor.flap(Functor);
 
 /**
  * as :: `b -> Result<a, e> -> Result<b, e>`
@@ -370,7 +370,23 @@ export const flap = tfunctor.flap(Functor);
  * pipe(err("error"), as(1)) // err("error")
  * ```
  */
-export const as = tfunctor.as(Functor);
+export const as = tFunctor.as(Functor);
+
+/**
+ * tap :: `(a -> void) -> Result<a, e> -> Result<a, e>`
+ *
+ * tap :: `<A>(f: (a: A) => void) => <E>(fa: Result<A, E>) => Result<A, E>`
+ *
+ * @param f `(a -> void)`
+ * @returns `Result<a, e> -> Result<a, e>`
+ *
+ * @example
+ * ```ts
+ * pipe(ok(0), tap(x => console.log(x))) // ok(0)
+ * pipe(err("error"), tap(x => console.log(x))) // err("error")
+ * ```
+ */
+export const tap = tFunctor.tap(Functor);
 
 /**
  * doubleMap :: `(a -> b) -> Result<Result<a, e1>, e2> -> Result<Result<b, e1>, e2>`
@@ -386,7 +402,7 @@ export const as = tfunctor.as(Functor);
  * pipe(err("error"), doubleMap(x => x + 1)) // err("error")
  * ```
  */
-export const doubleMap = tfunctor.mapCompose(Functor, Functor);
+export const doubleMap = tFunctor.mapCompose(Functor, Functor);
 
 /**
  * bimap :: `(a -> b) (e1 -> e2) -> Result<a, e1> -> Result<b, e2>`

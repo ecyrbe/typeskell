@@ -1,5 +1,5 @@
 import { Kind, $ } from '@kinds';
-import * as tfunctor from '@typeclass/functor';
+import * as tFunctor from '@typeclass/functor';
 import { type Of as tOf } from '@typeclass/of';
 import * as tTo from '@typeclass/to';
 import * as tZero from '@typeclass/zero';
@@ -36,7 +36,7 @@ export const To: tTo.To<TGenerator> = {
   },
 };
 
-export const Functor: tfunctor.Functor<TGenerator> = {
+export const Functor: tFunctor.Functor<TGenerator> = {
   map,
 };
 
@@ -91,3 +91,5 @@ export function* concatMany<T>(...faa: Generator<T>[]) {
 }
 
 export const conpact = tFilterable.compact(Filterable);
+
+export const tap = tFunctor.tap(Functor);

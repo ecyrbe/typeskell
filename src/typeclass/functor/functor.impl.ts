@@ -11,5 +11,7 @@ export const $flap: (functor: Functor<Kind.F>) => Functor.$flap<Kind.F> = functo
 
 export const $as: (functor: Functor<Kind.F>) => Functor.$as<Kind.F> = functor => b => functor.map(<A>(_: A) => b);
 
+export const $tap: (functor: Functor<Kind.F>) => Functor.$tap<Kind.F> = functor => f => functor.map(a => (f(a), a));
+
 export const $let: (functor: Functor<Kind.F>) => Functor.$let<Kind.F> = functor => (name, f) =>
   functor.map(a => ({ ...a, [name]: f(a) }) as any);

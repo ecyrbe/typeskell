@@ -1,5 +1,5 @@
 import { Kind } from '@kinds';
-import * as tfunctor from '@typeclass/functor';
+import * as tFunctor from '@typeclass/functor';
 import * as tOf from '@typeclass/of';
 import * as tTo from '@typeclass/to';
 import * as tZero from '@typeclass/zero';
@@ -32,7 +32,7 @@ export const To: tTo.To<TIO> = {
   },
 };
 
-export const Functor: tfunctor.Functor<TIO> = {
+export const Functor: tFunctor.Functor<TIO> = {
   map: f => io => () => f(run(io)),
 };
 
@@ -76,11 +76,13 @@ export const getOr = tTo.getOr(To);
 
 export const map = Functor.map;
 
-export const mapCompose = tfunctor.mapCompose(Functor, Functor);
+export const mapCompose = tFunctor.mapCompose(Functor, Functor);
 
-export const flap = tfunctor.flap(Functor);
+export const flap = tFunctor.flap(Functor);
 
-export const as = tfunctor.as(Functor);
+export const as = tFunctor.as(Functor);
+
+export const tap = tFunctor.tap(Functor);
 
 export const ap = Applicative.ap;
 

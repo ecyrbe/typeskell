@@ -15,7 +15,7 @@ export namespace Monad {
 
 export interface Monad<F extends Kind> extends Applicative<F> {
   /**
-   * flatMap :: `(a -> F b) -> F a -> F b`
+   * flatMap :: `(a -> M b) -> M a -> M b`
    */
   flatMap: Monad.$flatMap<F>;
 }
@@ -25,6 +25,9 @@ export interface Monad<F extends Kind> extends Applicative<F> {
  */
 export const flatten: <M extends Kind>(m: Monad<M>) => Monad.$flatten<M> = $flatten as any;
 
+/**
+ * bind :: `Monad M => (DoName n a) (a -> M b) -> M a -> M (Do n a b)`
+ */
 export const bind: <F extends Kind>(f: Monad<F>) => Monad.$bind<F> = $bind as any;
 
 type TestCases = [Expect<Equal<typeof flatten<Kind.F>, typeof $flatten>>];

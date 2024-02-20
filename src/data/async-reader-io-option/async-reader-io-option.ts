@@ -70,6 +70,8 @@ export const flap = tFunctor.flap(Functor);
 
 export const as = tFunctor.as(Functor);
 
+export const tap = tFunctor.tap(Functor);
+
 export const ap = Applicative.ap;
 
 export const liftA2 = tApplicative.liftA2(Applicative);

@@ -1,6 +1,6 @@
 import { Kind } from '@kinds';
 import * as O from '@data/option';
-import * as I from '@data/io';
+import * as IO from '@data/io';
 import * as tFunctor from '@typeclass/functor';
 import * as tZero from '@typeclass/zero';
 import * as tOf from '@typeclass/of';
@@ -12,15 +12,15 @@ import * as tSemiAlternative from '@typeclass/semialternative';
 import * as tFilterable from '@typeclass/filterable';
 import { pipe } from '@utils/pipe';
 
-export interface IOOption<A> extends I.IO<O.Option<A>> {}
+export interface IOOption<A> extends IO.IO<O.Option<A>> {}
 
 export interface TIOOption extends Kind.unary {
   return: IOOption<this['arg0']>;
 }
 
-export const none: <A = never>() => IOOption<A> = () => I.of(O.none());
+export const none: <A = never>() => IOOption<A> = () => () => O.none();
 
-export const some: <A>(a: A) => IOOption<A> = a => I.of(O.some(a));
+export const some: <A>(a: A) => IOOption<A> = a => () => O.some(a);
 
 export const run = <A>(io: IOOption<A>): O.Option<A> => io();
 
@@ -33,7 +33,7 @@ export const Of: tOf.Of<TIOOption> = {
 };
 
 export const Functor: tFunctor.Functor<TIOOption> = {
-  map: tFunctor.mapCompose(I.Functor, O.Functor),
+  map: tFunctor.mapCompose(IO.Functor, O.Functor),
 };
 
 export const To: tTo.To<TIOOption> = {
@@ -43,12 +43,12 @@ export const To: tTo.To<TIOOption> = {
 export const Applicative: tApplicative.Applicative<TIOOption> = {
   ...Of,
   ...Functor,
-  ap: tApplicative.apCompose(I.Applicative, O.Applicative),
+  ap: tApplicative.apCompose(IO.Applicative, O.Applicative),
 };
 
 export const Monad: tMonad.Monad<TIOOption> = {
   ...Applicative,
-  flatMap: f => io => pipe(io, I.map(O.flatMap(a => run(f(a))))),
+  flatMap: f => io => pipe(io, IO.map(O.flatMap(a => run(f(a))))),
 };
 
 export const Foldable: tFoldable.Foldable<TIOOption> = {
@@ -58,15 +58,17 @@ export const Foldable: tFoldable.Foldable<TIOOption> = {
 export const Filterable: tFilterable.Filterable<TIOOption> = {
   ...Functor,
   ...Zero,
-  filterMap: f => io => pipe(io, I.map(O.filterMap(f))),
+  filterMap: f => io => pipe(io, IO.map(O.filterMap(f))),
 };
 
 export const SemiAlternative: tSemiAlternative.SemiAlternative<TIOOption> = {
   ...Functor,
-  orElse: alt => io => () => pipe(io, I.map(O.orElse(alt())))(),
+  orElse: alt => io => () => pipe(io, IO.map(O.orElse(alt())))(),
 };
 
-export const fromIO: <A>(io: I.IO<A>) => IOOption<A> = I.map(O.some);
+export const fromIO: <A>(io: IO.IO<A>) => IOOption<A> = IO.map(O.some);
+
+export const fromOption: <A>(o: O.Option<A>) => IOOption<A> = IO.of;
 
 export const of = Of.of;
 
@@ -81,6 +83,8 @@ export const mapCompose = tFunctor.mapCompose(Functor, Functor);
 export const flap = tFunctor.flap(Functor);
 
 export const as = tFunctor.as(Functor);
+
+export const tap = tFunctor.tap(Functor);
 
 export const ap = Applicative.ap;
 

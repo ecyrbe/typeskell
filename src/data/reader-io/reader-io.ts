@@ -43,6 +43,11 @@ export const Monad: tMonad.Monad<TReaderIO> = {
     ),
 };
 
+export const fromIO: <A>(io: IO.IO<A>) => ReaderIO<A, unknown> = io => () => io;
+
+export const fromReader: <A, Env>(reader: Reader.Reader<A, Env>) => ReaderIO<A, Env> = reader => env => () =>
+  reader(env);
+
 export const of = Of.of;
 
 export const map = Functor.map;
@@ -52,6 +57,8 @@ export const mapCompose = tFunctor.mapCompose(Functor, Functor);
 export const flap = tFunctor.flap(Functor);
 
 export const as = tFunctor.as(Functor);
+
+export const tap = tFunctor.tap(Functor);
 
 export const ap = Applicative.ap;
 
