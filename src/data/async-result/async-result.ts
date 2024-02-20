@@ -10,8 +10,8 @@ import * as tBiFlatMap from '@typeclass/biflatmap';
 import * as tSemiAlternative from '@typeclass/semialternative';
 import { AsyncResult, TAsyncResult } from './async-result.types';
 
-export const ok = <A, E = unknown>(a: A): AsyncResult<A, E> => A.of(R.ok(a));
-export const err = <E, A = unknown>(e: E): AsyncResult<A, E> => A.of(R.err(e));
+export const ok = <A, E = never>(a: A): AsyncResult<A, E> => A.of(R.ok(a));
+export const err = <E, A = never>(e: E): AsyncResult<A, E> => A.of(R.err(e));
 
 export const Of: tOf.Of<TAsyncResult> = {
   of: ok,
