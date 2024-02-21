@@ -421,6 +421,18 @@ export const doubleMap = tFunctor.mapCompose(Functor, Functor);
  */
 export const bimap = Bifunctor.bimap;
 
+export const bitap = tbifunctor.bitap(Bifunctor);
+
+export const mapLeft = tbifunctor.mapLeft(Bifunctor);
+
+export const mapRight = tbifunctor.mapRight(Bifunctor);
+
+export const tapLeft = tbifunctor.tapLeft(Bifunctor);
+
+export const tapRight = tbifunctor.tapRight(Bifunctor);
+
+export const tapErr = tapRight;
+
 /**
  * mapErr :: `(e1 -> e2) -> Result<a, e1> -> Result<a, e2>`
  *
@@ -434,7 +446,7 @@ export const bimap = Bifunctor.bimap;
  * pipe(ok(0), mapErr(x => x + "!")) // ok(0)
  * pipe(err("error"), mapErr(x => x + "!")) // err("error!")
  */
-export const mapErr = tbifunctor.mapRight(Bifunctor);
+export const mapErr = mapRight;
 
 /**
  * ap :: `Result<a, e1> -> Result<(a -> b), e2> -> Result<b, e1 | e2>`
