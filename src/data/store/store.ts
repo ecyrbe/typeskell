@@ -2,6 +2,11 @@ import * as tFunctor from '@typeclass/functor';
 import * as tCoMonad from '@typeclass/comonad';
 import { Store, TStore } from './store.types';
 import { flow } from '@utils/pipe';
+import * as AF from '@data/arrayfull';
+
+export const pos: <A, S>(wa: Store<A, S>) => S = wa => wa.pos;
+
+export const peek: <S>(s: S) => <A>(wa: Store<A, S>) => A = s => wa => wa.peek(s);
 
 export const seek: <S>(s: S) => <A>(wa: Store<A, S>) => Store<A, S> = s => wa => ({ peek: wa.peek, pos: s });
 
@@ -27,6 +32,11 @@ export const CoMonad: tCoMonad.CoMonad<TStore> = {
     pos: wa.pos,
   }),
 };
+
+export const fromArrayFull = <A>(a: AF.ArrayFull<A>): Store<A, number> => ({
+  peek: s => a[s],
+  pos: 0,
+});
 
 export const map = Functor.map;
 
