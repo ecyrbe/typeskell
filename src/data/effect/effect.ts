@@ -174,6 +174,14 @@ export const mapRight = tBiFunctor.mapRight(BiFunctor);
 
 export const mapErr = mapRight;
 
+export const bitap = tBiFunctor.bitap(BiFunctor);
+
+export const tapLeft = tBiFunctor.tapLeft(BiFunctor);
+
+export const tapRight = tBiFunctor.tapRight(BiFunctor);
+
+export const tapErr = tapRight;
+
 export const ap = Applicative.ap;
 
 export const liftA2 = tApplicative.liftA2(Applicative);

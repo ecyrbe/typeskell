@@ -70,6 +70,14 @@ export const mapRight = tBiFunctor.mapRight(BiFunctor);
 
 export const mapErr = mapRight;
 
+export const bitap = tBiFunctor.bitap(BiFunctor);
+
+export const tapLeft = tBiFunctor.tapLeft(BiFunctor);
+
+export const tapRight = tBiFunctor.tapRight(BiFunctor);
+
+export const tapErr = tapRight;
+
 export const mapCompose = tFunctor.mapCompose(Functor, Functor);
 
 export const flap = tFunctor.flap(Functor);

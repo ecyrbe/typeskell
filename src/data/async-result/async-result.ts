@@ -71,6 +71,14 @@ export const mapRight = tbifunctor.mapRight(BiFunctor);
 
 export const mapErr = mapRight;
 
+export const bitap = tbifunctor.bitap(BiFunctor);
+
+export const tapLeft = tbifunctor.tapLeft(BiFunctor);
+
+export const tapRight = tbifunctor.tapRight(BiFunctor);
+
+export const tapErr = tapRight;
+
 export const flip = Flip.flip;
 
 export const ap = Applicative.ap;
