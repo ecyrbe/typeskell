@@ -2,45 +2,48 @@ import * as tOf from '@typeclass/of';
 import * as tFunctor from '@typeclass/functor';
 import * as tApplicative from '@typeclass/applicative';
 import * as tMonad from '@typeclass/monad';
-import type { AsyncReaderIO, TAsyncReaderIO } from './async-reader-io.types';
-import * as AIO from '@data/async-io';
+import type { ReaderTask, TReaderTask } from './reader-task.types';
+import * as IO from '@data/io';
+import * as T from '@data/task';
 import * as Reader from '@data/reader';
 import { pipe } from '@utils/pipe';
 
-export const ask: <Env>() => AsyncReaderIO<Env, Env> = () => env => AIO.of(env);
+export const ask: <Env>() => ReaderTask<Env, Env> = () => env => T.of(env);
 
-export const asks: <Env, A>(f: (env: Env) => A) => AsyncReaderIO<A, Env> = f => env => () => AIO.of(f(env))();
+export const asks: <Env, A>(f: (env: Env) => A) => ReaderTask<A, Env> = f => env => () => T.of(f(env))();
 
-export const local: <Env1, Env2>(f: (env: Env2) => Env1) => <A>(fa: AsyncReaderIO<A, Env1>) => AsyncReaderIO<A, Env2> =
+export const local: <Env1, Env2>(f: (env: Env2) => Env1) => <A>(fa: ReaderTask<A, Env1>) => ReaderTask<A, Env2> =
   f => fa => env =>
     fa(f(env));
 
-export const askReader: <Env1, Env2, A>(f: (env: Env1) => AsyncReaderIO<A, Env2>) => AsyncReaderIO<A, Env1 & Env2> =
+export const askReader: <Env1, Env2, A>(f: (env: Env1) => ReaderTask<A, Env2>) => ReaderTask<A, Env1 & Env2> =
   f => env =>
     f(env)(env);
 
-export const Of: tOf.Of<TAsyncReaderIO> = {
-  of: a => () => AIO.of(a),
+export const Of: tOf.Of<TReaderTask> = {
+  of: a => () => T.of(a),
 };
 
-export const Functor: tFunctor.Functor<TAsyncReaderIO> = {
-  map: tFunctor.mapCompose(Reader.Functor, AIO.Functor),
+export const Functor: tFunctor.Functor<TReaderTask> = {
+  map: tFunctor.mapCompose(Reader.Functor, T.Functor),
 };
 
-export const Applicative: tApplicative.Applicative<TAsyncReaderIO> = {
+export const Applicative: tApplicative.Applicative<TReaderTask> = {
   ...Of,
   ...Functor,
-  ap: tApplicative.apCompose(Reader.Applicative, AIO.Applicative),
+  ap: tApplicative.apCompose(Reader.Applicative, T.Applicative),
 };
 
-export const Monad: tMonad.Monad<TAsyncReaderIO> = {
+export const Monad: tMonad.Monad<TReaderTask> = {
   ...Applicative,
   flatMap: f => fa => env =>
     pipe(
       fa(env),
-      AIO.flatMap(a => f(a)(env)),
+      T.flatMap(a => f(a)(env)),
     ),
 };
+
+export const fromIO: <Env, A>(fa: IO.IO<A>) => ReaderTask<A, Env> = fa => env => T.fromIO(fa);
 
 export const of = Of.of;
 

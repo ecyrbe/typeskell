@@ -1,10 +1,10 @@
-import { Functor, Monad } from './async-io';
+import { Functor, Monad } from './task';
 import * as tFunctor from '@typeclass/functor';
 import * as tMonad from '@typeclass/monad';
 
 /**
- * Do notation for AsyncIO
- * it allows you to chain multiple AsyncIO computations together
+ * Do notation for Task
+ * it allows you to chain multiple Task computations together
  * and not worry about the None case
  *
  * @example
@@ -20,10 +20,10 @@ import * as tMonad from '@typeclass/monad';
 export const Do = Monad.of({});
 
 /**
- * bind an AsyncIO to a name
- * @param name name of the AsyncIO
- * @param f function that returns an AsyncIO
- * @returns AsyncIO with the name binded
+ * bind an Task to a name
+ * @param name name of the Task
+ * @param f function that returns an Task
+ * @returns Task with the name binded
  *
  * @example
  * ```ts

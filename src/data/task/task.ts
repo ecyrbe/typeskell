@@ -5,47 +5,47 @@ import * as tApplicative from '@typeclass/applicative';
 import * as tMonad from '@typeclass/monad';
 import * as tSemiAlternative from '@typeclass/semialternative';
 import * as tAlternative from '@typeclass/alternative';
-import { AsyncIO, TAsyncIO } from './async-io.types';
+import { Task, TTask } from './task.types';
 import * as I from '@data/io';
 import * as A from '@data/async';
 
-export const Of: tOf.Of<TAsyncIO> = {
+export const Of: tOf.Of<TTask> = {
   of: a => I.of(A.of(a)),
 };
 
-export const Zero: tZero.Zero<TAsyncIO> = {
+export const Zero: tZero.Zero<TTask> = {
   zero: () => I.of(A.zero()),
 };
 
-export const Functor: tFunctor.Functor<TAsyncIO> = {
+export const Functor: tFunctor.Functor<TTask> = {
   map: tFunctor.mapCompose(I.Functor, A.Functor),
 };
 
-export const Applicative: tApplicative.Applicative<TAsyncIO> = {
+export const Applicative: tApplicative.Applicative<TTask> = {
   ...Of,
   ...Functor,
   ap: tApplicative.apCompose(I.Applicative, A.Applicative),
 };
 
-export const Monad: tMonad.Monad<TAsyncIO> = {
+export const Monad: tMonad.Monad<TTask> = {
   ...Applicative,
   flatMap: f => I.map(A.flatMap(a => I.run(f(a)))),
 };
 
-export const SemiAlternative: tSemiAlternative.SemiAlternative<TAsyncIO> = {
+export const SemiAlternative: tSemiAlternative.SemiAlternative<TTask> = {
   ...Functor,
   orElse: fb => I.map(A.orElse(fb())),
 };
 
-export const Alternative: tAlternative.Alternative<TAsyncIO> = {
+export const Alternative: tAlternative.Alternative<TTask> = {
   ...Zero,
   ...Applicative,
   ...SemiAlternative,
 };
 
-export const fromIO: <A>(io: I.IO<A>) => AsyncIO<A> = I.map(A.of);
+export const fromIO: <A>(io: I.IO<A>) => Task<A> = I.map(A.of);
 
-export const fromAsync: <A>(async: A.Async<A>) => AsyncIO<A> = I.of;
+export const fromAsync: <A>(async: A.Async<A>) => Task<A> = I.of;
 
 export const of = Of.of;
 

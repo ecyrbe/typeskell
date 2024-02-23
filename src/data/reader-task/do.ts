@@ -1,4 +1,4 @@
-import { Functor, Monad } from './async-reader-io';
+import { Functor, Monad } from './reader-task';
 import * as tFunctor from '@typeclass/functor';
 import * as tMonad from '@typeclass/monad';
 

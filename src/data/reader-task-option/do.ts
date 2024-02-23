@@ -1,11 +1,10 @@
-import { Functor, Monad } from './async-io-result';
+import { Functor, Monad } from './reader-task-option';
 import * as tFunctor from '@typeclass/functor';
 import * as tMonad from '@typeclass/monad';
 
 /**
- * Do notation for AsyncIOResult
- * it allows you to chain multiple AsyncIOResult computations together
- * and not worry about the None case
+ * Do notation for ReaderTaskOption
+ * it allows you to chain multiple ReaderTaskOption computations together
  *
  * @example
  * ```ts
@@ -20,10 +19,10 @@ import * as tMonad from '@typeclass/monad';
 export const Do = Monad.of({});
 
 /**
- * bind an AsyncIOResult to a name
- * @param name name of the AsyncIOResult
- * @param f function that returns an AsyncIOResult
- * @returns AsyncIOResult with the name binded
+ * bind an ReaderTaskOption to a name
+ * @param name name of the ReaderTaskOption
+ * @param f function that returns a ReaderTaskOption
+ * @returns ReaderTaskOption with the name binded
  *
  * @example
  * ```ts

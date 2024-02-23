@@ -1,7 +1,7 @@
 import * as A from '@data/async';
 import * as R from '@data/result';
 import * as IO from '@data/io';
-import * as AIO from '@data/async-io';
+import * as T from '@data/task';
 import * as AO from '@data/async-option';
 import * as AR from '@data/async-result';
 import * as tFunctor from '@typeclass/functor';
@@ -12,61 +12,61 @@ import * as tSemiAlternative from '@typeclass/semialternative';
 import * as tBiFunctor from '@typeclass/bifunctor';
 import * as tFlip from '@typeclass/flip';
 import * as tBiFlatMap from '@typeclass/biflatmap';
-import { AsyncIOResult, TAsyncIOResult } from './async-io-result.types';
-import { flow, pipe } from '@utils/pipe';
+import { TaskResult, TTaskResult } from './task-result.types';
+import { pipe } from '@utils/pipe';
 
-export const ok = <A, E = never>(a: A): AsyncIOResult<A, E> => AIO.of(R.ok(a));
-export const err = <E, A = never>(e: E): AsyncIOResult<A, E> => AIO.of(R.err(e));
+export const ok = <A, E = never>(a: A): TaskResult<A, E> => T.of(R.ok(a));
+export const err = <E, A = never>(e: E): TaskResult<A, E> => T.of(R.err(e));
 
-export const Of: tOf.Of<TAsyncIOResult> = {
+export const Of: tOf.Of<TTaskResult> = {
   of: ok,
 };
 
-export const Functor: tFunctor.Functor<TAsyncIOResult> = {
-  map: tFunctor.mapCompose(AIO.Functor, R.Functor),
+export const Functor: tFunctor.Functor<TTaskResult> = {
+  map: tFunctor.mapCompose(T.Functor, R.Functor),
 };
 
-export const BiFunctor: tBiFunctor.BiFunctor<TAsyncIOResult> = {
-  bimap: (f, g) => AIO.map(R.bimap(f, g)),
+export const BiFunctor: tBiFunctor.BiFunctor<TTaskResult> = {
+  bimap: (f, g) => T.map(R.bimap(f, g)),
 };
 
-export const Flip: tFlip.Flip<TAsyncIOResult> = {
-  flip: AIO.map(R.flip),
+export const Flip: tFlip.Flip<TTaskResult> = {
+  flip: T.map(R.flip),
 };
 
-export const Applicative: tApplicative.Applicative<TAsyncIOResult> = {
+export const Applicative: tApplicative.Applicative<TTaskResult> = {
   ...Functor,
   ...Of,
-  ap: tApplicative.apCompose(AIO.Applicative, R.Applicative),
+  ap: tApplicative.apCompose(T.Applicative, R.Applicative),
 };
 
-export const Monad: tMonad.Monad<TAsyncIOResult> = {
+export const Monad: tMonad.Monad<TTaskResult> = {
   ...Applicative,
-  flatMap: f => AIO.flatMap(R.match(f, err as any)),
+  flatMap: f => T.flatMap(R.match(f, err as any)),
 };
 
-export const BiFlatMap: tBiFlatMap.BiFlatMap<TAsyncIOResult> = {
+export const BiFlatMap: tBiFlatMap.BiFlatMap<TTaskResult> = {
   ...Of,
   ...BiFunctor,
-  biFlatMap: (f, g) => AIO.flatMap(R.match(f, g)),
+  biFlatMap: (f, g) => T.flatMap(R.match(f, g)),
 };
 
-export const SemiAlternative: tSemiAlternative.SemiAlternative<TAsyncIOResult> = {
+export const SemiAlternative: tSemiAlternative.SemiAlternative<TTaskResult> = {
   ...Functor,
-  orElse: f => AIO.flatMap(R.match(ok as any, f)),
+  orElse: f => T.flatMap(R.match(ok as any, f)),
 };
 
-export const fromIO: <A, E = never>(io: IO.IO<A>) => AsyncIOResult<A, E> = IO.map(AR.ok);
+export const fromIO: <A, E = never>(io: IO.IO<A>) => TaskResult<A, E> = IO.map(AR.ok);
 
-export const fromAsync: <A, E = never>(a: A.Async<A>) => AsyncIOResult<A, E> = a => () => pipe(a, A.map(R.of));
+export const fromAsync: <A, E = never>(a: A.Async<A>) => TaskResult<A, E> = a => () => pipe(a, A.map(R.of));
 
-export const fromAsyncOption: <A, E = never>(onErr: () => E) => (ao: AO.AsyncOption<A>) => AsyncIOResult<A, E> =
+export const fromAsyncOption: <A, E = never>(onErr: () => E) => (ao: AO.AsyncOption<A>) => TaskResult<A, E> =
   onErr => ao => () =>
     pipe(ao, A.map(R.fromOption(onErr)));
 
-export const fromAsyncResult: <A, E>(a: AR.AsyncResult<A, E>) => AsyncIOResult<A, E> = a => () => a;
+export const fromAsyncResult: <A, E>(a: AR.AsyncResult<A, E>) => TaskResult<A, E> = a => () => a;
 
-export const fromAsyncIO: <A, E = never>(a: AIO.AsyncIO<A>) => AsyncIOResult<A, E> = AIO.map(R.of);
+export const fromTask: <A, E = never>(a: T.Task<A>) => TaskResult<A, E> = T.map(R.of);
 
 export const of = Of.of;
 

@@ -5,54 +5,54 @@ import * as tApplicative from '@typeclass/applicative';
 import * as tSemiAlternative from '@typeclass/semialternative';
 import * as tAlternative from '@typeclass/alternative';
 import * as tMonad from '@typeclass/monad';
-import type { AsyncReaderIOOption, TAsyncReaderIOOption } from './async-reader-io-option.types';
-import * as ARIO from '@data/async-reader-io';
+import type { ReaderTaskOption, TReaderTaskOption } from './reader-task-option.types';
+import * as RT from '@data/reader-task';
 import * as O from '@data/option';
 
-export const ask: <Env>() => AsyncReaderIOOption<Env, Env> = () => env => async () => O.some(env);
+export const ask: <Env>() => ReaderTaskOption<Env, Env> = () => env => async () => O.some(env);
 
-export const asks: <Env, A>(f: (env: Env) => A) => AsyncReaderIOOption<A, Env> = f => env => async () => O.some(f(env));
+export const asks: <Env, A>(f: (env: Env) => A) => ReaderTaskOption<A, Env> = f => env => async () => O.some(f(env));
 
 export const local: <Env1, Env2>(
   f: (env: Env2) => Env1,
-) => <A>(fa: AsyncReaderIOOption<A, Env1>) => AsyncReaderIOOption<A, Env2> = f => fa => env => fa(f(env));
+) => <A>(fa: ReaderTaskOption<A, Env1>) => ReaderTaskOption<A, Env2> = f => fa => env => fa(f(env));
 
 export const askReader: <Env1, Env2, A>(
-  f: (env: Env1) => AsyncReaderIOOption<A, Env2>,
-) => AsyncReaderIOOption<A, Env1 & Env2> = f => env => f(env)(env);
+  f: (env: Env1) => ReaderTaskOption<A, Env2>,
+) => ReaderTaskOption<A, Env1 & Env2> = f => env => f(env)(env);
 
-export const some: <A, Env = unknown>(a: A) => AsyncReaderIOOption<A, Env> = a => ARIO.of(O.some(a));
-export const none: <A = never, Env = unknown>() => AsyncReaderIOOption<A, Env> = () => ARIO.of(O.none());
+export const some: <A, Env = unknown>(a: A) => ReaderTaskOption<A, Env> = a => RT.of(O.some(a));
+export const none: <A = never, Env = unknown>() => ReaderTaskOption<A, Env> = () => RT.of(O.none());
 
-export const Of: tOf.Of<TAsyncReaderIOOption> = {
+export const Of: tOf.Of<TReaderTaskOption> = {
   of: some,
 };
 
-export const Zero: tZero.Zero<TAsyncReaderIOOption> = {
+export const Zero: tZero.Zero<TReaderTaskOption> = {
   zero: none,
 };
 
-export const Functor: tFunctor.Functor<TAsyncReaderIOOption> = {
-  map: tFunctor.mapCompose(ARIO.Functor, O.Functor),
+export const Functor: tFunctor.Functor<TReaderTaskOption> = {
+  map: tFunctor.mapCompose(RT.Functor, O.Functor),
 };
 
-export const Applicative: tApplicative.Applicative<TAsyncReaderIOOption> = {
+export const Applicative: tApplicative.Applicative<TReaderTaskOption> = {
   ...Of,
   ...Functor,
-  ap: tApplicative.apCompose(ARIO.Applicative, O.Applicative),
+  ap: tApplicative.apCompose(RT.Applicative, O.Applicative),
 };
 
-export const Monad: tMonad.Monad<TAsyncReaderIOOption> = {
+export const Monad: tMonad.Monad<TReaderTaskOption> = {
   ...Applicative,
-  flatMap: f => ARIO.flatMap(O.match(f, none)),
+  flatMap: f => RT.flatMap(O.match(f, none)),
 };
 
-export const SemiAlternative: tSemiAlternative.SemiAlternative<TAsyncReaderIOOption> = {
+export const SemiAlternative: tSemiAlternative.SemiAlternative<TReaderTaskOption> = {
   ...Functor,
-  orElse: f => ARIO.flatMap(O.match(some, f)),
+  orElse: f => RT.flatMap(O.match(some, f)),
 };
 
-export const Alternative: tAlternative.Alternative<TAsyncReaderIOOption> = {
+export const Alternative: tAlternative.Alternative<TReaderTaskOption> = {
   ...Zero,
   ...Applicative,
   ...SemiAlternative,

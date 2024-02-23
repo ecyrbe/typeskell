@@ -2,54 +2,54 @@ import * as O from '@data/option';
 import * as IO from '@data/io';
 import * as A from '@data/async';
 import * as AO from '@data/async-option';
-import * as AIO from '@data/async-io';
+import * as T from '@data/task';
 import * as tFunctor from '@typeclass/functor';
 import * as tOf from '@typeclass/of';
 import * as tZero from '@typeclass/zero';
 import * as tApplicative from '@typeclass/applicative';
 import * as tMonad from '@typeclass/monad';
 import * as tSemiAlternative from '@typeclass/semialternative';
-import { AsyncIOOption, TAsyncIOOption } from './async-io-option.types';
+import { TaskOption, TTaskOption } from './task-option.types';
 import { flow, pipe } from '@utils/pipe';
 
-export const some = <A>(a: A): AsyncIOOption<A> => AIO.of(O.some(a));
-export const none = <A = unknown>(): AsyncIOOption<A> => AIO.of(O.none());
+export const some = <A>(a: A): TaskOption<A> => T.of(O.some(a));
+export const none = <A = unknown>(): TaskOption<A> => T.of(O.none());
 
-export const Of: tOf.Of<TAsyncIOOption> = {
+export const Of: tOf.Of<TTaskOption> = {
   of: some,
 };
 
-export const Zero: tZero.Zero<TAsyncIOOption> = {
+export const Zero: tZero.Zero<TTaskOption> = {
   zero: none,
 };
 
-export const Functor: tFunctor.Functor<TAsyncIOOption> = {
-  map: tFunctor.mapCompose(AIO.Functor, O.Functor),
+export const Functor: tFunctor.Functor<TTaskOption> = {
+  map: tFunctor.mapCompose(T.Functor, O.Functor),
 };
 
-export const Applicative: tApplicative.Applicative<TAsyncIOOption> = {
+export const Applicative: tApplicative.Applicative<TTaskOption> = {
   ...Of,
   ...Functor,
-  ap: tApplicative.apCompose(AIO.Applicative, O.Applicative),
+  ap: tApplicative.apCompose(T.Applicative, O.Applicative),
 };
 
-export const Monad: tMonad.Monad<TAsyncIOOption> = {
+export const Monad: tMonad.Monad<TTaskOption> = {
   ...Applicative,
-  flatMap: f => AIO.flatMap(O.match(f, none as any)),
+  flatMap: f => T.flatMap(O.match(f, none as any)),
 };
 
-export const SemiAlternative: tSemiAlternative.SemiAlternative<TAsyncIOOption> = {
+export const SemiAlternative: tSemiAlternative.SemiAlternative<TTaskOption> = {
   ...Functor,
-  orElse: f => AIO.flatMap(O.match(some, f)),
+  orElse: f => T.flatMap(O.match(some, f)),
 };
 
-export const fromIO: <A>(io: IO.IO<A>) => AsyncIOOption<A> = IO.map(AO.of);
+export const fromIO: <A>(io: IO.IO<A>) => TaskOption<A> = IO.map(AO.of);
 
-export const fromAsync: <A>(a: A.Async<A>) => AsyncIOOption<A> = a => () => pipe(a, A.map(O.of));
+export const fromAsync: <A>(a: A.Async<A>) => TaskOption<A> = a => () => pipe(a, A.map(O.of));
 
-export const fromAsyncOption: <A>(a: AO.AsyncOption<A>) => AsyncIOOption<A> = IO.of;
+export const fromAsyncOption: <A>(a: AO.AsyncOption<A>) => TaskOption<A> = IO.of;
 
-export const fromAsyncIO: <A>(a: AIO.AsyncIO<A>) => AsyncIOOption<A> = AIO.map(O.of);
+export const fromTask: <A>(a: T.Task<A>) => TaskOption<A> = T.map(O.of);
 
 export const of = Of.of;
 
