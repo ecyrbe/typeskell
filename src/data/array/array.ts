@@ -11,7 +11,7 @@ import {
   SemiAlternative,
   To,
   Traversable,
-  Zero,
+  None,
 } from './array.typeclass';
 import * as O from '@data/option';
 import { TArray } from './array.types';
@@ -31,18 +31,18 @@ import { pipe } from '@utils/pipe';
 /**
  * produce an empty array of type a
  *
- * zero :: `() -> a[]`
+ * none :: `() -> a[]`
  *
- * zero :: `<A>() => A[]`
+ * none :: `<A>() => A[]`
  *
  * @returns `a[]`
  *
  * @example
  * ```ts
- * pipe(zero(), map(x => x + 1)) // []
+ * pipe(none(), map(x => x + 1)) // []
  * ```
  */
-export const zero = Zero.zero;
+export const none = None.none;
 
 /**
  * of :: a -> a[]
@@ -405,7 +405,7 @@ export const or = tSemiAlternative.or(SemiAlternative);
 export const concat = or;
 
 export const concatMany = <A>(...faa: A[][]) => {
-  return faa.reduce((acc, fa) => acc.concat(fa), zero());
+  return faa.reduce((acc, fa) => acc.concat(fa), none());
 };
 
 export const append = <A>(a: A) => concat(of(a));

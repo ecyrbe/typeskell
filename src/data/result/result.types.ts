@@ -11,6 +11,7 @@ export interface Ok<A, E> {
 }
 
 export type Result<A, E> = Ok<A, E> | Err<A, E>;
+
 export type OkOf<R> = R extends Result<infer A, unknown> ? A : never;
 export type ErrOf<R> = R extends Result<unknown, infer E> ? E : never;
 export type ResultOf<R> = R extends Ok<infer A, infer E>

@@ -2,7 +2,7 @@ import * as O from '@data/option';
 import * as A from '@data/async';
 import * as tFunctor from '@typeclass/functor';
 import * as tOf from '@typeclass/of';
-import * as tZero from '@typeclass/zero';
+import * as tNone from '@typeclass/none';
 import * as tApplicative from '@typeclass/applicative';
 import * as tMonad from '@typeclass/monad';
 import * as tSemiAlternative from '@typeclass/semialternative';
@@ -15,8 +15,8 @@ export const Of: tOf.Of<TAsyncOption> = {
   of: some,
 };
 
-export const Zero: tZero.Zero<TAsyncOption> = {
-  zero: none,
+export const None: tNone.None<TAsyncOption> = {
+  none,
 };
 
 export const Functor: tFunctor.Functor<TAsyncOption> = {

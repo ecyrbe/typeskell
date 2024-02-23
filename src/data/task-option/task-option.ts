@@ -5,7 +5,7 @@ import * as AO from '@data/async-option';
 import * as T from '@data/task';
 import * as tFunctor from '@typeclass/functor';
 import * as tOf from '@typeclass/of';
-import * as tZero from '@typeclass/zero';
+import * as tNone from '@typeclass/none';
 import * as tApplicative from '@typeclass/applicative';
 import * as tMonad from '@typeclass/monad';
 import * as tSemiAlternative from '@typeclass/semialternative';
@@ -19,8 +19,8 @@ export const Of: tOf.Of<TTaskOption> = {
   of: some,
 };
 
-export const Zero: tZero.Zero<TTaskOption> = {
-  zero: none,
+export const None: tNone.None<TTaskOption> = {
+  none,
 };
 
 export const Functor: tFunctor.Functor<TTaskOption> = {

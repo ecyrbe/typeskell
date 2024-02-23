@@ -1,6 +1,6 @@
 import type { Kind } from '@kinds';
 import type { Functor } from '@typeclass/functor';
-import type { Zero } from '@typeclass/zero';
+import type { None } from '@typeclass/none';
 import type { TypeSkell } from '@typeskell';
 import type { TOption } from '@data/option/option.types';
 import { $filter, $compact } from './filterable.impl';
@@ -17,15 +17,15 @@ export namespace Filterable {
 }
 
 /**
- * Filterable is a typeclass that extends Functor and Zero.
+ * Filterable is a typeclass that extends Functor and None.
  * It provides a filterMap method that allows you to filter and map at the same time.
  *
  * Laws:
  * - Composition: filterMap f . map g = filterMap (f . g)
- * - Annihilation: filterMap (const none) = zero
+ * - Annihilation: filterMap (const none) = none
  * - Identity: filterMap (const (some a)) = map (const a)
  */
-export interface Filterable<F extends Kind> extends Functor<F>, Zero<F> {
+export interface Filterable<F extends Kind> extends Functor<F>, None<F> {
   filterMap: Filterable.$filterMap<F>;
 }
 

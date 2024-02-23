@@ -1,8 +1,7 @@
-import { Kind } from '@kinds';
 import * as tFunctor from '@typeclass/functor';
 import * as tOf from '@typeclass/of';
 import * as tTo from '@typeclass/to';
-import * as tZero from '@typeclass/zero';
+import * as tNone from '@typeclass/none';
 import * as tApplicative from '@typeclass/applicative';
 import * as tMonad from '@typeclass/monad';
 import * as tSemiAlternative from '@typeclass/semialternative';
@@ -12,9 +11,9 @@ import { identity } from '@utils/functions';
 
 export const run = <A>(io: IO<A>): A => io();
 
-export const Zero: tZero.Zero<TIO> = {
-  zero: () => () => {
-    throw new Error('Zero IO');
+export const None: tNone.None<TIO> = {
+  none: () => () => {
+    throw new Error('Empty IO');
   },
 };
 
@@ -59,7 +58,7 @@ export const SemiAlternative: tSemiAlternative.SemiAlternative<TIO> = {
 };
 
 export const Alternative: tAlternative.Alternative<TIO> = {
-  ...Zero,
+  ...None,
   ...Applicative,
   ...SemiAlternative,
 };
@@ -68,7 +67,7 @@ export const fromIO: <A>(io: IO<A>) => IO<A> = identity;
 
 export const of = Of.of;
 
-export const zero = Zero.zero;
+export const none = None.none;
 
 export const getOrElse = To.getOrElse;
 

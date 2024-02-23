@@ -1,6 +1,6 @@
 import * as tFunctor from '@typeclass/functor';
 import * as tOf from '@typeclass/of';
-import * as tZero from '@typeclass/zero';
+import * as tNone from '@typeclass/none';
 import * as tApplicative from '@typeclass/applicative';
 import * as tMonad from '@typeclass/monad';
 import * as tSemiAlternative from '@typeclass/semialternative';
@@ -13,8 +13,8 @@ export const Of: tOf.Of<TTask> = {
   of: a => I.of(A.of(a)),
 };
 
-export const Zero: tZero.Zero<TTask> = {
-  zero: () => I.of(A.zero()),
+export const None: tNone.None<TTask> = {
+  none: () => I.of(A.none()),
 };
 
 export const Functor: tFunctor.Functor<TTask> = {
@@ -38,7 +38,7 @@ export const SemiAlternative: tSemiAlternative.SemiAlternative<TTask> = {
 };
 
 export const Alternative: tAlternative.Alternative<TTask> = {
-  ...Zero,
+  ...None,
   ...Applicative,
   ...SemiAlternative,
 };
@@ -49,7 +49,7 @@ export const fromAsync: <A>(async: A.Async<A>) => Task<A> = I.of;
 
 export const of = Of.of;
 
-export const zero = Zero.zero;
+export const none = None.none;
 
 export const map = Functor.map;
 

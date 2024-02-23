@@ -2,7 +2,7 @@ import { Kind, $ } from '@kinds';
 import * as tFunctor from '@typeclass/functor';
 import { type Of as tOf } from '@typeclass/of';
 import * as tTo from '@typeclass/to';
-import * as tZero from '@typeclass/zero';
+import * as tNone from '@typeclass/none';
 import * as tApplicative from '@typeclass/applicative';
 import * as tSemiAlign from '@typeclass/semialign';
 import * as tMonad from '@typeclass/monad';
@@ -17,8 +17,8 @@ export interface TGenerator extends Kind.unary {
   return: Generator<this['arg0']>;
 }
 
-export const Zero: tZero.Zero<TGenerator> = {
-  zero: function* () {
+export const None: tNone.None<TGenerator> = {
+  none: function* () {
     return;
   },
 };
@@ -63,7 +63,7 @@ export const Foldable: tFoldable.Foldable<TGenerator> = {
 };
 
 export const Filterable: tFilterable.Filterable<TGenerator> = {
-  ...Zero,
+  ...None,
   ...Functor,
   filterMap,
 };
@@ -71,6 +71,8 @@ export const Filterable: tFilterable.Filterable<TGenerator> = {
 export const SemiAlign: tSemiAlign.SemiAlign<TGenerator> = {
   zipWith,
 };
+
+export const none = None.none;
 
 export function* range(start: number, end: number = Infinity, step: number = 1) {
   for (let i = start; i <= end; i += step) {

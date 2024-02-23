@@ -1,6 +1,6 @@
 import * as tFunctor from '@typeclass/functor';
 import * as tOf from '@typeclass/of';
-import * as tZero from '@typeclass/zero';
+import * as tNone from '@typeclass/none';
 import * as tApplicative from '@typeclass/applicative';
 import * as tMonad from '@typeclass/monad';
 import * as tSemiAlternative from '@typeclass/semialternative';
@@ -12,8 +12,8 @@ export const Of: tOf.Of<TAsync> = {
   of: Promise.resolve,
 };
 
-export const Zero: tZero.Zero<TAsync> = {
-  zero: () => Promise.reject(new Error('Zero Promise')),
+export const None: tNone.None<TAsync> = {
+  none: () => Promise.reject(new Error('Empty Promise')),
 };
 
 export const Functor: tFunctor.Functor<TAsync> = {
@@ -37,7 +37,7 @@ export const SemiAlternative: tSemiAlternative.SemiAlternative<TAsync> = {
 };
 
 export const Alternative: tAlternative.Alternative<TAsync> = {
-  ...Zero,
+  ...None,
   ...Applicative,
   ...SemiAlternative,
 };
@@ -55,7 +55,7 @@ export { $catch as catch, $try as try, $throw as throw };
 
 export const of = Of.of;
 
-export const zero = Zero.zero;
+export const none = None.none;
 
 export const map = Functor.map;
 

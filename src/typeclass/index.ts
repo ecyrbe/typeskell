@@ -14,4 +14,4 @@ export * from './semialign';
 export * from './semialternative';
 export * from './to';
 export * from './traversable';
-export * from './zero';
+export * from './none';

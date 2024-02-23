@@ -1,5 +1,5 @@
 import * as tOf from '@typeclass/of';
-import * as tZero from '@typeclass/zero';
+import * as tNone from '@typeclass/none';
 import * as tFunctor from '@typeclass/functor';
 import * as tApplicative from '@typeclass/applicative';
 import * as tSemiAlternative from '@typeclass/semialternative';
@@ -28,8 +28,8 @@ export const Of: tOf.Of<TReaderTaskOption> = {
   of: some,
 };
 
-export const Zero: tZero.Zero<TReaderTaskOption> = {
-  zero: none,
+export const None: tNone.None<TReaderTaskOption> = {
+  none,
 };
 
 export const Functor: tFunctor.Functor<TReaderTaskOption> = {
@@ -53,14 +53,12 @@ export const SemiAlternative: tSemiAlternative.SemiAlternative<TReaderTaskOption
 };
 
 export const Alternative: tAlternative.Alternative<TReaderTaskOption> = {
-  ...Zero,
+  ...None,
   ...Applicative,
   ...SemiAlternative,
 };
 
 export const of = Of.of;
-
-export const zero = Zero.zero;
 
 export const map = Functor.map;
 

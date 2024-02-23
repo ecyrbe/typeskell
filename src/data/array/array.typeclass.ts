@@ -2,7 +2,7 @@ import type { Kind } from '@kinds';
 import type * as tfunctor from '@typeclass/functor';
 import type * as tOf from '@typeclass/of';
 import type * as tTo from '@typeclass/to';
-import type * as tZero from '@typeclass/zero';
+import type * as tNone from '@typeclass/none';
 import type * as tSemiAlign from '@typeclass/semialign';
 import type * as tMonad from '@typeclass/monad';
 import type * as tFoldable from '@typeclass/foldable';
@@ -15,8 +15,8 @@ import * as O from '@data/option';
 import { pipe } from '@utils/pipe';
 import type { TArray } from './array.types';
 
-export const Zero: tZero.Zero<TArray> = {
-  zero: () => [],
+export const None: tNone.None<TArray> = {
+  none: () => [],
 };
 
 export const Of: tOf.Of<TArray> = {
@@ -43,7 +43,7 @@ export const Foldable: tFoldable.Foldable<TArray> = {
 };
 
 export const Filterable: tFilterable.Filterable<TArray> = {
-  ...Zero,
+  ...None,
   ...Functor,
   filterMap: f => fa => {
     const result: O.OptionParamOf<ReturnType<typeof f>>[] = [];
@@ -106,7 +106,7 @@ export const SemiAlternative: tSemiAlternative.SemiAlternative<TArray> = {
 };
 
 export const Alternative: tAlternative.Alternative<TArray> = {
-  ...Zero,
+  ...None,
   ...Applicative,
   ...SemiAlternative,
 };

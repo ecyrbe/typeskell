@@ -2,7 +2,7 @@ import { Kind } from '@kinds';
 import * as O from '@data/option';
 import * as IO from '@data/io';
 import * as tFunctor from '@typeclass/functor';
-import * as tZero from '@typeclass/zero';
+import * as tNone from '@typeclass/none';
 import * as tOf from '@typeclass/of';
 import * as tTo from '@typeclass/to';
 import * as tApplicative from '@typeclass/applicative';
@@ -24,8 +24,8 @@ export const some: <A>(a: A) => IOOption<A> = a => () => O.some(a);
 
 export const run = <A>(io: IOOption<A>): O.Option<A> => io();
 
-export const Zero: tZero.Zero<TIOOption> = {
-  zero: none,
+export const None: tNone.None<TIOOption> = {
+  none,
 };
 
 export const Of: tOf.Of<TIOOption> = {
@@ -57,7 +57,7 @@ export const Foldable: tFoldable.Foldable<TIOOption> = {
 
 export const Filterable: tFilterable.Filterable<TIOOption> = {
   ...Functor,
-  ...Zero,
+  ...None,
   filterMap: f => io => pipe(io, IO.map(O.filterMap(f))),
 };
 
