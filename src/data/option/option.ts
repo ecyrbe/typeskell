@@ -10,7 +10,7 @@ import * as tSemiAlternative from '@typeclass/semialternative';
 import * as tAlternative from '@typeclass/alternative';
 import * as tSemiAlign from '@typeclass/semialign';
 import { pipe } from '@utils/pipe';
-import type * as O from './option.types';
+import type { Option, TOption } from './option.types';
 
 /**
  * produce none Option of type a
@@ -26,7 +26,7 @@ import type * as O from './option.types';
  * pipe(none(), map(x => x + 1)) // none
  * ```
  */
-export const none = <A = never>(): O.Option<A> => ({ _tag: 'None' });
+export const none = <A = never>(): Option<A> => ({ _tag: 'None' });
 
 /**
  * produce some Option of type a
@@ -43,7 +43,7 @@ export const none = <A = never>(): O.Option<A> => ({ _tag: 'None' });
  * pipe(some(1), map(x => x + 1)) // some(2)
  * ```
  */
-export const some = <A>(a: A): O.Option<A> => ({ _tag: 'Some', value: a });
+export const some = <A>(a: A): Option<A> => ({ _tag: 'Some', value: a });
 
 /**
  * isNone :: `Option<a> -> boolean`
@@ -59,7 +59,7 @@ export const some = <A>(a: A): O.Option<A> => ({ _tag: 'Some', value: a });
  * pipe(none, isNone) // true
  * ```
  */
-export const isNone = <A>(option: O.Option<A>): option is O.None<A> => option._tag === 'None';
+export const isNone = <A>(option: Option<A>): option is Option.None<A> => option._tag === 'None';
 
 /**
  * isSome :: `Option<a> -> boolean`
@@ -75,7 +75,7 @@ export const isNone = <A>(option: O.Option<A>): option is O.None<A> => option._t
  * pipe(none, isSome) // false
  * ```
  */
-export const isSome = <A>(option: O.Option<A>): option is O.Some<A> => option._tag === 'Some';
+export const isSome = <A>(option: Option<A>): option is Option.Some<A> => option._tag === 'Some';
 
 /**
  * fromNullable :: `a | null | undefined -> Option<a>`
@@ -92,7 +92,7 @@ export const isSome = <A>(option: O.Option<A>): option is O.Some<A> => option._t
  * pipe(undefined, fromNullable) // none
  * ```
  */
-export const fromNullable = <A>(a: A | null | undefined): O.Option<A> => (a == null ? none() : some(a));
+export const fromNullable = <A>(a: A | null | undefined): Option<A> => (a == null ? none() : some(a));
 
 /**
  * fromPredicate :: `(a -> boolean) -> a -> Option<a>`
@@ -110,7 +110,7 @@ export const fromNullable = <A>(a: A | null | undefined): O.Option<A> => (a == n
  */
 export const fromPredicate =
   <A>(predicate: (a: A) => boolean) =>
-  (a: A): O.Option<A> =>
+  (a: A): Option<A> =>
     predicate(a) ? some(a) : none();
 
 /**
@@ -127,7 +127,7 @@ export const fromPredicate =
  * pipe([], fromIterable) // none
  * ```
  */
-export const fromIterable = <A>(iterable: Iterable<A>): O.Option<A> => {
+export const fromIterable = <A>(iterable: Iterable<A>): Option<A> => {
   const iterator = iterable[Symbol.iterator]();
   const next = iterator.next();
   return next.done ? none() : some(next.value);
@@ -147,7 +147,7 @@ export const fromIterable = <A>(iterable: Iterable<A>): O.Option<A> => {
  * pipe(none, toNullable) // null
  * ```
  */
-export const toNullable = <A>(option: O.Option<A>): A | null => (isNone(option) ? null : option.value);
+export const toNullable = <A>(option: Option<A>): A | null => (isNone(option) ? null : option.value);
 
 /**
  * toUndefined :: `Option<a> -> a | undefined`
@@ -163,63 +163,63 @@ export const toNullable = <A>(option: O.Option<A>): A | null => (isNone(option) 
  * pipe(none, toUndefined) // undefined
  * ```
  */
-export const toUndefined = <A>(option: O.Option<A>): A | undefined => (isNone(option) ? undefined : option.value);
+export const toUndefined = <A>(option: Option<A>): A | undefined => (isNone(option) ? undefined : option.value);
 
-export const None: tNone.None<O.TOption> = {
+export const None: tNone.None<TOption> = {
   none,
 };
 
-export const Of: tOf.Of<O.TOption> = {
+export const Of: tOf.Of<TOption> = {
   of: some,
 };
 
-export const To: tTo.To<O.TOption> = {
+export const To: tTo.To<TOption> = {
   getOrElse: f => fa => (isSome(fa) ? fa.value : f()),
 };
 
-export const Functor: tfunctor.Functor<O.TOption> = {
+export const Functor: tfunctor.Functor<TOption> = {
   map: f => fa => (isSome(fa) ? some(f(fa.value)) : none()),
 };
 
-export const SemiAlternative: tSemiAlternative.SemiAlternative<O.TOption> = {
+export const SemiAlternative: tSemiAlternative.SemiAlternative<TOption> = {
   ...Functor,
   orElse: fb => fa => (isSome(fa) ? fa : fb()),
 };
 
-export const Foldable: tFoldable.Foldable<O.TOption> = {
+export const Foldable: tFoldable.Foldable<TOption> = {
   reduce: (f, b) => fa => (isSome(fa) ? f(b, fa.value) : b),
 };
 
-export const Filterable: tFilterable.Filterable<O.TOption> = {
+export const Filterable: tFilterable.Filterable<TOption> = {
   ...None,
   ...Functor,
   filterMap: f => fa => (isSome(fa) ? f(fa.value) : none()),
 };
 
-export const Applicative: tApplicative.Applicative<O.TOption> = {
+export const Applicative: tApplicative.Applicative<TOption> = {
   ...Of,
   ...Functor,
   ap: fa => fab => (isSome(fab) ? pipe(fa, Functor.map(fab.value)) : none()),
 };
 
-export const Alternative: tAlternative.Alternative<O.TOption> = {
+export const Alternative: tAlternative.Alternative<TOption> = {
   ...None,
   ...Applicative,
   ...SemiAlternative,
 };
 
-export const Monad: tMonad.Monad<O.TOption> = {
+export const Monad: tMonad.Monad<TOption> = {
   ...Applicative,
   flatMap: f => fa => (isSome(fa) ? f(fa.value) : none()),
 };
 
-export const SemiAlign: tSemiAlign.SemiAlign<O.TOption> = {
+export const SemiAlign: tSemiAlign.SemiAlign<TOption> = {
   zipWith: f => fa => fb => (isSome(fa) && isSome(fb) ? some(f(fa.value, fb.value)) : none()),
 };
 
 export const match =
   <A, B, C>(onSome: (a: A) => B, onNone: () => C) =>
-  (fa: O.Option<A>): B | C =>
+  (fa: Option<A>): B | C =>
     isSome(fa) ? onSome(fa.value) : onNone();
 
 /**
