@@ -272,6 +272,25 @@ export const fromPredicate =
 export const orElse = tBiFlatMap.orElse(BiFlatMap);
 
 /**
+ * less strict version of {@link orElse}
+ *
+ * orElseW :: `(e1 -> Result<a2, e2>) -> Result<a1, e1> -> Result<a1 | a2, e2>`
+ *
+ * @param f `(e1 -> Result<a2, e2>)`
+ * @returns `Result<a1, e1> -> Result<a1 | a2, e2>`
+ *
+ * @example
+ * ```ts
+ * pipe(ok(0), orElseW(() => ok(1))) // ok(0)
+ * pipe(ok(0), orElseW(() => ok("hello"))) // ok(0)
+ * pipe(err("error"), orElseW(() => ok(1))) // ok(1)
+ * pipe(err("error"), orElseW(() => err("error!"))) // err("error!")
+ * ```
+ */
+export const orElseW: <E1, E2, A2>(f: (e: E1) => Result<A2, E2>) => <A1>(fa: Result<A1, E1>) => Result<A1 | A2, E2> =
+  f => fa => (isOk(fa) ? ok(fa.ok) : f(fa.err));
+
+/**
  * Alternative version of orElse
  *
  * orElseAlt :: `(() -> Result<a, e1>) -> Result<a, e2> -> Result<a, e1>`
