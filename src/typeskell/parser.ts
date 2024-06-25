@@ -125,7 +125,7 @@ function parseTypeskell(
 }
 
 // parse a function in haskell style and generate a generic function in typescript style
-// lawer case a, b, c, d, e are generic types and F, G, H are generic type constructors
+// lower case a, b, c, d, e are generic types and F, G, H are generic type constructors
 // it should handle nested functions and nested type constructors inside parens
 // example:
 // ```ts
